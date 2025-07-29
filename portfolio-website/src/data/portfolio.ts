@@ -1,0 +1,310 @@
+import {
+  Project,
+  BlogPost,
+  GalleryImage,
+  Skill,
+  NavigationItem,
+  SocialLink,
+} from "@/types";
+
+export const navigationItems: NavigationItem[] = [
+  { label: "Home", href: "#home" },
+  { label: "About", href: "#about" },
+  { label: "Skills", href: "#skills" },
+  { label: "Projects", href: "#projects" },
+  { label: "Publications", href: "#publications" },
+  { label: "Photography", href: "#photography" },
+  { label: "Blog", href: "#blog" },
+  { label: "Contact", href: "#contact" },
+];
+
+export const socialLinks: SocialLink[] = [
+  { platform: "GitHub", url: "https://github.com", icon: "github" },
+  { platform: "LinkedIn", url: "https://linkedin.com", icon: "linkedin" },
+  { platform: "Twitter", url: "https://twitter.com", icon: "twitter" },
+  { platform: "Instagram", url: "https://instagram.com", icon: "instagram" },
+  { platform: "Dribbble", url: "https://dribbble.com", icon: "dribbble" },
+];
+
+export const projects: Project[] = [
+  {
+    id: "1",
+    title: "E-Commerce Platform",
+    description:
+      "A modern e-commerce platform built with Next.js and Stripe integration",
+    longDescription:
+      "A comprehensive e-commerce solution featuring user authentication, product management, shopping cart functionality, and secure payment processing with Stripe. Built with modern technologies for optimal performance and user experience.",
+    image:
+      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop",
+    ],
+    technologies: [
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS",
+      "Stripe",
+      "Prisma",
+      "PostgreSQL",
+    ],
+    category: "web",
+    featured: true,
+    demoUrl: "https://demo.example.com",
+    githubUrl: "https://github.com/example/ecommerce",
+    createdAt: "2024-01-15",
+    updatedAt: "2024-01-20",
+  },
+  {
+    id: "2",
+    title: "Task Management App",
+    description:
+      "A collaborative task management application with real-time updates",
+    longDescription:
+      "A powerful task management tool that enables teams to collaborate effectively with real-time updates, drag-and-drop functionality, and comprehensive project tracking capabilities.",
+    image:
+      "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop",
+    ],
+    technologies: ["React", "Node.js", "Socket.io", "MongoDB", "Express"],
+    category: "web",
+    featured: true,
+    demoUrl: "https://tasks.example.com",
+    githubUrl: "https://github.com/example/tasks",
+    createdAt: "2024-02-01",
+    updatedAt: "2024-02-10",
+  },
+  {
+    id: "3",
+    title: "Mobile Weather App",
+    description: "A beautiful weather application with animated backgrounds",
+    longDescription:
+      "An intuitive weather application featuring dynamic backgrounds that change based on weather conditions, detailed forecasts, and location-based weather updates.",
+    image:
+      "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800&h=600&fit=crop",
+    technologies: ["React Native", "TypeScript", "Weather API", "Animated"],
+    category: "mobile",
+    featured: false,
+    demoUrl: "https://weather.example.com",
+    githubUrl: "https://github.com/example/weather",
+    createdAt: "2024-03-01",
+    updatedAt: "2024-03-05",
+  },
+  {
+    id: "4",
+    title: "Brand Identity Design",
+    description: "Complete brand identity design for a tech startup",
+    longDescription:
+      "A comprehensive brand identity project including logo design, color palette, typography, and brand guidelines for a innovative tech startup.",
+    image:
+      "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=600&fit=crop",
+    technologies: ["Figma", "Adobe Illustrator", "Adobe Photoshop"],
+    category: "design",
+    featured: true,
+    createdAt: "2024-01-10",
+    updatedAt: "2024-01-25",
+  },
+];
+
+export const blogPosts: BlogPost[] = [
+  {
+    id: "1",
+    title: "The Future of Web Development: Trends to Watch in 2024",
+    excerpt:
+      "Exploring the latest trends and technologies shaping the future of web development, from AI integration to advanced animations.",
+    content: "Full blog post content would go here...",
+    image:
+      "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&h=600&fit=crop",
+    author: "Portfolio Owner",
+    category: "tech",
+    tags: ["web development", "trends", "2024", "technology"],
+    publishedAt: "2024-01-20",
+    updatedAt: "2024-01-20",
+    readingTime: 8,
+    featured: true,
+    slug: "future-of-web-development-2024",
+  },
+  {
+    id: "2",
+    title: "Creating Stunning Animations with Framer Motion",
+    excerpt:
+      "A comprehensive guide to creating beautiful and performant animations using Framer Motion in React applications.",
+    content: "Full blog post content would go here...",
+    image:
+      "https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&h=600&fit=crop",
+    author: "Portfolio Owner",
+    category: "tutorial",
+    tags: ["framer motion", "animations", "react", "tutorial"],
+    publishedAt: "2024-02-05",
+    updatedAt: "2024-02-05",
+    readingTime: 12,
+    featured: true,
+    slug: "stunning-animations-framer-motion",
+  },
+  {
+    id: "3",
+    title: "My Journey into Photography",
+    excerpt:
+      "Sharing my personal journey into photography and the lessons learned along the way.",
+    content: "Full blog post content would go here...",
+    image:
+      "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=800&h=600&fit=crop",
+    author: "Portfolio Owner",
+    category: "personal",
+    tags: ["photography", "journey", "personal", "creativity"],
+    publishedAt: "2024-02-15",
+    updatedAt: "2024-02-15",
+    readingTime: 6,
+    featured: false,
+    slug: "journey-into-photography",
+  },
+];
+
+export const galleryImages: GalleryImage[] = [
+  {
+    id: "1",
+    src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=1200&fit=crop",
+    alt: "Mountain landscape at sunset",
+    title: "Mountain Sunset",
+    description: "A breathtaking sunset over the mountain peaks",
+    category: "nature",
+    width: 800,
+    height: 1200,
+    featured: true,
+    createdAt: "2024-01-01",
+  },
+  {
+    id: "2",
+    src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop",
+    alt: "Portrait photography",
+    title: "Urban Portrait",
+    description: "Street portrait in natural lighting",
+    category: "portrait",
+    width: 800,
+    height: 800,
+    featured: true,
+    createdAt: "2024-01-05",
+  },
+  {
+    id: "3",
+    src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop",
+    alt: "City street at night",
+    title: "Night Streets",
+    description: "Urban nightlife captured in motion",
+    category: "street",
+    width: 800,
+    height: 600,
+    featured: false,
+    createdAt: "2024-01-10",
+  },
+  {
+    id: "4",
+    src: "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800&h=1000&fit=crop",
+    alt: "Modern architecture",
+    title: "Geometric Lines",
+    description: "Modern architectural details",
+    category: "architecture",
+    width: 800,
+    height: 1000,
+    featured: true,
+    createdAt: "2024-01-15",
+  },
+  {
+    id: "5",
+    src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop",
+    alt: "Forest path",
+    title: "Forest Trail",
+    description: "A peaceful walk through the forest",
+    category: "nature",
+    width: 800,
+    height: 600,
+    featured: false,
+    createdAt: "2024-01-20",
+  },
+  {
+    id: "6",
+    src: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&h=1200&fit=crop",
+    alt: "Portrait in golden hour",
+    title: "Golden Hour",
+    description: "Portrait captured during golden hour",
+    category: "portrait",
+    width: 800,
+    height: 1200,
+    featured: true,
+    createdAt: "2024-01-25",
+  },
+];
+
+export const skills: Skill[] = [
+  { id: "1", name: "React", level: 95, category: "frontend", color: "#61DAFB" },
+  {
+    id: "2",
+    name: "Next.js",
+    level: 90,
+    category: "frontend",
+    color: "#000000",
+  },
+  {
+    id: "3",
+    name: "TypeScript",
+    level: 88,
+    category: "frontend",
+    color: "#3178C6",
+  },
+  {
+    id: "4",
+    name: "Tailwind CSS",
+    level: 92,
+    category: "frontend",
+    color: "#06B6D4",
+  },
+  {
+    id: "5",
+    name: "Framer Motion",
+    level: 85,
+    category: "frontend",
+    color: "#0055FF",
+  },
+  {
+    id: "6",
+    name: "Node.js",
+    level: 82,
+    category: "backend",
+    color: "#339933",
+  },
+  {
+    id: "7",
+    name: "Express",
+    level: 80,
+    category: "backend",
+    color: "#000000",
+  },
+  {
+    id: "8",
+    name: "PostgreSQL",
+    level: 75,
+    category: "backend",
+    color: "#336791",
+  },
+  {
+    id: "9",
+    name: "MongoDB",
+    level: 78,
+    category: "backend",
+    color: "#47A248",
+  },
+  { id: "10", name: "Figma", level: 88, category: "design", color: "#F24E1E" },
+  {
+    id: "11",
+    name: "Adobe Photoshop",
+    level: 85,
+    category: "design",
+    color: "#31A8FF",
+  },
+  { id: "12", name: "Git", level: 90, category: "tools", color: "#F05032" },
+  { id: "13", name: "Docker", level: 70, category: "tools", color: "#2496ED" },
+  { id: "14", name: "AWS", level: 65, category: "tools", color: "#FF9900" },
+];
