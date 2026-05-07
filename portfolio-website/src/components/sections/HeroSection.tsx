@@ -44,7 +44,7 @@ export const HeroSection = () => {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       {/* Dawn glow overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-dawn-100/30 via-transparent to-transparent pointer-events-none z-[1]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-dawn-200/20 via-transparent to-transparent pointer-events-none z-[1]" />
 
       {/* Central content */}
       <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
@@ -54,10 +54,10 @@ export const HeroSection = () => {
           variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
-          className="inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-sm"
+          className="inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full bg-forest-950/5 backdrop-blur-md border border-forest-950/15 text-sm"
         >
-          <MapPin className="h-4 w-4 text-dawn-400" />
-          <span className="text-white/80">{personalProfile.location}</span>
+          <MapPin className="h-4 w-4 text-forest-800" />
+          <span className="text-forest-900 font-medium">{personalProfile.location}</span>
         </motion.div>
 
         {/* Name — cinematic letter-by-letter reveal */}
@@ -70,9 +70,9 @@ export const HeroSection = () => {
                 variants={letterVariants}
                 initial="hidden"
                 animate="visible"
-                className="inline-block text-white drop-shadow-[0_2px_30px_rgba(240,180,41,0.3)]"
+                className="inline-block text-forest-950 drop-shadow-[0_2px_15px_rgba(13,32,13,0.1)]"
                 style={{
-                  textShadow: "0 0 60px rgba(240, 180, 41, 0.2)",
+                  textShadow: "0 0 40px rgba(13, 32, 13, 0.05)",
                 }}
               >
                 {letter === " " ? "\u00A0" : letter}
@@ -87,9 +87,9 @@ export const HeroSection = () => {
           variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
-          className="text-xl sm:text-2xl md:text-3xl font-medium text-dawn-200/90 mb-6"
+          className="text-xl sm:text-2xl md:text-3xl font-medium text-forest-900 mb-6"
           style={{
-            textShadow: "0 2px 20px rgba(0,0,0,0.2)",
+            textShadow: "0 1px 10px rgba(255,255,255,0.4)",
           }}
         >
           {personalProfile.headline}
@@ -101,7 +101,7 @@ export const HeroSection = () => {
           variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
-          className="text-base sm:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed mb-10"
+          className="text-base sm:text-lg text-forest-900/80 max-w-2xl mx-auto leading-relaxed mb-10"
         >
           {personalProfile.intro}
         </motion.p>
@@ -116,7 +116,7 @@ export const HeroSection = () => {
         >
           <motion.a
             href="#projects"
-            className="px-8 py-4 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-full hover:bg-white/25 transition-all duration-300"
+            className="px-8 py-4 bg-forest-950/5 backdrop-blur-md border border-forest-950/20 text-forest-950 font-semibold rounded-full hover:bg-forest-950/10 transition-all duration-300"
             whileHover={{ scale: 1.03, y: -2 }}
             whileTap={{ scale: 0.97 }}
           >
@@ -124,7 +124,7 @@ export const HeroSection = () => {
           </motion.a>
           <motion.a
             href="#contact"
-            className="px-8 py-4 bg-dawn-500/80 backdrop-blur-md text-white font-medium rounded-full hover:bg-dawn-400/90 transition-all duration-300 shadow-lg shadow-dawn-500/20"
+            className="px-8 py-4 bg-forest-800 text-white font-semibold rounded-full hover:bg-forest-700 transition-all duration-300 shadow-lg shadow-forest-900/10"
             whileHover={{ scale: 1.03, y: -2 }}
             whileTap={{ scale: 0.97 }}
           >
@@ -144,7 +144,7 @@ export const HeroSection = () => {
             (label) => (
               <span
                 key={label}
-                className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 text-sm text-white/60"
+                className="px-4 py-2 rounded-full bg-forest-950/5 backdrop-blur-sm border border-forest-950/10 text-sm text-forest-900/70"
               >
                 {label}
               </span>
@@ -162,19 +162,19 @@ export const HeroSection = () => {
       >
         <motion.a
           href="#about"
-          className="flex flex-col items-center gap-2 text-white/50 hover:text-white/80 transition-colors"
+          className="flex flex-col items-center gap-2 text-forest-800/60 hover:text-forest-900 transition-colors"
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
         >
-          <span className="text-xs tracking-[0.2em] uppercase">
+          <span className="text-xs tracking-[0.2em] uppercase font-semibold">
             Begin the journey
           </span>
-          <ArrowDown className="w-4 h-4" />
+          <ArrowDown className="w-4 h-4 text-forest-800" />
         </motion.a>
       </motion.div>
 
       {/* Bottom gradient fade into next section */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-forest-950/80 z-[1] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-forest-950/60 z-[1] pointer-events-none" />
     </section>
   );
 };
