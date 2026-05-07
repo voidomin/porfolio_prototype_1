@@ -86,6 +86,8 @@ export const MountainAscentHUD = () => {
           {hudItems.map((item, index) => {
             const isActive = activeSection === item.id;
             const isHovered = hoveredItem === item.id;
+            // The green glow should follow the hovered item, or fall back to the active section
+            const isHighlighted = (hoveredItem ? hoveredItem : activeSection) === item.id;
 
             return (
               <div
@@ -121,8 +123,8 @@ export const MountainAscentHUD = () => {
                   className="relative flex items-center justify-center w-5 h-5"
                   whileHover={{ scale: 1.2 }}
                 >
-                  {/* Glowing halo pulse on active or hovered checkpoint - Snappy transition and fast breathing */}
-                  {(isActive || isHovered) && (
+                  {/* Glowing halo pulse solely on the single highlighted checkpoint */}
+                  {isHighlighted && (
                     <motion.div
                       layoutId="activeHalo"
                       className="absolute inset-0 rounded-full bg-forest-400/25"
