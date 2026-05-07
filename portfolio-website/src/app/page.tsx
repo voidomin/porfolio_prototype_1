@@ -8,6 +8,7 @@ import { ContactSection } from "@/components/sections/ContactSection";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingActionButton } from "@/components/ui/FloatingActionButton";
+import { MountainAscentHUD } from "@/components/ui/MountainAscentHUD";
 import { NatureScene } from "@/components/animations/NatureScene";
 import { BirdFlock } from "@/components/animations/BirdFlock";
 import { FloatingLeaves } from "@/components/animations/FloatingLeaves";
@@ -76,6 +77,9 @@ export default function Home() {
 
       {/* Night Falls */}
       <Footer />
+
+      {/* Mountain Ascent Climbing Map tracker */}
+      <MountainAscentHUD />
 
       {/* Compass FAB */}
       <FloatingActionButton />
