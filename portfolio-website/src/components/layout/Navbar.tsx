@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { navigationItems, personalProfile } from "@/data/portfolio";
@@ -19,6 +19,34 @@ export const Navbar = () => {
 
   const shouldHideNav = scrollDirection === "down" && scrollY > 100;
   const hasScrolled = scrollY > 50;
+
+  // Pre-calculate styling strings to completely resolve cognitive complexity & nested ternaries
+  let desktopButtonClass = "";
+  let mobileButtonClass = "";
+  let desktopBarColorOn = "bg-forest-950";
+  let desktopBarColorOff = "bg-forest-950/30";
+  let mobileBarColorOn = "bg-forest-950";
+  let mobileBarColorOff = "bg-forest-950/30";
+
+  if (hasScrolled) {
+    desktopButtonClass = soundEnabled
+      ? "bg-forest-500/10 text-forest-400 border-forest-500/20"
+      : "text-white/50 border-white/10 hover:text-white";
+    mobileButtonClass = soundEnabled
+      ? "bg-forest-500/10 text-forest-400 border-forest-500/20"
+      : "text-white/50 border-white/10";
+    desktopBarColorOn = "bg-forest-400";
+    desktopBarColorOff = "bg-white/30";
+    mobileBarColorOn = "bg-forest-400";
+    mobileBarColorOff = "bg-white/30";
+  } else {
+    desktopButtonClass = soundEnabled
+      ? "bg-forest-950/15 text-forest-950 border-forest-950/20 animate-pulse"
+      : "text-forest-950/50 border-forest-950/10 hover:text-forest-950";
+    mobileButtonClass = soundEnabled
+      ? "bg-forest-950/15 text-forest-950 border-forest-950/20 animate-pulse"
+      : "text-forest-950/50 border-forest-950/10";
+  }
 
   const handleLinkClick = (href: string) => {
     setIsOpen(false);
@@ -104,13 +132,7 @@ export const Navbar = () => {
               onClick={handleSoundToggle}
               className={cn(
                 "relative flex items-center justify-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-bold tracking-wider transition-all duration-300 select-none",
-                hasScrolled
-                  ? soundEnabled
-                    ? "bg-forest-500/10 text-forest-400 border-forest-500/20"
-                    : "text-white/50 border-white/10 hover:text-white"
-                  : soundEnabled
-                    ? "bg-forest-950/15 text-forest-950 border-forest-950/20 animate-pulse"
-                    : "text-forest-950/50 border-forest-950/10 hover:text-forest-950"
+                desktopButtonClass
               )}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -118,11 +140,11 @@ export const Navbar = () => {
             >
               {/* Dynamic Equalizer Bars */}
               <div className="flex items-end gap-[2.5px] h-3.5 w-4 overflow-hidden">
-                {[0.7, 1.1, 0.6, 0.9].map((dur, idx) => (
+                {[0.7, 1.1, 0.6, 0.9].map((dur) => (
                   <motion.div
-                    key={idx}
+                    key={`desk-eq-${dur}`}
                     animate={{
-                      scaleY: soundEnabled ? [0.25, 1.0, 0.25] : 0.25,
+                      scaleY: soundEnabled ? [0.25, 1, 0.25] : 0.25,
                     }}
                     transition={{
                       duration: dur,
@@ -131,9 +153,7 @@ export const Navbar = () => {
                     }}
                     className={cn(
                       "w-[2px] h-full origin-bottom rounded-full transition-colors duration-300",
-                      hasScrolled
-                        ? soundEnabled ? "bg-forest-400" : "bg-white/30"
-                        : soundEnabled ? "bg-forest-950" : "bg-forest-950/30"
+                      soundEnabled ? desktopBarColorOn : desktopBarColorOff
                     )}
                   />
                 ))}
@@ -151,23 +171,17 @@ export const Navbar = () => {
               onClick={handleSoundToggle}
               className={cn(
                 "relative flex items-center justify-center gap-1.5 p-2 rounded-full border text-[9px] font-bold tracking-wider transition-all duration-300",
-                hasScrolled
-                  ? soundEnabled
-                    ? "bg-forest-500/10 text-forest-400 border-forest-500/20"
-                    : "text-white/50 border-white/10"
-                  : soundEnabled
-                    ? "bg-forest-950/15 text-forest-950 border-forest-950/20 animate-pulse"
-                    : "text-forest-950/50 border-forest-950/10"
+                mobileButtonClass
               )}
               whileTap={{ scale: 0.95 }}
               title={soundEnabled ? "Mute Soundscape" : "Unmute Soundscape"}
             >
               <div className="flex items-end gap-[2px] h-3 w-3 overflow-hidden">
-                {[0.8, 1.1, 0.7, 1.0].map((dur, idx) => (
+                {[0.8, 1.1, 0.7, 1].map((dur) => (
                   <motion.div
-                    key={idx}
+                    key={`mob-eq-${dur}`}
                     animate={{
-                      scaleY: soundEnabled ? [0.25, 1.0, 0.25] : 0.25,
+                      scaleY: soundEnabled ? [0.25, 1, 0.25] : 0.25,
                     }}
                     transition={{
                       duration: dur,
@@ -176,9 +190,7 @@ export const Navbar = () => {
                     }}
                     className={cn(
                       "w-[1.5px] h-full origin-bottom rounded-full transition-colors duration-300",
-                      hasScrolled
-                        ? soundEnabled ? "bg-forest-400" : "bg-white/30"
-                        : soundEnabled ? "bg-forest-950" : "bg-forest-950/30"
+                      soundEnabled ? mobileBarColorOn : mobileBarColorOff
                     )}
                   />
                 ))}

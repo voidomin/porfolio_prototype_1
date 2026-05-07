@@ -34,7 +34,7 @@ export const InteractiveTrail = () => {
 
   // Update current scroll progress state for particle spawning
   useEffect(() => {
-    return scrollYProgress.onChange((v) => setScrollProgress(v));
+    return scrollYProgress.on("change", (v) => setScrollProgress(v));
   }, [scrollYProgress]);
 
   useEffect(() => {
@@ -46,16 +46,16 @@ export const InteractiveTrail = () => {
 
     // Setup high-DPI canvas resolution
     const resizeCanvas = () => {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
+      const dpr = globalThis.devicePixelRatio || 1;
+      canvas.width = globalThis.innerWidth * dpr;
+      canvas.height = globalThis.innerHeight * dpr;
+      canvas.style.width = `${globalThis.innerWidth}px`;
+      canvas.style.height = `${globalThis.innerHeight}px`;
       ctx.scale(dpr, dpr);
     };
 
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+    globalThis.addEventListener("resize", resizeCanvas);
 
     // Track mouse movement
     const handleMouseMove = (e: MouseEvent) => {
@@ -68,7 +68,7 @@ export const InteractiveTrail = () => {
       // Calculate travel distance to prevent spawning if mouse isn't moving
       const dx = mousePos.current.x - mousePos.current.lastX;
       const dy = mousePos.current.y - mousePos.current.lastY;
-      const speed = Math.sqrt(dx * dx + dy * dy);
+      const speed = Math.hypot(dx, dy);
 
       // Spawn exactly ONE micro-particle only on significant move, max active particles capped at 20
       if (speed > 4 && particles.current.length < 25) {
@@ -83,29 +83,31 @@ export const InteractiveTrail = () => {
           color = "rgba(255, 95, 30, 0.95)"; // Fast, hot campfire orange
         }
 
+        // Deconstruct physics attributes cleanly to resolve cognitive complexity & nested ternary warnings
+        let vx = (Math.random() - 0.5) * 0.8;
+        let vy = Math.random() * 0.5 + 0.2; // Leaf default
+        let size = Math.random() * 4 + 4; // Leaf default
+        let decay = 0.012; // Leaf default
+
+        if (type === "ember") {
+          vx = (Math.random() - 0.5) * 1.5;
+          vy = -Math.random() * 2 - 1;
+          size = Math.random() * 2 + 1.5;
+          decay = 0.025;
+        } else if (type === "pollen") {
+          vy = (Math.random() - 0.5) * 0.5;
+          size = Math.random() * 3.5 + 2.5;
+          decay = 0.015;
+        }
+
         particles.current.push({
           x: mousePos.current.x,
           y: mousePos.current.y,
-          // Physical velocities tailored to each particle behavior
-          vx: type === "ember"
-            ? (Math.random() - 0.5) * 1.5 // Horizontal heat drift
-            : (Math.random() - 0.5) * 0.8,
-          vy: type === "ember"
-            ? -Math.random() * 2.0 - 1.0 // Embers shoot upwards rapidly
-            : type === "pollen"
-              ? (Math.random() - 0.5) * 0.5 // Pollen floats in place (3D suspension)
-              : Math.random() * 0.5 + 0.2, // Leaves fall slowly
-          size: type === "leaf"
-            ? Math.random() * 4 + 4 // Leaf scale
-            : type === "pollen"
-              ? Math.random() * 3.5 + 2.5 // Star star-glint span
-              : Math.random() * 2 + 1.5, // Ember spark width
-          alpha: 1.0,
-          decay: type === "leaf" 
-            ? 0.012 
-            : type === "pollen" 
-              ? 0.015 
-              : 0.025, // Embers burn out quickly
+          vx,
+          vy,
+          size,
+          alpha: 1,
+          decay,
           rotation: Math.random() * Math.PI * 2,
           rotationSpeed: (Math.random() - 0.5) * 0.05,
           color,
@@ -217,8 +219,8 @@ export const InteractiveTrail = () => {
     drawParticles();
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas);
-      window.removeEventListener("mousemove", handleMouseMove);
+      globalThis.removeEventListener("resize", resizeCanvas);
+      globalThis.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animationId);
     };
