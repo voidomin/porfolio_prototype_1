@@ -53,7 +53,12 @@ export const Navbar = () => {
             className="relative cursor-pointer"
             whileHover={{ scale: 1.03 }}
           >
-            <span className="text-xl font-semibold tracking-wide text-white/90">
+            <span
+              className={cn(
+                "text-xl font-semibold tracking-wide transition-colors duration-300",
+                hasScrolled ? "text-white/90" : "text-forest-950"
+              )}
+            >
               {personalProfile.name}
             </span>
           </motion.a>
@@ -73,7 +78,9 @@ export const Navbar = () => {
                 }}
                 className={cn(
                   "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
-                  "text-white/60 hover:text-white hover:bg-white/10"
+                  hasScrolled
+                    ? "text-white/70 hover:text-white hover:bg-white/10"
+                    : "text-forest-950/80 hover:text-forest-950 hover:bg-forest-950/10"
                 )}
               >
                 {item.label}
@@ -84,7 +91,12 @@ export const Navbar = () => {
           {/* Mobile menu button */}
           <motion.button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-full hover:bg-white/10 text-white/80"
+            className={cn(
+              "md:hidden p-2 rounded-full transition-all duration-300",
+              hasScrolled
+                ? "hover:bg-white/10 text-white/80"
+                : "hover:bg-forest-950/10 text-forest-950"
+            )}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >
