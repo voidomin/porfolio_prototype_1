@@ -1,164 +1,117 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Download, MapPin, Calendar, Award, Users, Code } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Briefcase, Compass, Tent, Flame, TreePine } from "lucide-react";
+import {
+  aboutStats,
+  experienceTimeline,
+  personalProfile,
+} from "@/data/portfolio";
 
-const stats = [
-  { icon: Code, label: "Projects Completed", value: "50+" },
-  { icon: Users, label: "Happy Clients", value: "25+" },
-  { icon: Award, label: "Years Experience", value: "5+" },
-  { icon: Calendar, label: "Lines of Code", value: "100K+" },
-];
+/* ──────────────────────────────────────────────────────────
+   AboutSection – "Chapter 2: The Forest Path"
+   Misty forest green tones, a winding trail for the
+   experience timeline, and organic framing.
+   ────────────────────────────────────────────────────────── */
 
-const timeline = [
-  {
-    year: "2024",
-    title: "Senior Full Stack Developer",
-    company: "Tech Innovation Inc.",
-    description:
-      "Leading development of scalable web applications using modern technologies.",
-  },
-  {
-    year: "2022",
-    title: "Full Stack Developer",
-    company: "Digital Solutions Ltd.",
-    description:
-      "Developed and maintained multiple client projects with React and Node.js.",
-  },
-  {
-    year: "2020",
-    title: "Frontend Developer",
-    company: "Creative Agency",
-    description:
-      "Specialized in creating beautiful, responsive user interfaces and experiences.",
-  },
-  {
-    year: "2019",
-    title: "Junior Developer",
-    company: "StartUp Ventures",
-    description:
-      "Started my professional journey building web applications and learning best practices.",
-  },
-];
-
-const ResumeDownloadButton = () => {
-  const handleDownload = () => {
-    // In a real application, this would trigger the actual resume download
-    const link = document.createElement("a");
-    link.href = "/resume.pdf"; // You would replace this with your actual resume file
-    link.download = "John_Doe_Resume.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  return (
-    <motion.button
-      onClick={handleDownload}
-      className={cn(
-        "group relative px-8 py-4 bg-gradient-to-r from-primary-500 to-accent-500",
-        "text-white font-semibold rounded-full overflow-hidden",
-        "hover:shadow-2xl hover:shadow-primary-500/25",
-        "transition-all duration-300 transform hover:scale-105"
-      )}
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.95 }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-r from-accent-500 to-primary-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="relative flex items-center space-x-2">
-        <Download className="w-5 h-5 group-hover:animate-bounce" />
-        <span>Download Resume</span>
-      </div>
-      <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-    </motion.button>
-  );
-};
+const trailIcons = [Tent, Compass, Flame];
 
 export const AboutSection = () => {
   return (
-    <section id="about" className="py-20 bg-white dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-6">
+    <section
+      id="about"
+      className="relative py-24 md:py-32 overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(180deg, #0d200d 0%, #1d3d1d 15%, #265b26 50%, #1d3d1d 85%, #224922 100%)",
+      }}
+    >
+      {/* Forest mist overlay */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-forest-950/60 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_50%,rgba(219,240,219,0.08),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_30%,rgba(219,240,219,0.06),transparent_50%)]" />
+      </div>
+
+      {/* Decorative trees */}
+      <div className="absolute left-4 top-20 opacity-10 pointer-events-none">
+        <TreePine className="w-20 h-20 text-forest-300" />
+      </div>
+      <div className="absolute right-8 top-40 opacity-8 pointer-events-none">
+        <TreePine className="w-16 h-16 text-forest-300" />
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
+        {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.7 }}
+          className="text-center mb-20"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            About <span className="text-primary-500">Me</span>
+          <p className="text-forest-300/60 text-sm tracking-[0.3em] uppercase mb-4">
+            Chapter Two
+          </p>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            The Forest{" "}
+            <span className="text-forest-300">Path</span>
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Passionate developer and designer with a love for creating
-            exceptional digital experiences
+          <p className="text-forest-200/60 max-w-xl mx-auto">
+            A quiet story of roots, engineering, and product craft.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
-          {/* Profile Image and Info */}
+        {/* Profile + Bio */}
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16 items-start mb-24">
+          {/* Profile card */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6"
+            transition={{ duration: 0.7 }}
+            className="flex flex-col items-center lg:items-start"
           >
-            <div className="relative">
-              <div className="w-64 h-64 mx-auto lg:mx-0 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 p-1">
-                <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                  <span className="text-4xl font-bold text-gray-600 dark:text-gray-300">
-                    JD
+            {/* Monogram with organic frame */}
+            <div className="relative mb-6">
+              <div className="w-40 h-40 rounded-full bg-gradient-to-br from-forest-400/30 to-forest-700/40 p-1 shadow-2xl shadow-forest-900/50">
+                <div className="w-full h-full rounded-full bg-forest-900/80 backdrop-blur-sm flex items-center justify-center border border-forest-500/20">
+                  <span className="text-5xl font-bold text-forest-200 tracking-tight">
+                    A
                   </span>
                 </div>
               </div>
-              <div className="absolute -bottom-4 -right-4 bg-primary-500 text-white p-3 rounded-full">
-                <Code className="w-6 h-6" />
+              {/* Organic leaf accent */}
+              <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-forest-500/80 flex items-center justify-center shadow-lg">
+                <TreePine className="w-5 h-5 text-white" />
               </div>
             </div>
 
-            <div className="text-center lg:text-left space-y-4">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                John Doe
-              </h3>
-              <p className="text-lg text-primary-500 font-medium">
-                Senior Full Stack Developer & UI/UX Designer
-              </p>
-              <div className="flex items-center justify-center lg:justify-start space-x-2 text-gray-600 dark:text-gray-400">
-                <MapPin className="w-4 h-4" />
-                <span>San Francisco, CA</span>
-              </div>
-            </div>
-
-            <ResumeDownloadButton />
+            <h3 className="text-2xl font-bold text-white mb-1">
+              {personalProfile.name}
+            </h3>
+            <p className="text-forest-300 font-medium text-sm mb-2">
+              {personalProfile.headline}
+            </p>
+            <p className="text-forest-200/50 text-sm">
+              {personalProfile.location}
+            </p>
           </motion.div>
 
-          {/* About Content */}
+          {/* Bio content */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
             className="space-y-6"
           >
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                I&apos;m a passionate full-stack developer with over 5 years of
-                experience creating digital solutions that make a difference. My
-                journey began with a curiosity about how things work on the web,
-                and it has evolved into a deep love for crafting beautiful,
-                functional, and user-centered applications.
+            <div className="glass-nature rounded-2xl p-8">
+              <p className="text-forest-100/80 leading-relaxed text-lg mb-4">
+                {personalProfile.about}
               </p>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                I specialize in modern web technologies including React,
-                Next.js, Node.js, and TypeScript. When I&apos;m not coding,
-                you&apos;ll find me exploring new design trends, contributing to
-                open-source projects, or capturing moments through photography.
-              </p>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                I believe in the power of collaboration and continuous learning.
-                Every project is an opportunity to push boundaries and create
-                something extraordinary.
+              <p className="text-forest-100/60 leading-relaxed">
+                {personalProfile.aboutExtended}
               </p>
             </div>
           </motion.div>
@@ -166,88 +119,90 @@ export const AboutSection = () => {
 
         {/* Stats */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-24"
         >
-          {stats.map((stat, index) => (
+          {aboutStats.map((stat, index) => (
             <motion.div
               key={stat.label}
-              initial={{ opacity: 0, scale: 0.5 }}
+              initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-xl hover:shadow-lg transition-shadow"
+              className="text-center p-6 glass-nature rounded-2xl"
             >
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-500/10 rounded-full mb-4">
-                <stat.icon className="w-6 h-6 text-primary-500" />
-              </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <div className="text-2xl md:text-3xl font-bold text-forest-300 mb-2">
                 {stat.value}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {stat.label}
-              </div>
+              <div className="text-sm text-forest-200/50">{stat.label}</div>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Timeline */}
+        {/* Experience Timeline — Forest Trail */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.6 }}
         >
-          <h3 className="text-2xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+          <h3 className="text-2xl font-bold text-center mb-16 text-white">
             Professional Journey
           </h3>
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 top-0 bottom-0 w-0.5 bg-primary-500/30" />
 
-            <div className="space-y-8">
-              {timeline.map((item, index) => (
-                <motion.div
-                  key={item.year}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className={cn(
-                    "relative flex items-center",
-                    index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                  )}
-                >
-                  {/* Timeline dot */}
-                  <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-3 h-3 bg-primary-500 rounded-full border-4 border-white dark:border-gray-900" />
+          <div className="relative max-w-3xl mx-auto">
+            {/* Trail line */}
+            <div className="absolute left-6 md:left-1/2 md:-translate-x-[1px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-forest-500/40 via-forest-400/30 to-forest-500/40" />
 
-                  {/* Content */}
-                  <div
-                    className={cn(
-                      "ml-12 md:ml-0 md:w-1/2",
-                      index % 2 === 0 ? "md:pr-8" : "md:pl-8"
-                    )}
+            <div className="space-y-12">
+              {experienceTimeline.map((item, index) => {
+                const Icon = trailIcons[index % trailIcons.length];
+                return (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: index * 0.15 }}
+                    className={`relative flex items-start ${
+                      index % 2 === 0
+                        ? "md:flex-row"
+                        : "md:flex-row-reverse"
+                    }`}
                   >
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-                      <div className="text-primary-500 font-bold text-sm mb-1">
-                        {item.year}
-                      </div>
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                        {item.title}
-                      </h4>
-                      <div className="text-primary-600 dark:text-primary-400 font-medium mb-3">
-                        {item.company}
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm">
-                        {item.description}
-                      </p>
+                    {/* Trail node */}
+                    <div className="absolute left-6 md:left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-forest-700/80 border-2 border-forest-400/40 flex items-center justify-center z-10 shadow-lg shadow-forest-900/30">
+                      <Icon className="w-4 h-4 text-forest-300" />
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+
+                    {/* Card */}
+                    <div
+                      className={`ml-20 md:ml-0 md:w-[calc(50%-2rem)] ${
+                        index % 2 === 0 ? "md:pr-8" : "md:pl-8"
+                      }`}
+                    >
+                      <div className="glass-nature rounded-2xl p-6">
+                        <div className="flex items-center gap-2 text-forest-300 font-medium text-sm mb-2">
+                          <Briefcase className="h-3.5 w-3.5" />
+                          {item.period}
+                        </div>
+                        <h4 className="text-lg font-semibold text-white mb-1">
+                          {item.title}
+                        </h4>
+                        <div className="text-forest-400 font-medium text-sm mb-3">
+                          {item.organization}
+                        </div>
+                        <p className="text-forest-200/60 text-sm leading-relaxed">
+                          {item.summary}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </motion.div>

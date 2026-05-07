@@ -71,6 +71,36 @@ export interface SocialLink {
   icon: string;
 }
 
+export interface PersonalProfile {
+  name: string;
+  headline: string;
+  location: string;
+  intro: string;
+  about: string;
+  aboutExtended: string;
+}
+
+export interface ExperienceItem {
+  id: string;
+  period: string;
+  title: string;
+  organization: string;
+  summary: string;
+}
+
+export interface Publication {
+  id: string;
+  title: string;
+  authors: string[];
+  venue: string;
+  year: number;
+  type: "journal" | "conference" | "book" | "preprint" | "other";
+  link?: string;
+  citation?: string;
+  abstract?: string;
+  featured: boolean;
+}
+
 export interface SEOData {
   title: string;
   description: string;

@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
+import { Manrope, Fraunces, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { ScrollProgress } from "@/components/animations/ScrollProgress";
+import { StorybookCursor } from "@/components/layout/StorybookCursor";
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-manrope",
   display: "swap",
 });
 
-const playfair = Playfair_Display({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-playfair",
+  variable: "--font-fraunces",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -24,32 +25,31 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio - Creative Developer & Designer",
+  title: "Akash — Full-Stack & Data Science Engineer",
   description:
-    "A stunning portfolio showcasing creative projects, photography, and blog content with modern animations and interactive elements.",
+    "Portfolio of Akash featuring full-stack engineering, data science work, selected projects, and research contributions. A storytelling journey through nature.",
   keywords: [
     "portfolio",
-    "developer",
-    "designer",
-    "creative",
+    "full stack engineer",
+    "data science engineer",
     "projects",
-    "photography",
-    "blog",
+    "machine learning",
+    "software development",
   ],
-  authors: [{ name: "Portfolio Owner" }],
-  creator: "Portfolio Owner",
+  authors: [{ name: "Akash" }],
+  creator: "Akash",
   openGraph: {
-    title: "Portfolio - Creative Developer & Designer",
+    title: "Akash — Full-Stack & Data Science Engineer",
     description:
-      "A stunning portfolio showcasing creative projects, photography, and blog content with modern animations and interactive elements.",
+      "Portfolio featuring full-stack engineering work, data science experience, and selected product builds.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Portfolio - Creative Developer & Designer",
+    title: "Akash — Full-Stack & Data Science Engineer",
     description:
-      "A stunning portfolio showcasing creative projects, photography, and blog content with modern animations and interactive elements.",
+      "Portfolio featuring full-stack engineering work, data science experience, and selected product builds.",
   },
   robots: {
     index: true,
@@ -59,27 +59,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${playfair.variable} ${jetbrains.variable}`}
+      className={`${manrope.variable} ${fraunces.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
       <body className="font-sans antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange={false}
-        >
-          <SmoothScroll>
-            <ScrollProgress />
-            <div className="relative min-h-screen">{children}</div>
-          </SmoothScroll>
-        </ThemeProvider>
+        <StorybookCursor />
+        <SmoothScroll>
+          <ScrollProgress />
+          <div className="relative min-h-screen">{children}</div>
+        </SmoothScroll>
       </body>
     </html>
   );

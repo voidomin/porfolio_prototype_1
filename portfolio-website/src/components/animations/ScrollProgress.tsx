@@ -1,27 +1,78 @@
 "use client";
 
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 
-interface ScrollProgressProps {
-  className?: string;
-  color?: string;
-}
+/* ──────────────────────────────────────────────────────────
+   ScrollProgress – a "sun path" indicator at the very top
+   of the viewport. A small glowing dot (sun/moon) moves
+   from left to right as the user scrolls, transitioning
+   from warm gold to cool silver.
+   ────────────────────────────────────────────────────────── */
 
-export const ScrollProgress: React.FC<ScrollProgressProps> = ({
-  className = "",
-  color = "bg-primary-500",
-}) => {
+export const ScrollProgress: React.FC = () => {
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
+  const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001,
   });
 
+  // Progress bar color transition
+  const barBackground = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.6, 1],
+    [
+      "linear-gradient(90deg, #f0b429, #f8cc4d)",
+      "linear-gradient(90deg, #f0b429, #7db523)",
+      "linear-gradient(90deg, #7db523, #e05d57)",
+      "linear-gradient(90deg, #e05d57, #5d40e6)",
+    ]
+  );
+
+  // Dot color (sun → moon)
+  const dotColor = useTransform(
+    scrollYProgress,
+    [0, 0.5, 1],
+    ["#f0b429", "#7db523", "#c7cfff"]
+  );
+
+  const dotGlow = useTransform(
+    scrollYProgress,
+    [0, 0.5, 1],
+    [
+      "0 0 8px 2px rgba(240,180,41,0.5)",
+      "0 0 8px 2px rgba(125,181,35,0.4)",
+      "0 0 8px 2px rgba(199,207,255,0.5)",
+    ]
+  );
+
   return (
-    <motion.div
-      className={`fixed top-0 left-0 right-0 h-1 ${color} origin-left z-50 ${className}`}
-      style={{ scaleX }}
-    />
+    <>
+      {/* Progress bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-[3px] origin-left z-[60]"
+        style={{
+          scaleX: smoothProgress,
+          background: barBackground,
+        }}
+      />
+
+      {/* Sun/Moon dot at the leading edge */}
+      <motion.div
+        className="fixed top-0 z-[61] pointer-events-none"
+        style={{
+          left: useTransform(smoothProgress, (v) => `${v * 100}%`),
+          x: "-50%",
+        }}
+      >
+        <motion.div
+          className="w-2 h-2 rounded-full -translate-y-[1px]"
+          style={{
+            backgroundColor: dotColor,
+            boxShadow: dotGlow,
+          }}
+        />
+      </motion.div>
+    </>
   );
 };

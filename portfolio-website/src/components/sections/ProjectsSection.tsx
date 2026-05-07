@@ -2,16 +2,21 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, Github, Filter, Eye } from "lucide-react";
+import { ExternalLink, Github, Eye, Feather } from "lucide-react";
 import { projects } from "@/data/portfolio";
 import { Project, type ProjectCategory } from "@/types";
 import { cn } from "@/lib/utils";
 
+/* ──────────────────────────────────────────────────────────
+   ProjectsSection – "Chapter 4: Stepping Stones"
+   Projects presented as stepping stones across a river.
+   Each card has an earthy/stone texture with water
+   shimmer effects.
+   ────────────────────────────────────────────────────────── */
+
 const categories: { value: ProjectCategory | "all"; label: string }[] = [
   { value: "all", label: "All Projects" },
   { value: "web", label: "Web Apps" },
-  { value: "mobile", label: "Mobile Apps" },
-  { value: "design", label: "Design" },
   { value: "other", label: "Other" },
 ];
 
@@ -31,11 +36,29 @@ const ProjectCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="group relative bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500"
+      className="group relative rounded-3xl overflow-hidden shadow-xl transition-all duration-500"
+      style={{
+        background: "linear-gradient(145deg, #efede6, #ddd9cc)",
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Project Image */}
+      {/* Ripple effect on hover */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0.4 }}
+            animate={{ scale: 3, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
+          >
+            <div className="w-24 h-24 rounded-full bg-river-400/20" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Project image */}
       <div className="relative h-48 overflow-hidden">
         <motion.img
           src={project.image}
@@ -45,24 +68,26 @@ const ProjectCard = ({
             imageLoaded ? "opacity-100" : "opacity-0"
           )}
           onLoad={() => setImageLoaded(true)}
-          whileHover={{ scale: 1.1 }}
+          animate={{ scale: isHovered ? 1.06 : 1 }}
+          transition={{ duration: 0.6 }}
         />
         {!imageLoaded && (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-500 to-accent-500 animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-br from-stone-300 to-stone-400 animate-pulse" />
         )}
 
         {/* Overlay */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: isHovered ? 1 : 0 }}
-          className="absolute inset-0 bg-black/60 flex items-center justify-center space-x-4"
+          transition={{ duration: 0.3 }}
+          className="absolute inset-0 bg-forest-950/50 flex items-center justify-center gap-3"
         >
           {project.demoUrl && (
             <motion.a
               href={project.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors"
+              className="p-3 bg-white/15 backdrop-blur-sm rounded-full text-white hover:bg-white/25 transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -74,7 +99,7 @@ const ProjectCard = ({
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors"
+              className="p-3 bg-white/15 backdrop-blur-sm rounded-full text-white hover:bg-white/25 transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -82,7 +107,7 @@ const ProjectCard = ({
             </motion.a>
           )}
           <motion.button
-            className="p-3 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors"
+            className="p-3 bg-white/15 backdrop-blur-sm rounded-full text-white hover:bg-white/25 transition-colors"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -90,60 +115,64 @@ const ProjectCard = ({
           </motion.button>
         </motion.div>
 
-        {/* Featured Badge */}
+        {/* Featured feather badge */}
         {project.featured && (
-          <div className="absolute top-4 left-4 px-3 py-1 bg-primary-500 text-white text-xs font-semibold rounded-full">
+          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 bg-dawn-500/90 backdrop-blur-sm text-white text-xs font-semibold rounded-full shadow-md">
+            <Feather className="w-3 h-3" />
             Featured
           </div>
         )}
       </div>
 
-      {/* Project Content */}
-      <div className="p-6">
+      {/* Content */}
+      <div className="relative p-6 z-10">
+        {/* Water shimmer at top of content */}
+        <div className="absolute top-0 left-0 right-0 h-px water-shimmer" />
+
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-medium text-primary-500 uppercase tracking-wider">
+          <span className="text-xs font-medium text-forest-700 uppercase tracking-wider">
             {project.category}
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-stone-500">
             {new Date(project.createdAt).getFullYear()}
           </span>
         </div>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-primary-500 transition-colors">
+        <h3 className="text-xl font-semibold text-stone-900 mb-3 group-hover:text-forest-700 transition-colors">
           {project.title}
         </h3>
 
-        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">
+        <p className="text-stone-600 text-sm mb-4 leading-relaxed">
           {project.description}
         </p>
 
-        {/* Technologies */}
+        {/* Tech tags */}
         <div className="flex flex-wrap gap-2 mb-4">
           {project.technologies.slice(0, 4).map((tech) => (
             <span
               key={tech}
-              className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md"
+              className="px-2.5 py-1 text-xs bg-forest-50 text-forest-800 rounded-lg border border-forest-200/50"
             >
               {tech}
             </span>
           ))}
           {project.technologies.length > 4 && (
-            <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md">
-              +{project.technologies.length - 4} more
+            <span className="px-2.5 py-1 text-xs bg-forest-50 text-forest-800 rounded-lg border border-forest-200/50">
+              +{project.technologies.length - 4}
             </span>
           )}
         </div>
 
         {/* Links */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           {project.demoUrl && (
             <a
               href={project.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary-500 hover:text-primary-600 text-sm font-medium transition-colors"
+              className="text-forest-700 hover:text-forest-900 text-sm font-medium transition-colors"
             >
-              Live Demo
+              Live Demo →
             </a>
           )}
           {project.githubUrl && (
@@ -151,7 +180,7 @@ const ProjectCard = ({
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-medium transition-colors"
+              className="text-stone-500 hover:text-stone-700 text-sm font-medium transition-colors"
             >
               Source Code
             </a>
@@ -180,55 +209,68 @@ export const ProjectsSection = () => {
   };
 
   return (
-    <section id="projects" className="py-20 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-6">
+    <section
+      id="projects"
+      className="relative py-24 md:py-32 overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(180deg, #d3ed9e 0%, #dbeffe 10%, #eff8ff 30%, #eff8ff 70%, #dbeffe 90%, #bfe3fe 100%)",
+      }}
+    >
+      {/* River shimmer overlay */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgba(147,210,253,0.15),transparent_60%)]" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
+        {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Featured <span className="text-primary-500">Projects</span>
+          <p className="text-river-600/50 text-sm tracking-[0.3em] uppercase mb-4">
+            Chapter Four
+          </p>
+          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+            Stepping{" "}
+            <span className="text-river-600">Stones</span>
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            A showcase of my recent work and creative projects across different
-            domains
+          <p className="text-stone-600/70 max-w-xl mx-auto">
+            Products and experiments — stepping stones across the river of
+            practice and craft.
           </p>
         </motion.div>
 
-        {/* Filter Buttons */}
+        {/* Filter tabs */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-4 mb-12"
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="flex flex-wrap justify-center gap-3 mb-12"
         >
-          {categories.map((category) => (
+          {categories.map((cat) => (
             <motion.button
-              key={category.value}
-              onClick={() => handleCategoryChange(category.value)}
+              key={cat.value}
+              onClick={() => handleCategoryChange(cat.value)}
               className={cn(
-                "px-6 py-3 rounded-full font-medium transition-all duration-300",
-                "border-2 border-transparent",
-                activeCategory === category.value
-                  ? "bg-primary-500 text-white shadow-lg shadow-primary-500/25"
-                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-primary-500/50"
+                "px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300",
+                activeCategory === cat.value
+                  ? "bg-forest-700 text-white shadow-lg shadow-forest-900/20"
+                  : "bg-white/60 text-stone-600 border border-stone-300/40 hover:border-forest-400/40 hover:bg-white/80"
               )}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
             >
-              <div className="flex items-center space-x-2">
-                <Filter className="w-4 h-4" />
-                <span>{category.label}</span>
-              </div>
+              {cat.label}
             </motion.button>
           ))}
         </motion.div>
 
-        {/* Projects Grid */}
+        {/* Projects grid */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeCategory}
@@ -236,67 +278,49 @@ export const ProjectsSection = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
           >
             {filteredProjects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
+              <ProjectCard
+                key={project.id}
+                project={project}
+                index={index}
+              />
             ))}
           </motion.div>
         </AnimatePresence>
 
-        {/* No Projects Message */}
         {filteredProjects.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
-            <p className="text-gray-500 dark:text-gray-400">
-              No projects found in this category.
-            </p>
+            <p className="text-stone-500">No projects found in this category.</p>
           </motion.div>
         )}
 
         {/* Stats */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
         >
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary-500">
-              {projects.length}+
+          {[
+            { value: `${projects.length}+`, label: "Total Projects", color: "text-forest-700" },
+            { value: projects.filter((p) => p.category === "web").length.toString(), label: "Web Applications", color: "text-river-600" },
+            { value: projects.filter((p) => p.featured).length.toString(), label: "Featured Projects", color: "text-forest-700" },
+            { value: `${new Set(projects.flatMap((p) => p.technologies)).size}+`, label: "Technologies Used", color: "text-river-600" },
+          ].map((stat) => (
+            <div key={stat.label} className="p-4 bg-white/40 backdrop-blur-sm rounded-2xl border border-stone-200/30">
+              <div className={`text-2xl md:text-3xl font-bold ${stat.color} mb-1`}>
+                {stat.value}
+              </div>
+              <div className="text-sm text-stone-500">{stat.label}</div>
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Total Projects
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary-500">
-              {projects.filter((p) => p.category === "web").length}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Web Applications
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary-500">
-              {projects.filter((p) => p.featured).length}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Featured Projects
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary-500">
-              {new Set(projects.flatMap((p) => p.technologies)).size}+
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Technologies Used
-            </div>
-          </div>
+          ))}
         </motion.div>
       </div>
     </section>

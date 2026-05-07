@@ -2,153 +2,270 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap");
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    /* Nature Day-Cycle System */
+    --dawn-sky-start: #fef7e0;
+    --dawn-sky-end: #fdedb7;
+    --dawn-glow: rgba(240, 180, 41, 0.35);
+    --forest-canopy: #1d3d1d;
+    --forest-floor: #265b26;
+    --forest-mist: rgba(219, 240, 219, 0.4);
+    --meadow-sun: #f5fbe8;
+    --meadow-grass: #7db523;
+    --river-flow: #93d2fd;
+    --river-stone: #c7c0ac;
+    --dusk-warm: #f5b3af;
+    --dusk-sky: #762b2a;
+    --night-deep: #0f0d2e;
+    --night-star: #c7cfff;
+
+    /* Shared */
+    --section-padding: clamp(4rem, 8vw, 8rem);
+    --content-max-width: 80rem;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-fraunces), serif;
+    letter-spacing: -0.01em;
   }
-}
 
-@layer base {
-  * {
-    @apply border-gray-200 dark:border-gray-800;
-  }
   body {
-    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-white;
+    font-family: var(--font-manrope), sans-serif;
+    color: #1e293b;
+    background-color: #0f0d2e;
+    overflow-x: hidden;
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* Custom cursor for desktop */
+@media (pointer: fine) {
+  body { cursor: none; }
+  a, button, input, textarea, select, label, [role="button"] { cursor: none; }
+  input, textarea, select { cursor: text; }
 }
 
-::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+/* Custom scrollbar — nature themed */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0f0d2e; }
+::-webkit-scrollbar-thumb { 
+  background: linear-gradient(180deg, #f0b429, #3a8f3a, #5d40e6);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { 
+  background: linear-gradient(180deg, #f8cc4d, #5aaf5a, #8180f9);
 }
 
-::-webkit-scrollbar-thumb {
-  @apply bg-primary-500/50 rounded-full;
+html { scroll-behavior: smooth; }
+
+/* ─── Nature Scene Layers ─── */
+.nature-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary-500/70;
+/* Mountain silhouettes */
+.mountain-layer {
+  position: absolute;
+  bottom: 0;
+  left: -5%;
+  right: -5%;
+  pointer-events: none;
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+/* Cloud drift animation */
+.cloud {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(8px);
+  opacity: 0.6;
 }
 
-/* Custom animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
+/* ─── Section Transitions ─── */
+.section-chapter {
+  position: relative;
+  z-index: 1;
 }
 
-@keyframes glow {
-  0%,
-  100% {
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8),
-      0 0 30px rgba(59, 130, 246, 0.6);
-  }
+/* Organic dividers between sections */
+.terrain-divider {
+  position: relative;
+  height: 80px;
+  margin-top: -80px;
+  z-index: 2;
+  pointer-events: none;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+.terrain-divider svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+/* ─── Nature Element Animations ─── */
+
+/* Bird V-shape */
+.bird-v {
+  position: absolute;
+  pointer-events: none;
 }
 
-.animate-glow {
-  animation: glow 2s ease-in-out infinite alternate;
+.bird-v::before,
+.bird-v::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
 }
 
-.animate-shimmer {
+.bird-v::before {
+  transform-origin: right center;
+  transform: rotate(-25deg);
+  right: 50%;
+}
+
+.bird-v::after {
+  transform-origin: left center;
+  transform: rotate(25deg);
+  left: 50%;
+}
+
+/* Floating leaf particles */
+.leaf-particle {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.leaf-particle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Firefly glow */
+.firefly-dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f0b429;
+  box-shadow: 0 0 8px 2px rgba(240, 180, 41, 0.6);
+  pointer-events: none;
+}
+
+/* Star twinkle */
+.star-dot {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: white;
+  pointer-events: none;
+}
+
+/* ─── Text Reveal Effects ─── */
+.text-reveal {
+  overflow: hidden;
+}
+
+.text-reveal > * {
+  transform: translateY(100%);
+  animation: textRevealUp 0.8s ease-out forwards;
+}
+
+@keyframes textRevealUp {
+  to { transform: translateY(0); }
+}
+
+/* ─── Nature Card Styles ─── */
+.nature-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.5rem;
+  transition: all 0.4s ease;
+}
+
+.nature-card:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* Glass morphism for nature sections */
+.glass-nature {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Wood texture effect (CSS gradient pattern) */
+.wood-texture {
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      rgba(121, 85, 72, 0.03),
+      rgba(121, 85, 72, 0.03) 1px,
+      transparent 1px,
+      transparent 8px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(121, 85, 72, 0.02),
+      rgba(121, 85, 72, 0.02) 1px,
+      transparent 1px,
+      transparent 16px
+    );
+}
+
+/* Parchment texture */
+.parchment {
+  background-color: #fef7e0;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(180, 140, 80, 0.08), transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(180, 140, 80, 0.06), transparent 50%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b08850' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ─── Water/River Effect ─── */
+.water-shimmer {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.2),
+    rgba(147, 210, 253, 0.15),
     transparent
   );
   background-size: 200% 100%;
-  animation: shimmer 2s infinite;
+  animation: shimmer 3s infinite;
 }
 
-/* Text selection */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ─── Text Selection ─── */
 ::selection {
-  @apply bg-primary-500/20 text-primary-500;
+  background: rgba(125, 181, 35, 0.25);
+  color: #1d3d1d;
 }
 
 /* Focus styles */
 :focus-visible {
-  @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(125, 181, 35, 0.5), 0 0 0 4px rgba(125, 181, 35, 0.2);
 }
 
-/* Reduced motion */
+/* ─── Reduced Motion ─── */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

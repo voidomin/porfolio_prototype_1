@@ -1,0 +1,129 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+/* ──────────────────────────────────────────────────────────
+   BirdFlock – animated SVG birds that fly across the
+   viewport periodically. Simple V-shaped birds with
+   wing-flap animation, flying in a loose formation.
+   ────────────────────────────────────────────────────────── */
+
+interface Bird {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  delay: number;
+  speed: number;
+}
+
+function createFlock(): Bird[] {
+  const count = 4 + Math.floor(Math.random() * 3);
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    x: -10 - i * 3,
+    y: 15 + Math.random() * 25 + (i % 2 === 0 ? -5 : 5),
+    size: 0.8 + Math.random() * 0.4,
+    delay: i * 0.8 + Math.random() * 0.5,
+    speed: 16 + Math.random() * 8,
+  }));
+}
+
+const BirdShape = ({ size, color }: { size: number; color: string }) => (
+  <svg
+    width={24 * size}
+    height={12 * size}
+    viewBox="0 0 24 12"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <motion.path
+      d="M0,8 Q4,0 12,6 Q20,0 24,8"
+      stroke={color}
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      fill="none"
+      animate={{
+        d: [
+          "M0,8 Q4,0 12,6 Q20,0 24,8",
+          "M0,4 Q4,6 12,6 Q20,6 24,4",
+          "M0,8 Q4,0 12,6 Q20,0 24,8",
+        ],
+      }}
+      transition={{
+        duration: 0.6,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+    />
+  </svg>
+);
+
+export const BirdFlock = () => {
+  const [flocks, setFlocks] = useState<Bird[][]>([]);
+  const [flockKey, setFlockKey] = useState(0);
+
+  useEffect(() => {
+    // Spawn a new flock every 12-20 seconds
+    const spawnFlock = () => {
+      setFlocks((prev) => {
+        const newFlocks = [...prev, createFlock()];
+        // Keep max 3 flocks in memory
+        if (newFlocks.length > 3) newFlocks.shift();
+        return newFlocks;
+      });
+      setFlockKey((k) => k + 1);
+    };
+
+    // Initial flock after a short delay
+    const initialTimeout = setTimeout(spawnFlock, 3000);
+
+    const interval = setInterval(spawnFlock, 15000 + Math.random() * 8000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-0 pointer-events-none overflow-hidden"
+      style={{ zIndex: 5 }}
+    >
+      <AnimatePresence>
+        {flocks.map((flock, fi) => (
+          <div key={`flock-${fi}-${flockKey}`}>
+            {flock.map((bird) => (
+              <motion.div
+                key={`bird-${fi}-${bird.id}`}
+                className="absolute"
+                initial={{
+                  x: `${bird.x}vw`,
+                  y: `${bird.y}vh`,
+                  opacity: 0,
+                }}
+                animate={{
+                  x: "110vw",
+                  y: `${bird.y - 5 + Math.random() * 10}vh`,
+                  opacity: [0, 0.7, 0.7, 0],
+                }}
+                transition={{
+                  duration: bird.speed,
+                  delay: bird.delay,
+                  ease: "linear",
+                }}
+              >
+                <BirdShape
+                  size={bird.size}
+                  color="rgba(30,30,30,0.35)"
+                />
+              </motion.div>
+            ))}
+          </div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+};
