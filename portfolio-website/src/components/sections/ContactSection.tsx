@@ -43,6 +43,167 @@ function generateFireflies(count: number) {
   }));
 }
 
+// Interactive rising campfire embers on input hover & focus
+const InputEmberEmitter = ({ active }: { active: boolean }) => {
+  const [embers, setEmbers] = useState<{ id: number; left: number; size: number; delay: number; duration: number; distanceY: number; driftX: number }[]>([]);
+
+  useEffect(() => {
+    if (!active) {
+      setEmbers([]);
+      return;
+    }
+    // Generate 12 lively embers
+    const list = Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      left: 5 + Math.random() * 90,
+      size: 1.5 + Math.random() * 2.5,
+      delay: Math.random() * 1.2,
+      duration: 1.2 + Math.random() * 1.5,
+      distanceY: -40 - Math.random() * 50,
+      driftX: -20 + Math.random() * 40,
+    }));
+    setEmbers(list);
+  }, [active]);
+
+  if (!active) return null;
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
+      {embers.map((ember) => (
+        <motion.div
+          key={ember.id}
+          className="absolute rounded-full bg-orange-400"
+          style={{
+            left: `${ember.left}%`,
+            bottom: "0px",
+            width: ember.size,
+            height: ember.size,
+            boxShadow: `0 0 ${ember.size * 3}px ${ember.size}px rgba(249,115,22,0.8)`,
+          }}
+          initial={{ opacity: 0, y: 0, x: 0 }}
+          animate={{
+            opacity: [0, 1, 0.7, 0],
+            y: [0, ember.distanceY],
+            x: [0, ember.driftX],
+          }}
+          transition={{
+            duration: ember.duration,
+            delay: ember.delay,
+            repeat: Infinity,
+            ease: "easeOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+interface FormInputProps {
+  label: string;
+  id: string;
+  name: string;
+  type?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  required?: boolean;
+}
+
+const FormInput = ({
+  label,
+  id,
+  name,
+  type = "text",
+  value,
+  onChange,
+  placeholder,
+  required = false,
+}: FormInputProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div className="relative group">
+      <label htmlFor={id} className="block text-sm font-medium text-white/75 mb-2 select-none">
+        {label} {required && "*"}
+      </label>
+      <div 
+        className="relative rounded-xl overflow-hidden"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <input
+          type={type}
+          id={id}
+          name={name}
+          value={value}
+          onChange={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/25 focus:border-dawn-400/50 focus:bg-white/10 focus:outline-none transition-all relative z-10"
+          placeholder={placeholder}
+          required={required}
+        />
+        {/* Campfire embers trail overlay */}
+        <InputEmberEmitter active={isFocused || isHovered} />
+      </div>
+    </div>
+  );
+};
+
+interface FormTextareaProps {
+  label: string;
+  id: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  placeholder: string;
+  required?: boolean;
+  rows?: number;
+}
+
+const FormTextarea = ({
+  label,
+  id,
+  name,
+  value,
+  onChange,
+  placeholder,
+  required = false,
+  rows = 5,
+}: FormTextareaProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div className="relative group">
+      <label htmlFor={id} className="block text-sm font-medium text-white/75 mb-2 select-none">
+        {label} {required && "*"}
+      </label>
+      <div 
+        className="relative rounded-xl overflow-hidden"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <textarea
+          id={id}
+          name={name}
+          rows={rows}
+          value={value}
+          onChange={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/25 focus:border-dawn-400/50 focus:bg-white/10 focus:outline-none resize-none transition-all relative z-10"
+          placeholder={placeholder}
+          required={required}
+        />
+        {/* Campfire embers trail overlay */}
+        <InputEmberEmitter active={isFocused || isHovered} />
+      </div>
+    </div>
+  );
+};
+
 export const ContactSection = () => {
   const [formData, setFormData] = useState<ContactFormData>({
     name: "",
@@ -264,77 +425,45 @@ export const ContactSection = () => {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="contact-name"
-                    className="block text-sm font-medium text-white/70 mb-2"
-                  >
-                    Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="contact-name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white/8 border border-white/15 rounded-xl text-white placeholder:text-white/30 focus:border-dawn-400/50 focus:bg-white/12 transition-all"
-                    placeholder="Your name"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="contact-email"
-                    className="block text-sm font-medium text-white/70 mb-2"
-                  >
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    id="contact-email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white/8 border border-white/15 rounded-xl text-white placeholder:text-white/30 focus:border-dawn-400/50 focus:bg-white/12 transition-all"
-                    placeholder="your@email.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="contact-subject"
-                  className="block text-sm font-medium text-white/70 mb-2"
-                >
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  id="contact-subject"
-                  name="subject"
-                  value={formData.subject}
+                <FormInput
+                  label="Name"
+                  id="contact-name"
+                  name="name"
+                  value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-white/8 border border-white/15 rounded-xl text-white placeholder:text-white/30 focus:border-dawn-400/50 focus:bg-white/12 transition-all"
-                  placeholder="What would you like to discuss?"
+                  placeholder="Your name"
+                  required
+                />
+                <FormInput
+                  label="Email"
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="your@email.com"
+                  required
                 />
               </div>
 
-              <div>
-                <label
-                  htmlFor="contact-message"
-                  className="block text-sm font-medium text-white/70 mb-2"
-                >
-                  Message *
-                </label>
-                <textarea
-                  id="contact-message"
-                  name="message"
-                  rows={5}
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-white/8 border border-white/15 rounded-xl text-white placeholder:text-white/30 focus:border-dawn-400/50 focus:bg-white/12 resize-none transition-all"
-                  placeholder="Share your thoughts..."
-                />
-              </div>
+              <FormInput
+                label="Subject"
+                id="contact-subject"
+                name="subject"
+                value={formData.subject}
+                onChange={handleInputChange}
+                placeholder="What would you like to discuss?"
+              />
+
+              <FormTextarea
+                label="Message"
+                id="contact-message"
+                name="message"
+                value={formData.message}
+                onChange={handleInputChange}
+                placeholder="Share your thoughts..."
+                required
+              />
 
               {formState.message && (
                 <motion.div

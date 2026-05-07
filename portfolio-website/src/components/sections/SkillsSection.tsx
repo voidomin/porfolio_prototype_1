@@ -75,9 +75,13 @@ const SkillCategoryCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.15 }}
-      className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-meadow-300/30 shadow-lg shadow-meadow-900/5 hover:shadow-xl hover:border-meadow-400/40 transition-all duration-500"
+      whileHover={{ 
+        rotate: [0, -0.8, 0.6, -0.3, 0.15, 0],
+        scale: 1.015,
+      }}
+      className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-meadow-300/30 shadow-lg shadow-meadow-900/5 hover:shadow-xl hover:border-meadow-400/40 transition-all duration-500 origin-bottom"
     >
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6 select-none">
         <span className="text-2xl">{meta.emoji}</span>
         <h3 className="text-lg font-semibold text-meadow-900">
           {meta.name}
@@ -194,12 +198,16 @@ export const SkillsSection = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
-              className="text-center p-5 bg-white/50 backdrop-blur-sm rounded-2xl border border-meadow-300/20"
+              whileHover={{ 
+                rotate: [0, -1.2, 0.9, -0.5, 0.2, 0],
+                scale: 1.03,
+              }}
+              className="text-center p-5 bg-white/50 backdrop-blur-sm rounded-2xl border border-meadow-300/20 origin-bottom hover:border-meadow-400/40 hover:shadow-md transition-all duration-300"
             >
-              <div className={`text-2xl md:text-3xl font-bold ${stat.color} mb-1`}>
+              <div className={`text-2xl md:text-3xl font-bold ${stat.color} mb-1 select-none`}>
                 {stat.value}
               </div>
-              <div className="text-sm text-meadow-700/50">{stat.label}</div>
+              <div className="text-sm text-meadow-700/50 select-none">{stat.label}</div>
             </motion.div>
           ))}
         </motion.div>

@@ -43,18 +43,31 @@ const ProjectCard = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Ripple effect on hover */}
+      {/* Liquid Water Ripple on hover */}
       <AnimatePresence>
         {isHovered && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0.4 }}
-            animate={{ scale: 3, opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
-            className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
-          >
-            <div className="w-24 h-24 rounded-full bg-river-400/20" />
-          </motion.div>
+          <>
+            {/* Primary expanding ring */}
+            <motion.div
+              initial={{ scale: 0.1, opacity: 0.5 }}
+              animate={{ scale: 3.5, opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+              className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
+            >
+              <div className="w-24 h-24 rounded-full border-2 border-river-400/30" />
+            </motion.div>
+            {/* Secondary delayed expanding ring */}
+            <motion.div
+              initial={{ scale: 0.1, opacity: 0.4 }}
+              animate={{ scale: 2.7, opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.3, delay: 0.25, ease: "easeOut" }}
+              className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
+            >
+              <div className="w-24 h-24 rounded-full border border-river-300/20" />
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
