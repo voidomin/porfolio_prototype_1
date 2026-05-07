@@ -11,6 +11,7 @@ import { FloatingActionButton } from "@/components/ui/FloatingActionButton";
 import { NatureScene } from "@/components/animations/NatureScene";
 import { BirdFlock } from "@/components/animations/BirdFlock";
 import { FloatingLeaves } from "@/components/animations/FloatingLeaves";
+import { InteractiveTrail } from "@/components/animations/InteractiveTrail";
 import { SectionDivider } from "@/components/animations/SectionDivider";
 
 export default function Home() {
@@ -22,6 +23,9 @@ export default function Home() {
       {/* Ambient nature overlays */}
       <BirdFlock />
       <FloatingLeaves />
+      
+      {/* Interactive trailing micro-particles */}
+      <InteractiveTrail />
 
       {/* Navigation */}
       <Navbar />
