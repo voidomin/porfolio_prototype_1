@@ -65,7 +65,10 @@ export const MountainAscentHUD = () => {
   };
 
   return (
-    <div className="fixed right-5 lg:right-8 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-center select-none pointer-events-auto">
+    <div 
+      className="fixed right-5 lg:right-8 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-center select-none pointer-events-auto"
+      onMouseLeave={() => setHoveredItem(null)} // Returns to scroll-active dot solely when leaving the entire sidebar HUD
+    >
       {/* HUD Container - More compact, ultra-refined */}
       <div className="relative flex flex-col items-center py-3.5 px-1.5 rounded-xl bg-black/15 backdrop-blur-md border border-white/5 shadow-2xl">
         
@@ -94,7 +97,6 @@ export const MountainAscentHUD = () => {
                 key={item.id}
                 className="relative flex items-center justify-center cursor-pointer group"
                 onMouseEnter={() => setHoveredItem(item.id)}
-                onMouseLeave={() => setHoveredItem(null)}
                 onClick={() => handleScrollTo(item.id)}
               >
                 {/* Floating label tag on hover (slides in smoothly from left) */}
