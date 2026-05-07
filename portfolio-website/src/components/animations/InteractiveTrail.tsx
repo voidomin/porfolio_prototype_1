@@ -71,33 +71,43 @@ export const InteractiveTrail = () => {
       const speed = Math.sqrt(dx * dx + dy * dy);
 
       // Spawn exactly ONE micro-particle only on significant move, max active particles capped at 20
-      if (speed > 4 && particles.current.length < 20) {
+      if (speed > 4 && particles.current.length < 25) {
         let type: "leaf" | "pollen" | "ember" = "leaf";
-        let color = "rgba(100, 160, 60, 0.7)"; // Leaf green
+        let color = "rgba(120, 180, 80, 0.7)"; // Leaf green
 
         if (scrollProgress >= 0.35 && scrollProgress < 0.7) {
           type = "pollen";
-          color = "rgba(240, 180, 41, 0.75)"; // Pollen gold
+          color = "rgba(250, 195, 50, 0.85)"; // Pollen gold/amber shimmer
         } else if (scrollProgress >= 0.7) {
           type = "ember";
-          color = "rgba(230, 90, 40, 0.8)"; // Cozy amber ember
+          color = "rgba(255, 95, 30, 0.95)"; // Fast, hot campfire orange
         }
 
         particles.current.push({
           x: mousePos.current.x,
           y: mousePos.current.y,
-          // Soft dispersion velocity
-          vx: (Math.random() - 0.5) * 1.0,
-          vy: type === "ember" 
-            ? -Math.random() * 1.5 - 0.5 // Embers float upwards
-            : (Math.random() - 0.2) * 1.0, // Leaves/pollen drift down
-          size: type === "leaf" 
-            ? Math.random() * 5 + 4 // Leaf size
-            : Math.random() * 3 + 2, // Dust size
+          // Physical velocities tailored to each particle behavior
+          vx: type === "ember"
+            ? (Math.random() - 0.5) * 1.5 // Horizontal heat drift
+            : (Math.random() - 0.5) * 0.8,
+          vy: type === "ember"
+            ? -Math.random() * 2.0 - 1.0 // Embers shoot upwards rapidly
+            : type === "pollen"
+              ? (Math.random() - 0.5) * 0.5 // Pollen floats in place (3D suspension)
+              : Math.random() * 0.5 + 0.2, // Leaves fall slowly
+          size: type === "leaf"
+            ? Math.random() * 4 + 4 // Leaf scale
+            : type === "pollen"
+              ? Math.random() * 3.5 + 2.5 // Star star-glint span
+              : Math.random() * 2 + 1.5, // Ember spark width
           alpha: 1.0,
-          decay: type === "leaf" ? 0.015 : 0.02, // Fades quickly
+          decay: type === "leaf" 
+            ? 0.012 
+            : type === "pollen" 
+              ? 0.015 
+              : 0.025, // Embers burn out quickly
           rotation: Math.random() * Math.PI * 2,
-          rotationSpeed: (Math.random() - 0.5) * 0.04,
+          rotationSpeed: (Math.random() - 0.5) * 0.05,
           color,
           type,
         });
@@ -113,8 +123,11 @@ export const InteractiveTrail = () => {
 
     // Animation canvas loop
     let animationId: number;
+    let time = 0;
+
     const drawParticles = () => {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      time += 1;
 
       for (let i = particles.current.length - 1; i >= 0; i--) {
         const p = particles.current[i];
@@ -124,12 +137,18 @@ export const InteractiveTrail = () => {
         p.alpha -= p.decay;
         p.rotation += p.rotationSpeed;
 
-        // Apply slight gravity/drift to mimic forest atmosphere
+        // Realistic fluid dynamics
         if (p.type === "leaf") {
-          p.vy += 0.01; // Soft leaf gravity
-          p.vx += Math.sin(p.rotation) * 0.05; // Gentle sway
+          p.vy += 0.005; // Gentle forest leaf gravity gravity
+          p.vx += Math.sin(p.rotation + time * 0.01) * 0.04; // Swaying wind slide
+        } else if (p.type === "pollen") {
+          // Pollen drifts suspended suspended on a warm breeze vector (Brownian style)
+          p.vx += Math.sin(time * 0.02 + p.y * 0.01) * 0.03;
+          p.vy += Math.cos(time * 0.02 + p.x * 0.01) * 0.02;
         } else if (p.type === "ember") {
-          p.vx += Math.sin(p.x * 0.02) * 0.1; // Ember crackle wave
+          // Embers accelerate upward due to convection heat draft
+          p.vy -= 0.04;
+          p.vx += Math.sin(p.y * 0.04 + time * 0.05) * 0.12; // High-frequency thermal wobble
         }
 
         if (p.alpha <= 0) {
@@ -138,12 +157,12 @@ export const InteractiveTrail = () => {
         }
 
         ctx.save();
-        ctx.globalAlpha = p.alpha;
         ctx.translate(p.x, p.y);
-        ctx.rotate(p.rotation);
 
         if (p.type === "leaf") {
-          // Draw organic leaf shape path
+          ctx.rotate(p.rotation);
+          ctx.globalAlpha = p.alpha;
+          // Organic curved leaf shape
           ctx.beginPath();
           ctx.moveTo(0, -p.size / 2);
           ctx.quadraticCurveTo(p.size / 2, -p.size / 4, 0, p.size / 2);
@@ -151,25 +170,42 @@ export const InteractiveTrail = () => {
           ctx.fillStyle = p.color;
           ctx.fill();
         } else if (p.type === "pollen") {
-          // Pollen sparkles - radial glow
-          const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size);
-          grad.addColorStop(0, "rgba(255, 255, 255, 1)");
-          grad.addColorStop(0.3, p.color);
-          grad.addColorStop(1, "rgba(240, 180, 41, 0)");
-          ctx.fillStyle = grad;
+          // Sparkle dapple - twinkling star glint (scales dynamically with time)
+          const shimmer = p.alpha * (0.6 + 0.4 * Math.sin(time * 0.15 + p.x));
+          ctx.globalAlpha = shimmer;
+          ctx.rotate(p.rotation);
+
+          // Draw 4-point light spark glint
           ctx.beginPath();
-          ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+          ctx.moveTo(0, -p.size);
+          ctx.quadraticCurveTo(0, 0, p.size, 0);
+          ctx.quadraticCurveTo(0, 0, 0, p.size);
+          ctx.quadraticCurveTo(0, 0, -p.size, 0);
+          ctx.quadraticCurveTo(0, 0, 0, -p.size);
+          
+          // Outer dapple radial glow
+          const radial = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size * 1.5);
+          radial.addColorStop(0, "#ffffff");
+          radial.addColorStop(0.3, p.color);
+          radial.addColorStop(1, "rgba(250, 195, 50, 0)");
+          ctx.fillStyle = radial;
           ctx.fill();
         } else if (p.type === "ember") {
-          // Rising embers - warm flickering particles
-          const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size);
-          grad.addColorStop(0, "rgba(255, 200, 120, 1)");
-          grad.addColorStop(0.4, p.color);
-          grad.addColorStop(1, "rgba(230, 90, 40, 0)");
-          ctx.fillStyle = grad;
+          // Campfire embers are hot velocity-blurred lines, flickering as they burn
+          const flicker = p.alpha * (0.8 + Math.random() * 0.2);
+          ctx.globalAlpha = flicker;
+
           ctx.beginPath();
-          ctx.arc(0, 0, p.size, 0, Math.PI * 2);
-          ctx.fill();
+          // Draw hot glowing spark motion streak backward from current speed direction
+          ctx.moveTo(0, 0);
+          ctx.lineTo(-p.vx * 3.5, -p.vy * 3.5);
+          
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = p.size;
+          ctx.lineCap = "round";
+          ctx.shadowColor = "rgba(255, 95, 30, 0.8)";
+          ctx.shadowBlur = p.size * 2;
+          ctx.stroke();
         }
 
         ctx.restore();
