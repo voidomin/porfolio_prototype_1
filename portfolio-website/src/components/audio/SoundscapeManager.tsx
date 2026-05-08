@@ -35,7 +35,7 @@ export const SoundscapeManager = () => {
 
   // Track scroll changes for dynamic crossfades
   useEffect(() => {
-    return scrollYProgress.onChange((v) => setScrollProgress(v));
+    return scrollYProgress.on("change", (v) => setScrollProgress(v));
   }, [scrollYProgress]);
 
   // Adjust volume levels dynamically based on scroll chapters
@@ -295,6 +295,46 @@ export const SoundscapeManager = () => {
     }
   }, [cleanupSoundscape]);
 
+  // Instantly synthesize a physical crackle popup on stoking
+  const triggerManualCrackle = useCallback(() => {
+    // Only synthesize if sound is active and playing
+    if (!isPlayingRef.current || !audioCtxRef.current || !fireGainRef.current) return;
+    const ctx = audioCtxRef.current;
+    const now = ctx.currentTime;
+
+    // Wood pop (sudden high-frequency sharp impulse click)
+    const clickOsc = ctx.createOscillator();
+    clickOsc.type = "sine";
+    clickOsc.frequency.setValueAtTime(1200 + Math.random() * 1800, now);
+
+    const clickEnv = ctx.createGain();
+    clickEnv.gain.setValueAtTime(0, now);
+    clickEnv.gain.linearRampToValueAtTime(0.24, now + 0.001); // Louder attack for active interaction!
+    clickEnv.gain.exponentialRampToValueAtTime(0.001, now + 0.022); // Fast decay
+
+    clickOsc.connect(clickEnv);
+    clickEnv.connect(fireGainRef.current);
+
+    clickOsc.start(now);
+    clickOsc.stop(now + 0.04);
+
+    // Dynamic low-frequency snap resonance
+    const resonantOsc = ctx.createOscillator();
+    resonantOsc.type = "triangle";
+    resonantOsc.frequency.setValueAtTime(90 + Math.random() * 60, now);
+
+    const resonantEnv = ctx.createGain();
+    resonantEnv.gain.setValueAtTime(0, now);
+    resonantEnv.gain.linearRampToValueAtTime(0.12, now + 0.04);
+    resonantEnv.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+    resonantOsc.connect(resonantEnv);
+    resonantEnv.connect(fireGainRef.current);
+
+    resonantOsc.start(now);
+    resonantOsc.stop(now + 0.2);
+  }, []);
+
   // Listen for navbar mute/unmute custom triggers
   useEffect(() => {
     const handleToggle = (e: Event) => {
@@ -309,11 +349,13 @@ export const SoundscapeManager = () => {
     };
 
     window.addEventListener("nature-sound-toggle", handleToggle);
+    globalThis.addEventListener("nature-campfire-crackle", triggerManualCrackle);
     return () => {
       window.removeEventListener("nature-sound-toggle", handleToggle);
+      globalThis.removeEventListener("nature-campfire-crackle", triggerManualCrackle);
       cleanupSoundscape();
     };
-  }, [startSoundscape, stopSoundscape, cleanupSoundscape]);
+  }, [startSoundscape, stopSoundscape, cleanupSoundscape, triggerManualCrackle]);
 
   return null; // Silent component that acts strictly as the audio canvas controller
 };

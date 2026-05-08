@@ -165,9 +165,31 @@ export const InteractiveTrail = () => {
       }
     };
 
+    const handleCampfireStoke = (e: Event) => {
+      const { x, y } = (e as CustomEvent).detail;
+      const count = 22;
+
+      for (let i = 0; i < count; i++) {
+        particles.current.push({
+          x: x + (Math.random() - 0.5) * 16,
+          y: y + (Math.random() - 0.5) * 12,
+          vx: (Math.random() - 0.5) * 4.5,
+          vy: -Math.random() * 5.5 - 2,
+          size: Math.random() * 3 + 2,
+          alpha: 1,
+          decay: 0.015 + Math.random() * 0.015,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.3,
+          color: "rgba(255, 95, 30, 0.95)",
+          type: "ember",
+        });
+      }
+    };
+
     globalThis.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseleave", handleMouseLeave);
     globalThis.addEventListener("nature-wind-gust", handleWindGust);
+    globalThis.addEventListener("nature-campfire-stoke", handleCampfireStoke);
 
     // Animation canvas loop
     let animationId: number;
@@ -269,6 +291,7 @@ export const InteractiveTrail = () => {
       globalThis.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       globalThis.removeEventListener("nature-wind-gust", handleWindGust);
+      globalThis.removeEventListener("nature-campfire-stoke", handleCampfireStoke);
       cancelAnimationFrame(animationId);
     };
   }, [scrollProgress]);

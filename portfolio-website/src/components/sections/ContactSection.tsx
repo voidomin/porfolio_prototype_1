@@ -222,6 +222,28 @@ export const ContactSection = () => {
     setMounted(true);
   }, []);
 
+  const handleCampfireStoke = () => {
+    const campfireEl = document.getElementById("campfire-vector");
+    let px = globalThis.innerWidth / 2;
+    let py = globalThis.innerHeight * 0.8;
+
+    if (campfireEl) {
+      const rect = campfireEl.getBoundingClientRect();
+      px = rect.left + rect.width / 2;
+      py = rect.top + rect.height / 2;
+    }
+
+    // 1. Dispatch custom event to spark rising campfire embers from this exact position
+    globalThis.dispatchEvent(
+      new CustomEvent("nature-campfire-stoke", {
+        detail: { x: px, y: py },
+      })
+    );
+
+    // 2. Dispatch event to trigger synthesized crackle sounds
+    globalThis.dispatchEvent(new CustomEvent("nature-campfire-crackle"));
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -408,6 +430,100 @@ export const ContactSection = () => {
                   );
                 })}
               </div>
+            </div>
+
+            {/* Interactive Campfire */}
+            <div className="glass-nature rounded-3xl p-8 flex flex-col items-center text-center relative overflow-hidden group select-none">
+              <h3 className="text-xl font-bold text-white mb-3">
+                Interactive Campfire 🔥
+              </h3>
+              <p className="text-xs text-white/50 mb-6 max-w-xs leading-relaxed">
+                Stoke the digital campfire! Click the logs below to spark high-energy rising embers and hear synthesized wood snaps.
+              </p>
+
+              {/* Animated Campfire Vector */}
+              <motion.div
+                id="campfire-vector"
+                onClick={handleCampfireStoke}
+                className="cursor-pointer relative flex items-center justify-center w-36 h-36 bg-black/25 border border-white/5 hover:border-dawn-500/20 rounded-full shadow-inner transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                title="Click logs to stoke the fire!"
+              >
+                {/* Licking Flame Animations (using SVG paths and subtle scaling loops) */}
+                <svg className="w-20 h-20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Outer glow */}
+                  <circle cx="50" cy="50" r="30" fill="url(#fireGlow)" opacity="0.3" className="animate-pulse" />
+
+                  {/* Flame Back */}
+                  <motion.path
+                    d="M50 15C50 15 35 40 35 55C35 67 43 75 50 75C57 75 65 67 65 55C65 40 50 15 50 15Z"
+                    fill="#f0541e"
+                    opacity="0.85"
+                    animate={{
+                      scaleY: [1, 1.15, 0.95, 1.08, 1],
+                      skewX: [0, -3, 3, -1, 0],
+                      y: [0, -2, 1, -1, 0],
+                    }}
+                    transition={{
+                      duration: 2.2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    style={{ originX: "50px", originY: "75px" }}
+                  />
+
+                  {/* Flame Middle */}
+                  <motion.path
+                    d="M50 25C50 25 38 43 38 58C38 68 45 75 50 75C55 75 62 68 62 58C62 43 50 25 50 25Z"
+                    fill="#ff9800"
+                    opacity="0.95"
+                    animate={{
+                      scaleY: [1, 0.92, 1.12, 0.97, 1],
+                      skewX: [0, 4, -4, 2, 0],
+                      y: [0, 1, -2, 1, 0],
+                    }}
+                    transition={{
+                      duration: 1.8,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    style={{ originX: "50px", originY: "75px" }}
+                  />
+
+                  {/* Flame Core */}
+                  <motion.path
+                    d="M50 38C50 38 42 50 42 62C42 69 46 75 50 75C54 75 58 69 58 62C58 50 50 38 50 38Z"
+                    fill="#ffeb3b"
+                    animate={{
+                      scaleY: [1, 1.1, 0.9, 1.05, 1],
+                      skewX: [0, -2, 2, 0, 0],
+                    }}
+                    transition={{
+                      duration: 1.3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    style={{ originX: "50px", originY: "75px" }}
+                  />
+
+                  {/* Cross-positioned Campfire Logs */}
+                  {/* Log Left */}
+                  <line x1="25" y1="78" x2="75" y2="68" stroke="#4a2711" strokeWidth="8" strokeLinecap="round" />
+                  {/* Log Right */}
+                  <line x1="75" y1="78" x2="25" y2="68" stroke="#3d1f0c" strokeWidth="8" strokeLinecap="round" />
+                  {/* Glowing Log Core embers */}
+                  <circle cx="50" cy="73" r="4" fill="#f0541e" className="animate-ping" />
+
+                  {/* SVG Gradient definitions */}
+                  <defs>
+                    <radialGradient id="fireGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#f0541e" />
+                      <stop offset="100%" stopColor="#f0541e" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+                </svg>
+              </motion.div>
             </div>
           </motion.div>
 
