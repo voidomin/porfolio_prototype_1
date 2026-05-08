@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { skills } from "@/data/portfolio";
 import { Skill, type SkillCategory } from "@/types";
@@ -68,6 +69,27 @@ const SkillCategoryCard = ({
   index: number;
 }) => {
   const meta = skillCategories[category];
+  const [gustRotate, setGustRotate] = useState(0);
+
+  useEffect(() => {
+    const handleGust = (e: Event) => {
+      const { vx } = (e as CustomEvent).detail;
+      // Stagger reaction by index for physical wind sweep effect
+      const delayMs = index * 70;
+      setTimeout(() => {
+        const tilt = vx > 0 ? 5.5 : -5.5;
+        setGustRotate(tilt);
+        
+        // Sway bounce sequence
+        setTimeout(() => setGustRotate(vx > 0 ? -2.5 : 2.5), 200);
+        setTimeout(() => setGustRotate(vx > 0 ? 1 : -1), 400);
+        setTimeout(() => setGustRotate(0), 600);
+      }, delayMs);
+    };
+
+    globalThis.addEventListener("nature-wind-gust", handleGust);
+    return () => globalThis.removeEventListener("nature-wind-gust", handleGust);
+  }, [index]);
 
   return (
     <motion.div
@@ -79,6 +101,7 @@ const SkillCategoryCard = ({
         rotate: [0, -0.8, 0.6, -0.3, 0.15, 0],
         scale: 1.015,
       }}
+      animate={{ rotate: gustRotate }}
       className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-meadow-300/30 shadow-lg shadow-meadow-900/5 hover:shadow-xl hover:border-meadow-400/40 transition-all duration-500 origin-bottom"
     >
       <div className="flex items-center gap-3 mb-6 select-none">
@@ -92,6 +115,54 @@ const SkillCategoryCard = ({
           <SkillBar key={skill.id} skill={skill} index={skillIndex} />
         ))}
       </div>
+    </motion.div>
+  );
+};
+
+const StatCard = ({
+  stat,
+  index,
+}: {
+  stat: { value: string; label: string; color: string };
+  index: number;
+}) => {
+  const [gustRotate, setGustRotate] = useState(0);
+
+  useEffect(() => {
+    const handleGust = (e: Event) => {
+      const { vx } = (e as CustomEvent).detail;
+      // Stagger slightly after the main category cards for natural cascading wave flow
+      const delayMs = 250 + index * 50;
+      setTimeout(() => {
+        const tilt = vx > 0 ? 4 : -4;
+        setGustRotate(tilt);
+        
+        setTimeout(() => setGustRotate(vx > 0 ? -1.8 : 1.8), 200);
+        setTimeout(() => setGustRotate(0), 400);
+      }, delayMs);
+    };
+
+    globalThis.addEventListener("nature-wind-gust", handleGust);
+    return () => globalThis.removeEventListener("nature-wind-gust", handleGust);
+  }, [index]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+      whileHover={{ 
+        rotate: [0, -1.2, 0.9, -0.5, 0.2, 0],
+        scale: 1.03,
+      }}
+      animate={{ rotate: gustRotate }}
+      className="text-center p-5 bg-white/50 backdrop-blur-sm rounded-2xl border border-meadow-300/20 origin-bottom hover:border-meadow-400/40 hover:shadow-md transition-all duration-300"
+    >
+      <div className={`text-2xl md:text-3xl font-bold ${stat.color} mb-1 select-none`}>
+        {stat.value}
+      </div>
+      <div className="text-sm text-meadow-700/50 select-none">{stat.label}</div>
     </motion.div>
   );
 };
@@ -192,23 +263,7 @@ export const SkillsSection = () => {
               color: "text-forest-600",
             },
           ].map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
-              whileHover={{ 
-                rotate: [0, -1.2, 0.9, -0.5, 0.2, 0],
-                scale: 1.03,
-              }}
-              className="text-center p-5 bg-white/50 backdrop-blur-sm rounded-2xl border border-meadow-300/20 origin-bottom hover:border-meadow-400/40 hover:shadow-md transition-all duration-300"
-            >
-              <div className={`text-2xl md:text-3xl font-bold ${stat.color} mb-1 select-none`}>
-                {stat.value}
-              </div>
-              <div className="text-sm text-meadow-700/50 select-none">{stat.label}</div>
-            </motion.div>
+            <StatCard key={stat.label} stat={stat} index={i} />
           ))}
         </motion.div>
       </div>

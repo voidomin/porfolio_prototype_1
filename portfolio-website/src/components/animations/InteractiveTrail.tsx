@@ -70,6 +70,19 @@ export const InteractiveTrail = () => {
       const dy = mousePos.current.y - mousePos.current.lastY;
       const speed = Math.hypot(dx, dy);
 
+      // Detect swipe/gust gesture (high-velocity mouse drag)
+      if (speed > 35) {
+        // Calculate dynamic direction vector normalized
+        const normX = dx / speed;
+        const normY = dy / speed;
+
+        globalThis.dispatchEvent(
+          new CustomEvent("nature-wind-gust", {
+            detail: { vx: normX * 14, vy: normY * 14 },
+          })
+        );
+      }
+
       // Spawn exactly ONE micro-particle only on significant move, max active particles capped at 20
       if (speed > 4 && particles.current.length < 25) {
         let type: "leaf" | "pollen" | "ember" = "leaf";
@@ -120,8 +133,41 @@ export const InteractiveTrail = () => {
       mousePos.current.active = false;
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    const handleWindGust = (e: Event) => {
+      const { vx, vy } = (e as CustomEvent).detail;
+      const count = 15;
+
+      for (let i = 0; i < count; i++) {
+        let type: "leaf" | "pollen" | "ember" = "leaf";
+        let color = "rgba(120, 180, 80, 0.7)"; // Leaf green
+
+        if (scrollProgress >= 0.35 && scrollProgress < 0.7) {
+          type = "pollen";
+          color = "rgba(250, 195, 50, 0.85)";
+        } else if (scrollProgress >= 0.7) {
+          type = "ember";
+          color = "rgba(255, 95, 30, 0.95)";
+        }
+
+        particles.current.push({
+          x: Math.random() * (globalThis.innerWidth || 1200),
+          y: Math.random() * (globalThis.innerHeight || 800),
+          vx: vx + (Math.random() - 0.5) * 4,
+          vy: vy + (Math.random() - 0.5) * 4,
+          size: type === "leaf" ? Math.random() * 5 + 5 : Math.random() * 3.5 + 2.5,
+          alpha: 1,
+          decay: type === "leaf" ? 0.008 : 0.015,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.15,
+          color,
+          type,
+        });
+      }
+    };
+
+    globalThis.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseleave", handleMouseLeave);
+    globalThis.addEventListener("nature-wind-gust", handleWindGust);
 
     // Animation canvas loop
     let animationId: number;
@@ -222,6 +268,7 @@ export const InteractiveTrail = () => {
       globalThis.removeEventListener("resize", resizeCanvas);
       globalThis.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
+      globalThis.removeEventListener("nature-wind-gust", handleWindGust);
       cancelAnimationFrame(animationId);
     };
   }, [scrollProgress]);
