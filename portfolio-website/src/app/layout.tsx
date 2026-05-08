@@ -25,6 +25,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://akashportfolio.dev"), // Set your production domain here
   title: "Akash — Full-Stack & Data Science Engineer",
   description:
     "Portfolio of Akash featuring full-stack engineering, data science work, selected projects, and research contributions. A storytelling journey through nature.",

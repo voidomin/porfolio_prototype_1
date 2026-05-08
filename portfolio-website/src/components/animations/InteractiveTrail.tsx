@@ -31,6 +31,7 @@ export const InteractiveTrail = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const mousePos = useRef({ x: 0, y: 0, lastX: 0, lastY: 0, active: false });
   const particles = useRef<Particle[]>([]);
+  const lastGustTime = useRef(0);
 
   // Update current scroll progress state for particle spawning
   useEffect(() => {
@@ -79,7 +80,7 @@ export const InteractiveTrail = () => {
         globalThis.dispatchEvent(
           new CustomEvent("nature-wind-gust", {
             detail: { vx: normX * 14, vy: normY * 14 },
-          })
+          }),
         );
       }
 
@@ -134,8 +135,15 @@ export const InteractiveTrail = () => {
     };
 
     const handleWindGust = (e: Event) => {
+      // Cooldown: prevent gust spam - only allow one gust every 150ms
+      const now = Date.now();
+      if (now - lastGustTime.current < 150) {
+        return;
+      }
+      lastGustTime.current = now;
+
       const { vx, vy } = (e as CustomEvent).detail;
-      const count = 15;
+      const count = 7; // Reduced from 15 to prevent screen flooding
 
       for (let i = 0; i < count; i++) {
         let type: "leaf" | "pollen" | "ember" = "leaf";
@@ -154,9 +162,10 @@ export const InteractiveTrail = () => {
           y: Math.random() * (globalThis.innerHeight || 800),
           vx: vx + (Math.random() - 0.5) * 4,
           vy: vy + (Math.random() - 0.5) * 4,
-          size: type === "leaf" ? Math.random() * 5 + 5 : Math.random() * 3.5 + 2.5,
+          size:
+            type === "leaf" ? Math.random() * 5 + 5 : Math.random() * 3.5 + 2.5,
           alpha: 1,
-          decay: type === "leaf" ? 0.008 : 0.015,
+          decay: type === "ember" ? 0.032 : type === "leaf" ? 0.008 : 0.015, // Faster decay for embers
           rotation: Math.random() * Math.PI * 2,
           rotationSpeed: (Math.random() - 0.5) * 0.15,
           color,
@@ -167,7 +176,7 @@ export const InteractiveTrail = () => {
 
     const handleCampfireStoke = (e: Event) => {
       const { x, y } = (e as CustomEvent).detail;
-      const count = 22;
+      const count = 14; // Reduced from 22 for better visual balance
 
       for (let i = 0; i < count; i++) {
         particles.current.push({
@@ -177,7 +186,7 @@ export const InteractiveTrail = () => {
           vy: -Math.random() * 5.5 - 2,
           size: Math.random() * 3 + 2,
           alpha: 1,
-          decay: 0.015 + Math.random() * 0.015,
+          decay: 0.032 + Math.random() * 0.012, // Increased from 0.015 for faster fade
           rotation: Math.random() * Math.PI * 2,
           rotationSpeed: (Math.random() - 0.5) * 0.3,
           color: "rgba(255, 95, 30, 0.95)",
@@ -252,7 +261,7 @@ export const InteractiveTrail = () => {
           ctx.quadraticCurveTo(0, 0, 0, p.size);
           ctx.quadraticCurveTo(0, 0, -p.size, 0);
           ctx.quadraticCurveTo(0, 0, 0, -p.size);
-          
+
           // Outer dapple radial glow
           const radial = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size * 1.5);
           radial.addColorStop(0, "#ffffff");
@@ -269,7 +278,7 @@ export const InteractiveTrail = () => {
           // Draw hot glowing spark motion streak backward from current speed direction
           ctx.moveTo(0, 0);
           ctx.lineTo(-p.vx * 3.5, -p.vy * 3.5);
-          
+
           ctx.strokeStyle = p.color;
           ctx.lineWidth = p.size;
           ctx.lineCap = "round";
@@ -291,7 +300,10 @@ export const InteractiveTrail = () => {
       globalThis.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       globalThis.removeEventListener("nature-wind-gust", handleWindGust);
-      globalThis.removeEventListener("nature-campfire-stoke", handleCampfireStoke);
+      globalThis.removeEventListener(
+        "nature-campfire-stoke",
+        handleCampfireStoke,
+      );
       cancelAnimationFrame(animationId);
     };
   }, [scrollProgress]);
