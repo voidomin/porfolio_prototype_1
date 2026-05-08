@@ -42,43 +42,43 @@ export default function Home() {
       <HeroSection />
 
       {/* Terrain: mountain ridge → forest */}
-      <SectionDivider variant="mountain-ridge" fillColor="#0d200d" />
+      <SectionDivider variant="mountain-ridge" fillColor="rgba(13, 32, 13, 0.35)" />
 
       {/* Chapter 2: The Forest Path */}
       <AboutSection />
 
       {/* Terrain: forest treeline → meadow */}
-      <SectionDivider variant="forest-treeline" fillColor="#224922" />
+      <SectionDivider variant="forest-treeline" fillColor="rgba(34, 73, 34, 0.2)" />
 
       {/* Chapter 3: The Meadow */}
       <SkillsSection />
 
       {/* Terrain: rolling hills → river */}
-      <SectionDivider variant="rolling-hills" fillColor="#d3ed9e" />
+      <SectionDivider variant="rolling-hills" fillColor="rgba(211, 237, 158, 0.2)" />
 
       {/* Chapter 4: Stepping Stones */}
       <ProjectsSection />
 
       {/* Terrain: river bank → clearing */}
-      <SectionDivider variant="river-bank" fillColor="#bfe3fe" />
+      <SectionDivider variant="river-bank" fillColor="rgba(191, 227, 254, 0.2)" />
 
       {/* Chapter 5: The Clearing */}
       <PublicationsSection />
 
       {/* Terrain: rolling hills → golden hour */}
-      <SectionDivider variant="rolling-hills" fillColor="#fce8e6" />
+      <SectionDivider variant="rolling-hills" fillColor="rgba(252, 232, 230, 0.2)" />
 
       {/* Chapter 6: Golden Hour */}
       <PhotographySection />
 
       {/* Terrain: dusk horizon → campfire */}
-      <SectionDivider variant="dusk-horizon" fillColor="#fce8e6" />
+      <SectionDivider variant="dusk-horizon" fillColor="rgba(252, 232, 230, 0.2)" />
 
       {/* Chapter 7: Campfire at Dusk */}
       <ContactSection />
 
       {/* Terrain: night hills → footer */}
-      <SectionDivider variant="night-hills" fillColor="#1a0a09" />
+      <SectionDivider variant="night-hills" fillColor="rgba(26, 10, 9, 0.5)" />
 
       {/* Night Falls */}
       <Footer />

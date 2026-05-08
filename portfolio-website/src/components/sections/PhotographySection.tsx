@@ -17,7 +17,7 @@ export const PhotographySection = () => {
       className="relative py-24 md:py-32 overflow-hidden"
       style={{
         background:
-          "linear-gradient(180deg, #fce8e6 0%, #fdedb7 20%, #fbdf85 50%, #fdedb7 80%, #fce8e6 100%)",
+          "linear-gradient(180deg, rgba(252, 232, 230, 0.2) 0%, rgba(253, 237, 183, 0.25) 15%, rgba(251, 223, 133, 0.2) 50%, rgba(253, 237, 183, 0.25) 85%, rgba(252, 232, 230, 0.2) 100%)",
       }}
     >
       {/* Golden hour atmosphere */}

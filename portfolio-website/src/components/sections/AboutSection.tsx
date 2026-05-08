@@ -23,7 +23,7 @@ export const AboutSection = () => {
       className="relative py-24 md:py-32 overflow-hidden"
       style={{
         background:
-          "linear-gradient(180deg, #0d200d 0%, #1d3d1d 15%, #265b26 50%, #1d3d1d 85%, #224922 100%)",
+          "linear-gradient(180deg, rgba(13, 32, 13, 0.35) 0%, rgba(29, 61, 29, 0.45) 15%, rgba(38, 91, 38, 0.5) 50%, rgba(29, 61, 29, 0.45) 85%, rgba(34, 73, 34, 0.35) 100%)",
       }}
     >
       {/* Forest mist overlay */}

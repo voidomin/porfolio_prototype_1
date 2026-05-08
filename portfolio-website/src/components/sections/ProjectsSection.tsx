@@ -227,7 +227,7 @@ export const ProjectsSection = () => {
       className="relative py-24 md:py-32 overflow-hidden"
       style={{
         background:
-          "linear-gradient(180deg, #d3ed9e 0%, #dbeffe 10%, #eff8ff 30%, #eff8ff 70%, #dbeffe 90%, #bfe3fe 100%)",
+          "linear-gradient(180deg, rgba(211, 237, 158, 0.2) 0%, rgba(219, 239, 254, 0.15) 10%, rgba(239, 248, 255, 0.1) 30%, rgba(239, 248, 255, 0.1) 70%, rgba(219, 239, 254, 0.15) 90%, rgba(191, 227, 254, 0.25) 100%)",
       }}
     >
       {/* River shimmer overlay */}

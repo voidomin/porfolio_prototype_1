@@ -19,7 +19,7 @@ export const PublicationsSection = () => {
       className="relative py-24 md:py-32 overflow-hidden"
       style={{
         background:
-          "linear-gradient(180deg, #bfe3fe 0%, #fef7e0 10%, #fdedb7 50%, #fef7e0 90%, #fce8e6 100%)",
+          "linear-gradient(180deg, rgba(191, 227, 254, 0.2) 0%, rgba(232, 245, 204, 0.15) 10%, rgba(245, 251, 232, 0.15) 30%, rgba(245, 251, 232, 0.15) 70%, rgba(232, 245, 204, 0.15) 90%, rgba(252, 232, 230, 0.25) 100%)",
       }}
     >
       {/* Afternoon warmth */}

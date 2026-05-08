@@ -294,7 +294,7 @@ export const ContactSection = () => {
       className="relative py-24 md:py-32 overflow-hidden"
       style={{
         background:
-          "linear-gradient(180deg, #fce8e6 0%, #f5b3af 15%, #e05d57 35%, #762b2a 60%, #401312 80%, #1a0a09 100%)",
+          "linear-gradient(180deg, rgba(252, 232, 230, 0.2) 0%, rgba(245, 179, 175, 0.25) 15%, rgba(224, 93, 87, 0.3) 35%, rgba(118, 43, 42, 0.35) 60%, rgba(64, 19, 18, 0.45) 80%, rgba(26, 10, 9, 0.5) 100%)",
       }}
     >
       {/* Firefly particles */}

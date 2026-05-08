@@ -186,7 +186,7 @@ export const SkillsSection = () => {
       className="relative py-24 md:py-32 overflow-hidden"
       style={{
         background:
-          "linear-gradient(180deg, #224922 0%, #e8f5cc 10%, #f5fbe8 30%, #f5fbe8 70%, #e8f5cc 90%, #d3ed9e 100%)",
+          "linear-gradient(180deg, rgba(34, 73, 34, 0.2) 0%, rgba(232, 245, 204, 0.2) 10%, rgba(245, 251, 232, 0.15) 30%, rgba(245, 251, 232, 0.15) 70%, rgba(232, 245, 204, 0.2) 90%, rgba(211, 237, 158, 0.2) 100%)",
       }}
     >
       {/* Meadow atmosphere */}

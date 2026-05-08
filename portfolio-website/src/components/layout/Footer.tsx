@@ -48,7 +48,7 @@ export const Footer = () => {
     <footer
       className="relative overflow-hidden"
       style={{
-        background: "linear-gradient(180deg, #1a0a09 0%, #0f0d2e 30%, #0a0820 100%)",
+        background: "linear-gradient(180deg, rgba(26, 10, 9, 0.5) 0%, rgba(15, 13, 46, 0.7) 30%, rgba(10, 8, 32, 0.85) 100%)",
       }}
       onMouseEnter={handleHover}
     >
