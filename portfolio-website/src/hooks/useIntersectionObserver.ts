@@ -47,56 +47,6 @@ export const useIntersectionObserver = ({
   return { elementRef, isIntersecting };
 };
 
-export const useMultipleIntersectionObserver = (
-  elementsCount: number,
-  options?: UseIntersectionObserverProps
-) => {
-  const [intersectingElements, setIntersectingElements] = useState<boolean[]>(
-    new Array(elementsCount).fill(false)
-  );
-  const elementRefs = useRef<(HTMLElement | null)[]>(
-    new Array(elementsCount).fill(null)
-  );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const index = elementRefs.current.findIndex(
-            (el) => el === entry.target
-          );
-          if (index !== -1) {
-            setIntersectingElements((prev) => {
-              const newState = [...prev];
-              newState[index] = entry.isIntersecting;
-              return newState;
-            });
-          }
-        });
-      },
-      {
-        threshold: options?.threshold || 0.1,
-        rootMargin: options?.rootMargin || "0px",
-      }
-    );
-
-    elementRefs.current.forEach((element) => {
-      if (element) observer.observe(element);
-    });
-
-    return () => {
-      elementRefs.current.forEach((element) => {
-        if (element) observer.unobserve(element);
-      });
-    };
-  }, [options?.threshold, options?.rootMargin]);
-
-  const setElementRef = (index: number) => (element: HTMLElement | null) => {
-    elementRefs.current[index] = element;
-  };
-
-  return { intersectingElements, setElementRef };
-};
 
 export const useScrollDirection = () => {
   const [scrollDirection, setScrollDirection] = useState<"up" | "down">("down");

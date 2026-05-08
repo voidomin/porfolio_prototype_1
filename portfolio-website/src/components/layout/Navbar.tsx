@@ -137,6 +137,8 @@ export const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               title={soundEnabled ? "Mute ambient mountain sounds" : "Unmute ambient mountain sounds"}
+              aria-label={soundEnabled ? "Mute ambient mountain sounds" : "Unmute ambient mountain sounds"}
+              aria-pressed={soundEnabled}
             >
               {/* Dynamic Equalizer Bars */}
               <div className="flex items-end gap-[2.5px] h-3.5 w-4 overflow-hidden">
@@ -175,6 +177,8 @@ export const Navbar = () => {
               )}
               whileTap={{ scale: 0.95 }}
               title={soundEnabled ? "Mute Soundscape" : "Unmute Soundscape"}
+              aria-label={soundEnabled ? "Mute ambient soundscape" : "Unmute ambient soundscape"}
+              aria-pressed={soundEnabled}
             >
               <div className="flex items-end gap-[2px] h-3 w-3 overflow-hidden">
                 {[0.8, 1.1, 0.7, 1].map((dur) => (
@@ -208,6 +212,9 @@ export const Navbar = () => {
               )}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
+              aria-label={isOpen ? "Close main navigation menu" : "Open main navigation menu"}
+              aria-expanded={isOpen}
+              aria-controls="mobile-navigation-drawer"
             >
             <AnimatePresence mode="wait">
               {isOpen ? (
@@ -250,6 +257,9 @@ export const Navbar = () => {
             />
 
             <motion.div
+              id="mobile-navigation-drawer"
+              role="navigation"
+              aria-label="Mobile navigation"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}

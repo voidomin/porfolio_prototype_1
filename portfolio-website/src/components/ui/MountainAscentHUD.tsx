@@ -65,9 +65,10 @@ export const MountainAscentHUD = () => {
   };
 
   return (
-    <div 
+    <nav 
       className="fixed right-5 lg:right-8 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-center select-none pointer-events-auto"
       onMouseLeave={() => setHoveredItem(null)} // Returns to scroll-active dot solely when leaving the entire sidebar HUD
+      aria-label="Hiking trail section navigator"
     >
       {/* HUD Container - More compact, ultra-refined */}
       <div className="relative flex flex-col items-center py-3.5 px-1.5 rounded-xl bg-black/15 backdrop-blur-md border border-white/5 shadow-2xl">
@@ -93,11 +94,14 @@ export const MountainAscentHUD = () => {
             const isHighlighted = (hoveredItem ? hoveredItem : activeSection) === item.id;
 
             return (
-              <div
+              <button
                 key={item.id}
-                className="relative flex items-center justify-center cursor-pointer group"
+                className="relative flex items-center justify-center cursor-pointer group bg-transparent border-none p-0 focus:outline-none"
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onClick={() => handleScrollTo(item.id)}
+                aria-label={`Scroll to ${item.label}`}
+                aria-current={isActive ? "true" : "false"}
+                title={`Scroll to ${item.label}`}
               >
                 {/* Floating label tag on hover (slides in smoothly from left) */}
                 <AnimatePresence>
@@ -148,11 +152,11 @@ export const MountainAscentHUD = () => {
                     )}
                   />
                 </motion.div>
-              </div>
+              </button>
             );
           })}
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
