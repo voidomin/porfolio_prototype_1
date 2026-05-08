@@ -17,6 +17,7 @@ export const ChapterTitleIntro = () => {
   const [activeChapter, setActiveChapter] = useState<typeof chapters[0] | null>(null);
   const [show, setShow] = useState(false);
   const lastActiveId = useRef<string | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const handleScrollSpy = () => {
@@ -37,12 +38,16 @@ export const ChapterTitleIntro = () => {
               setActiveChapter(item);
               setShow(true);
 
-              // Auto dismiss after 2.8 seconds
-              const timer = setTimeout(() => {
-                setShow(false);
-              }, 2800);
+              // Clear any existing auto-dismiss timer
+              if (timerRef.current) {
+                clearTimeout(timerRef.current);
+              }
 
-              return () => clearTimeout(timer);
+              // Set a fresh auto-dismiss timer after 2.8s
+              timerRef.current = setTimeout(() => {
+                setShow(false);
+                timerRef.current = null;
+              }, 2800);
             }
             break;
           }
@@ -53,7 +58,12 @@ export const ChapterTitleIntro = () => {
     globalThis.addEventListener("scroll", handleScrollSpy, { passive: true });
     handleScrollSpy(); // Run on initial render
 
-    return () => globalThis.removeEventListener("scroll", handleScrollSpy);
+    return () => {
+      globalThis.removeEventListener("scroll", handleScrollSpy);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
   }, []);
 
   return (
