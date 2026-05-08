@@ -12,6 +12,50 @@ import { useScrollDirection } from "@/hooks/useIntersectionObserver";
    Nature-inspired hover effects. No dark mode toggle.
    ────────────────────────────────────────────────────────── */
 
+interface EqualizerBarsProps {
+  soundEnabled: boolean;
+  barColorOn: string;
+  barColorOff: string;
+  isMobile?: boolean;
+}
+
+const EqualizerBars = ({
+  soundEnabled,
+  barColorOn,
+  barColorOff,
+  isMobile = false,
+}: EqualizerBarsProps) => {
+  const durations = isMobile ? [0.8, 1.1, 0.7, 1] : [0.7, 1.1, 0.6, 0.9];
+  return (
+    <div
+      className={cn(
+        "flex items-end overflow-hidden",
+        isMobile ? "gap-[2px] h-3 w-3" : "gap-[2.5px] h-3.5 w-4"
+      )}
+    >
+      {durations.map((dur) => (
+        <motion.div
+          key={`${isMobile ? "mob" : "desk"}-eq-${dur}`}
+          animate={{
+            scaleY: soundEnabled ? [0.25, 1, 0.25] : 0.25,
+          }}
+          transition={{
+            duration: dur,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className={cn(
+            "origin-bottom rounded-full transition-colors duration-300",
+            isMobile ? "w-[1.5px]" : "w-[2px]",
+            "h-full",
+            soundEnabled ? barColorOn : barColorOff
+          )}
+        />
+      ))}
+    </div>
+  );
+};
+
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
@@ -140,26 +184,12 @@ export const Navbar = () => {
               aria-label={soundEnabled ? "Mute ambient mountain sounds" : "Unmute ambient mountain sounds"}
               aria-pressed={soundEnabled}
             >
-              {/* Dynamic Equalizer Bars */}
-              <div className="flex items-end gap-[2.5px] h-3.5 w-4 overflow-hidden">
-                {[0.7, 1.1, 0.6, 0.9].map((dur) => (
-                  <motion.div
-                    key={`desk-eq-${dur}`}
-                    animate={{
-                      scaleY: soundEnabled ? [0.25, 1, 0.25] : 0.25,
-                    }}
-                    transition={{
-                      duration: dur,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className={cn(
-                      "w-[2px] h-full origin-bottom rounded-full transition-colors duration-300",
-                      soundEnabled ? desktopBarColorOn : desktopBarColorOff
-                    )}
-                  />
-                ))}
-              </div>
+              <EqualizerBars
+                soundEnabled={soundEnabled}
+                barColorOn={desktopBarColorOn}
+                barColorOff={desktopBarColorOff}
+                isMobile={false}
+              />
               <span className="uppercase text-[9px] font-bold">
                 {soundEnabled ? "Sound ON" : "Sound OFF"}
               </span>
@@ -180,25 +210,12 @@ export const Navbar = () => {
               aria-label={soundEnabled ? "Mute ambient soundscape" : "Unmute ambient soundscape"}
               aria-pressed={soundEnabled}
             >
-              <div className="flex items-end gap-[2px] h-3 w-3 overflow-hidden">
-                {[0.8, 1.1, 0.7, 1].map((dur) => (
-                  <motion.div
-                    key={`mob-eq-${dur}`}
-                    animate={{
-                      scaleY: soundEnabled ? [0.25, 1, 0.25] : 0.25,
-                    }}
-                    transition={{
-                      duration: dur,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className={cn(
-                      "w-[1.5px] h-full origin-bottom rounded-full transition-colors duration-300",
-                      soundEnabled ? mobileBarColorOn : mobileBarColorOff
-                    )}
-                  />
-                ))}
-              </div>
+              <EqualizerBars
+                soundEnabled={soundEnabled}
+                barColorOn={mobileBarColorOn}
+                barColorOff={mobileBarColorOff}
+                isMobile={true}
+              />
             </motion.button>
 
             {/* Mobile menu button */}
