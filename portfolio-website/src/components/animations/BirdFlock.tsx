@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ──────────────────────────────────────────────────────────
@@ -16,6 +16,11 @@ interface Bird {
   size: number;
   delay: number;
   speed: number;
+}
+
+interface Flock {
+  id: number;
+  birds: Bird[];
 }
 
 function createFlock(): Bird[] {
@@ -61,19 +66,20 @@ const BirdShape = ({ size, color }: { size: number; color: string }) => (
 );
 
 export const BirdFlock = () => {
-  const [flocks, setFlocks] = useState<Bird[][]>([]);
-  const [flockKey, setFlockKey] = useState(0);
+  const [flocks, setFlocks] = useState<Flock[]>([]);
+  const flockIdCounter = useRef(0);
 
   useEffect(() => {
     // Spawn a new flock every 12-20 seconds
     const spawnFlock = () => {
+      flockIdCounter.current += 1;
+      const nextId = flockIdCounter.current;
       setFlocks((prev) => {
-        const newFlocks = [...prev, createFlock()];
+        const newFlocks = [...prev, { id: nextId, birds: createFlock() }];
         // Keep max 3 flocks in memory
         if (newFlocks.length > 3) newFlocks.shift();
         return newFlocks;
       });
-      setFlockKey((k) => k + 1);
     };
 
     // Initial flock after a short delay
@@ -93,11 +99,11 @@ export const BirdFlock = () => {
       style={{ zIndex: 5 }}
     >
       <AnimatePresence>
-        {flocks.map((flock, fi) => (
-          <div key={`flock-${fi}-${flockKey}`}>
-            {flock.map((bird) => (
+        {flocks.map((flock) => (
+          <div key={`flock-${flock.id}`}>
+            {flock.birds.map((bird) => (
               <motion.div
-                key={`bird-${fi}-${bird.id}`}
+                key={`bird-${flock.id}-${bird.id}`}
                 className="absolute"
                 initial={{
                   x: `${bird.x}vw`,
