@@ -58,6 +58,89 @@ export const InteractiveTrail = () => {
     resizeCanvas();
     globalThis.addEventListener("resize", resizeCanvas);
 
+    // Helper to spawn a single particle
+    const spawnParticleAt = (x: number, y: number) => {
+      let type: "leaf" | "pollen" | "ember" = "leaf";
+      let color = "rgba(120, 180, 80, 0.7)"; // Leaf green
+
+      if (scrollProgress >= 0.35 && scrollProgress < 0.7) {
+        type = "pollen";
+        color = "rgba(250, 195, 50, 0.85)"; // Pollen gold/amber shimmer
+      } else if (scrollProgress >= 0.7) {
+        type = "ember";
+        color = "rgba(255, 95, 30, 0.95)"; // Fast, hot campfire orange
+      }
+
+      let vx = (Math.random() - 0.5) * 0.8;
+      let vy = Math.random() * 0.5 + 0.2; // Leaf default
+      let size = Math.random() * 4 + 4; // Leaf default
+      let decay = 0.012; // Leaf default
+
+      if (type === "ember") {
+        vx = (Math.random() - 0.5) * 1.5;
+        vy = -Math.random() * 2 - 1;
+        size = Math.random() * 2 + 1.5;
+        decay = 0.025;
+      } else if (type === "pollen") {
+        vy = (Math.random() - 0.5) * 0.5;
+        size = Math.random() * 3.5 + 2.5;
+        decay = 0.015;
+      }
+
+      particles.current.push({
+        x,
+        y,
+        vx,
+        vy,
+        size,
+        alpha: 1,
+        decay,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.05,
+        color,
+        type,
+      });
+    };
+
+    // Helper to spawn a burst of particles
+    const spawnBurstAt = (x: number, y: number, count: number) => {
+      for (let i = 0; i < count; i++) {
+        let type: "leaf" | "pollen" | "ember" = "leaf";
+        let color = "rgba(120, 180, 80, 0.7)";
+
+        if (scrollProgress >= 0.35 && scrollProgress < 0.7) {
+          type = "pollen";
+          color = "rgba(250, 195, 50, 0.85)";
+        } else if (scrollProgress >= 0.7) {
+          type = "ember";
+          color = "rgba(255, 95, 30, 0.95)";
+        }
+
+        let vx = (Math.random() - 0.5) * 2.5;
+        let vy = (Math.random() - 0.5) * 2.5;
+        let size = Math.random() * 3 + 1.5;
+        let decay = 0.022;
+
+        if (type === "ember") {
+          vy = -Math.random() * 3 - 1.5;
+        }
+
+        particles.current.push({
+          x,
+          y,
+          vx,
+          vy,
+          size,
+          alpha: 1,
+          decay,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.15,
+          color,
+          type,
+        });
+      }
+    };
+
     // Track mouse movement
     const handleMouseMove = (e: MouseEvent) => {
       mousePos.current.lastX = mousePos.current.x;
@@ -84,50 +167,56 @@ export const InteractiveTrail = () => {
         );
       }
 
-      // Spawn exactly ONE micro-particle only on significant move, max active particles capped at 20
+      // Spawn exactly ONE micro-particle only on significant move, max active particles capped at 25
       if (speed > 4 && particles.current.length < 25) {
-        let type: "leaf" | "pollen" | "ember" = "leaf";
-        let color = "rgba(120, 180, 80, 0.7)"; // Leaf green
-
-        if (scrollProgress >= 0.35 && scrollProgress < 0.7) {
-          type = "pollen";
-          color = "rgba(250, 195, 50, 0.85)"; // Pollen gold/amber shimmer
-        } else if (scrollProgress >= 0.7) {
-          type = "ember";
-          color = "rgba(255, 95, 30, 0.95)"; // Fast, hot campfire orange
-        }
-
-        // Deconstruct physics attributes cleanly to resolve cognitive complexity & nested ternary warnings
-        let vx = (Math.random() - 0.5) * 0.8;
-        let vy = Math.random() * 0.5 + 0.2; // Leaf default
-        let size = Math.random() * 4 + 4; // Leaf default
-        let decay = 0.012; // Leaf default
-
-        if (type === "ember") {
-          vx = (Math.random() - 0.5) * 1.5;
-          vy = -Math.random() * 2 - 1;
-          size = Math.random() * 2 + 1.5;
-          decay = 0.025;
-        } else if (type === "pollen") {
-          vy = (Math.random() - 0.5) * 0.5;
-          size = Math.random() * 3.5 + 2.5;
-          decay = 0.015;
-        }
-
-        particles.current.push({
-          x: mousePos.current.x,
-          y: mousePos.current.y,
-          vx,
-          vy,
-          size,
-          alpha: 1,
-          decay,
-          rotation: Math.random() * Math.PI * 2,
-          rotationSpeed: (Math.random() - 0.5) * 0.05,
-          color,
-          type,
-        });
+        spawnParticleAt(e.clientX, e.clientY);
       }
+    };
+
+    // Track touch movement (mobile)
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      const touch = e.touches[0];
+
+      mousePos.current.lastX = mousePos.current.x;
+      mousePos.current.lastY = mousePos.current.y;
+      mousePos.current.x = touch.clientX;
+      mousePos.current.y = touch.clientY;
+      mousePos.current.active = true;
+
+      const dx = mousePos.current.x - mousePos.current.lastX;
+      const dy = mousePos.current.y - mousePos.current.lastY;
+      const speed = Math.hypot(dx, dy);
+
+      // Detect fast swipe wind gust on mobile (lower threshold for thumb swipes)
+      if (speed > 20) {
+        const normX = dx / speed;
+        const normY = dy / speed;
+
+        globalThis.dispatchEvent(
+          new CustomEvent("nature-wind-gust", {
+            detail: { vx: normX * 10, vy: normY * 10 },
+          }),
+        );
+      }
+
+      if (speed > 3 && particles.current.length < 25) {
+        spawnParticleAt(touch.clientX, touch.clientY);
+      }
+    };
+
+    // Track touch start (taps/clicks on mobile)
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      const touch = e.touches[0];
+      mousePos.current.x = touch.clientX;
+      mousePos.current.y = touch.clientY;
+      mousePos.current.lastX = touch.clientX;
+      mousePos.current.lastY = touch.clientY;
+      mousePos.current.active = true;
+
+      // Burst of particles from fingerprint tap
+      spawnBurstAt(touch.clientX, touch.clientY, 4);
     };
 
     const handleMouseLeave = () => {
@@ -197,6 +286,8 @@ export const InteractiveTrail = () => {
 
     globalThis.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseleave", handleMouseLeave);
+    globalThis.addEventListener("touchstart", handleTouchStart, { passive: true });
+    globalThis.addEventListener("touchmove", handleTouchMove, { passive: true });
     globalThis.addEventListener("nature-wind-gust", handleWindGust);
     globalThis.addEventListener("nature-campfire-stoke", handleCampfireStoke);
 
@@ -299,6 +390,8 @@ export const InteractiveTrail = () => {
       globalThis.removeEventListener("resize", resizeCanvas);
       globalThis.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
+      globalThis.removeEventListener("touchstart", handleTouchStart);
+      globalThis.removeEventListener("touchmove", handleTouchMove);
       globalThis.removeEventListener("nature-wind-gust", handleWindGust);
       globalThis.removeEventListener(
         "nature-campfire-stoke",
