@@ -56,6 +56,154 @@ const EqualizerBars = ({
   );
 };
 
+interface NavLinkProps {
+  href: string;
+  label: string;
+  hasScrolled: boolean;
+  onClick: (href: string) => void;
+}
+
+const NavLink = ({ href, label, hasScrolled, onClick }: NavLinkProps) => {
+  return (
+    <motion.a
+      href={href}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick(href);
+      }}
+      className={cn(
+        "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
+        hasScrolled
+          ? "text-white/70 hover:text-white hover:bg-white/10"
+          : "text-forest-950/80 hover:text-forest-950 hover:bg-forest-950/10"
+      )}
+    >
+      {label}
+    </motion.a>
+  );
+};
+
+const MenuToggleIcon = ({ isOpen }: { isOpen: boolean }) => (
+  <AnimatePresence mode="wait">
+    {isOpen ? (
+      <motion.div
+        key="close"
+        initial={{ rotate: -90, scale: 0 }}
+        animate={{ rotate: 0, scale: 1 }}
+        exit={{ rotate: 90, scale: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <X className="w-6 h-6" />
+      </motion.div>
+    ) : (
+      <motion.div
+        key="menu"
+        initial={{ rotate: 90, scale: 0 }}
+        animate={{ rotate: 0, scale: 1 }}
+        exit={{ rotate: -90, scale: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Menu className="w-6 h-6" />
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
+
+interface MobileMenuProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onLinkClick: (href: string) => void;
+}
+
+const MobileMenu = ({ isOpen, onClose, onLinkClick }: MobileMenuProps) => {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          />
+
+          <motion.div
+            id="mobile-navigation-drawer"
+            role="navigation"
+            aria-label="Mobile navigation"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed top-0 right-0 h-full w-80 max-w-[80vw] z-50 bg-night-950/95 backdrop-blur-xl border-l border-white/10 md:hidden"
+          >
+            <div className="p-6 pt-20">
+              <div className="space-y-2">
+                {navigationItems.map((item, i) => (
+                  <motion.a
+                    key={item.href}
+                    href={item.href}
+                    initial={{ x: 40, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: i * 0.08 + 0.15, duration: 0.3 }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onLinkClick(item.href);
+                    }}
+                    className="block text-lg font-medium py-3 px-4 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                  >
+                    {item.label}
+                  </motion.a>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
+interface ButtonStyles {
+  desktopButtonClass: string;
+  mobileButtonClass: string;
+  desktopBarColorOn: string;
+  desktopBarColorOff: string;
+  mobileBarColorOn: string;
+  mobileBarColorOff: string;
+}
+
+const getSoundButtonStyles = (hasScrolled: boolean, soundEnabled: boolean): ButtonStyles => {
+  if (hasScrolled) {
+    return {
+      desktopButtonClass: soundEnabled
+        ? "bg-forest-500/10 text-forest-400 border-forest-500/20"
+        : "text-white/50 border-white/10 hover:text-white",
+      mobileButtonClass: soundEnabled
+        ? "bg-forest-500/10 text-forest-400 border-forest-500/20"
+        : "text-white/50 border-white/10",
+      desktopBarColorOn: "bg-forest-400",
+      desktopBarColorOff: "bg-white/30",
+      mobileBarColorOn: "bg-forest-400",
+      mobileBarColorOff: "bg-white/30",
+    };
+  }
+
+  return {
+    desktopButtonClass: soundEnabled
+      ? "bg-forest-950/15 text-forest-950 border-forest-950/20 animate-pulse"
+      : "text-forest-950/50 border-forest-950/10 hover:text-forest-950",
+    mobileButtonClass: soundEnabled
+      ? "bg-forest-950/15 text-forest-950 border-forest-950/20 animate-pulse"
+      : "text-forest-950/50 border-forest-950/10",
+    desktopBarColorOn: "bg-forest-950",
+    desktopBarColorOff: "bg-forest-950/30",
+    mobileBarColorOn: "bg-forest-950",
+    mobileBarColorOff: "bg-forest-950/30",
+  };
+};
+
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
@@ -64,33 +212,14 @@ export const Navbar = () => {
   const shouldHideNav = scrollDirection === "down" && scrollY > 100;
   const hasScrolled = scrollY > 50;
 
-  // Pre-calculate styling strings to completely resolve cognitive complexity & nested ternaries
-  let desktopButtonClass = "";
-  let mobileButtonClass = "";
-  let desktopBarColorOn = "bg-forest-950";
-  let desktopBarColorOff = "bg-forest-950/30";
-  let mobileBarColorOn = "bg-forest-950";
-  let mobileBarColorOff = "bg-forest-950/30";
-
-  if (hasScrolled) {
-    desktopButtonClass = soundEnabled
-      ? "bg-forest-500/10 text-forest-400 border-forest-500/20"
-      : "text-white/50 border-white/10 hover:text-white";
-    mobileButtonClass = soundEnabled
-      ? "bg-forest-500/10 text-forest-400 border-forest-500/20"
-      : "text-white/50 border-white/10";
-    desktopBarColorOn = "bg-forest-400";
-    desktopBarColorOff = "bg-white/30";
-    mobileBarColorOn = "bg-forest-400";
-    mobileBarColorOff = "bg-white/30";
-  } else {
-    desktopButtonClass = soundEnabled
-      ? "bg-forest-950/15 text-forest-950 border-forest-950/20 animate-pulse"
-      : "text-forest-950/50 border-forest-950/10 hover:text-forest-950";
-    mobileButtonClass = soundEnabled
-      ? "bg-forest-950/15 text-forest-950 border-forest-950/20 animate-pulse"
-      : "text-forest-950/50 border-forest-950/10";
-  }
+  const {
+    desktopButtonClass,
+    mobileButtonClass,
+    desktopBarColorOn,
+    desktopBarColorOff,
+    mobileBarColorOn,
+    mobileBarColorOff,
+  } = getSoundButtonStyles(hasScrolled, soundEnabled);
 
   const handleLinkClick = (href: string) => {
     setIsOpen(false);
@@ -103,7 +232,6 @@ export const Navbar = () => {
   const handleSoundToggle = () => {
     const nextState = !soundEnabled;
     setSoundEnabled(nextState);
-    // Dispatch custom event to trigger SoundscapeManager
     window.dispatchEvent(
       new CustomEvent("nature-sound-toggle", { detail: { enabled: nextState } })
     );
@@ -149,25 +277,19 @@ export const Navbar = () => {
           <div className="hidden md:flex items-center gap-6">
             <div className="flex items-center gap-1">
               {navigationItems.map((item, i) => (
-                <motion.a
+                <motion.div
                   key={item.href}
-                  href={item.href}
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: i * 0.08 + 0.3, duration: 0.3 }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleLinkClick(item.href);
-                  }}
-                  className={cn(
-                    "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
-                    hasScrolled
-                      ? "text-white/70 hover:text-white hover:bg-white/10"
-                      : "text-forest-950/80 hover:text-forest-950 hover:bg-forest-950/10"
-                  )}
                 >
-                  {item.label}
-                </motion.a>
+                  <NavLink
+                    href={item.href}
+                    label={item.label}
+                    hasScrolled={hasScrolled}
+                    onClick={handleLinkClick}
+                  />
+                </motion.div>
               ))}
             </div>
 
@@ -233,80 +355,18 @@ export const Navbar = () => {
               aria-expanded={isOpen}
               aria-controls="mobile-navigation-drawer"
             >
-            <AnimatePresence mode="wait">
-              {isOpen ? (
-                <motion.div
-                  key="close"
-                  initial={{ rotate: -90, scale: 0 }}
-                  animate={{ rotate: 0, scale: 1 }}
-                  exit={{ rotate: 90, scale: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <X className="w-6 h-6" />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="menu"
-                  initial={{ rotate: 90, scale: 0 }}
-                  animate={{ rotate: 0, scale: 1 }}
-                  exit={{ rotate: -90, scale: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Menu className="w-6 h-6" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
+              <MenuToggleIcon isOpen={isOpen} />
+            </motion.button>
           </div>
         </div>
       </motion.nav>
 
       {/* Mobile menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
-            />
-
-            <motion.div
-              id="mobile-navigation-drawer"
-              role="navigation"
-              aria-label="Mobile navigation"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed top-0 right-0 h-full w-80 max-w-[80vw] z-50 bg-night-950/95 backdrop-blur-xl border-l border-white/10 md:hidden"
-            >
-              <div className="p-6 pt-20">
-                <div className="space-y-2">
-                  {navigationItems.map((item, i) => (
-                    <motion.a
-                      key={item.href}
-                      href={item.href}
-                      initial={{ x: 40, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: i * 0.08 + 0.15, duration: 0.3 }}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleLinkClick(item.href);
-                      }}
-                      className="block text-lg font-medium py-3 px-4 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-all"
-                    >
-                      {item.label}
-                    </motion.a>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <MobileMenu
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onLinkClick={handleLinkClick}
+      />
     </>
   );
 };
