@@ -9,6 +9,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingActionButton } from "@/components/ui/FloatingActionButton";
 import { MountainAscentHUD } from "@/components/ui/MountainAscentHUD";
+import { ChapterTitleIntro } from "@/components/ui/ChapterTitleIntro";
 import { NatureScene } from "@/components/animations/NatureScene";
 import { BirdFlock } from "@/components/animations/BirdFlock";
 import { FloatingLeaves } from "@/components/animations/FloatingLeaves";
@@ -84,6 +85,9 @@ export default function Home() {
 
       {/* Mountain Ascent Climbing Map tracker */}
       <MountainAscentHUD />
+
+      {/* Cinematic Chapter Title Intros */}
+      <ChapterTitleIntro />
 
       {/* Compass FAB */}
       <FloatingActionButton />

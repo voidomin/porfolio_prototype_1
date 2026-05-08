@@ -1,0 +1,98 @@
+"use client";
+
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const chapters = [
+  { id: "home", title: "Chapter I", name: "Dawn Summit", subtitle: "Misty mountain peak at sunrise", icon: "🌅" },
+  { id: "about", title: "Chapter II", name: "Pine Forest", subtitle: "Silent, towering green canopies", icon: "🌲" },
+  { id: "skills", title: "Chapter III", name: "The Meadow", subtitle: "Sunlit wind-swept fields of grass", icon: "🌿" },
+  { id: "projects", title: "Chapter IV", name: "Stepping Stones", subtitle: "Pristine mountain rivers and ripples", icon: "🪨" },
+  { id: "publications", title: "Chapter V", name: "The Clearing", subtitle: "Deep editorial mountain hollows", icon: "📖" },
+  { id: "photography", title: "Chapter VI", name: "Golden Hour", subtitle: "Warm ambers and visual memories", icon: "📷" },
+  { id: "contact", title: "Chapter VII", name: "Campfire at Dusk", subtitle: "Gathering under rising ambers", icon: "🔥" },
+];
+
+export const ChapterTitleIntro = () => {
+  const [activeChapter, setActiveChapter] = useState<typeof chapters[0] | null>(null);
+  const [show, setShow] = useState(false);
+  const lastActiveId = useRef<string | null>(null);
+
+  useEffect(() => {
+    const handleScrollSpy = () => {
+      // Find the element currently centered in the viewport
+      const viewportCenter = globalThis.scrollY + globalThis.innerHeight / 2;
+
+      for (let i = chapters.length - 1; i >= 0; i--) {
+        const item = chapters[i];
+        const el = document.getElementById(item.id);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+
+          // If the element crosses the middle of the screen
+          if (viewportCenter >= top && viewportCenter <= top + height) {
+            if (lastActiveId.current !== item.id) {
+              lastActiveId.current = item.id;
+              setActiveChapter(item);
+              setShow(true);
+
+              // Auto dismiss after 2.8 seconds
+              const timer = setTimeout(() => {
+                setShow(false);
+              }, 2800);
+
+              return () => clearTimeout(timer);
+            }
+            break;
+          }
+        }
+      }
+    };
+
+    globalThis.addEventListener("scroll", handleScrollSpy, { passive: true });
+    handleScrollSpy(); // Run on initial render
+
+    return () => globalThis.removeEventListener("scroll", handleScrollSpy);
+  }, []);
+
+  return (
+    <div className="fixed bottom-6 left-6 z-[80] pointer-events-none select-none max-w-[340px] hidden md:block">
+      <AnimatePresence>
+        {show && activeChapter && (
+          <motion.div
+            initial={{ opacity: 0, x: -50, scale: 0.92 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: -30, scale: 0.95, transition: { duration: 0.25 } }}
+            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+            className="pointer-events-auto flex items-stretch gap-4 p-4 rounded-2xl bg-stone-900/40 backdrop-blur-xl border border-amber-500/10 shadow-2xl relative overflow-hidden"
+          >
+            {/* Left accent bar */}
+            <div className="w-1 bg-gradient-to-b from-amber-500/30 to-amber-500 rounded-full" />
+
+            {/* Inner Content */}
+            <div className="flex flex-col gap-1 pr-2">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-amber-500/60 font-mono">
+                {activeChapter.title}
+              </span>
+              <h4 className="text-lg font-serif font-semibold text-white/90 leading-tight">
+                {activeChapter.name} {activeChapter.icon}
+              </h4>
+              <p className="text-xs text-white/40 font-light italic">
+                {activeChapter.subtitle}
+              </p>
+            </div>
+
+            {/* Bottom shrink-loading bar progress */}
+            <motion.div
+              initial={{ width: "100%" }}
+              animate={{ width: "0%" }}
+              transition={{ duration: 2.8, ease: "linear" }}
+              className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-amber-500/10 to-amber-500/60"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
