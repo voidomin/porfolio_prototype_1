@@ -302,8 +302,8 @@ export const ProjectsSection = () => {
       id="projects"
       ref={isDesktop ? containerRef : undefined}
       className={cn(
-        "relative overflow-hidden",
-        isDesktop ? "h-[300vh] py-0" : "py-24 md:py-32"
+        "relative",
+        isDesktop ? "h-[300vh] py-0 overflow-visible" : "overflow-hidden py-24 md:py-32"
       )}
       style={{
         background:
