@@ -331,6 +331,20 @@ export const skills: Skill[] = [
     color: "#14B8A6",
   },
   {
+    id: "19",
+    name: "Figma",
+    level: 84,
+    category: "design",
+    color: "#F24E1E",
+  },
+  {
+    id: "20",
+    name: "Adobe Photoshop",
+    level: 78,
+    category: "design",
+    color: "#31A8FF",
+  },
+  {
     id: "11",
     name: "GitHub",
     level: 90,
