@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { ExternalLink, Github, Eye, Feather } from "lucide-react";
 import { projects } from "@/data/portfolio";
 import { Project, type ProjectCategory } from "@/types";
@@ -208,134 +208,217 @@ export const ProjectsSection = () => {
   const [activeCategory, setActiveCategory] = useState<ProjectCategory | "all">(
     "all"
   );
-  const [filteredProjects, setFilteredProjects] = useState(projects);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // Responsive device detector
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(globalThis.innerWidth >= 1024);
+    };
+    handleResize();
+    globalThis.addEventListener("resize", handleResize);
+    return () => globalThis.removeEventListener("resize", handleResize);
+  }, []);
+
+  const filteredProjects = activeCategory === "all"
+    ? projects
+    : projects.filter((project) => project.category === activeCategory);
 
   const handleCategoryChange = (category: ProjectCategory | "all") => {
     setActiveCategory(category);
-    if (category === "all") {
-      setFilteredProjects(projects);
-    } else {
-      setFilteredProjects(
-        projects.filter((project) => project.category === category)
-      );
-    }
   };
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+  });
+
+  useEffect(() => {
+    if (isDesktop && scrollYProgress) {
+      return scrollYProgress.on("change", (v: number) => setScrollProgress(v));
+    }
+  }, [isDesktop, scrollYProgress]);
+
+  // Dynamically translate the project cards horizontally on desktop based on card length
+  const cardCount = filteredProjects.length;
+  // Calculate horizontal translation percent so that all cards slide past completely
+  const xTranslation = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["0%", `-${Math.max(0, (cardCount - 1.6) * (100 / cardCount))}%`]
+  );
 
   return (
     <section
       id="projects"
-      className="relative py-24 md:py-32 overflow-hidden"
+      ref={isDesktop ? containerRef : undefined}
+      className={cn(
+        "relative overflow-hidden",
+        isDesktop ? "h-[300vh] py-0" : "py-24 md:py-32"
+      )}
       style={{
         background:
           "linear-gradient(180deg, rgba(211, 237, 158, 0.2) 0%, rgba(219, 239, 254, 0.15) 10%, rgba(239, 248, 255, 0.1) 30%, rgba(239, 248, 255, 0.1) 70%, rgba(219, 239, 254, 0.15) 90%, rgba(191, 227, 254, 0.25) 100%)",
       }}
     >
       {/* River shimmer overlay */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgba(147,210,253,0.15),transparent_60%)]" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-16"
-        >
-          <p className="text-river-600/50 text-sm tracking-[0.3em] uppercase mb-4">
-            Chapter Four
-          </p>
-          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
-            Stepping{" "}
-            <span className="text-river-600">Stones</span>
-          </h2>
-          <p className="text-stone-600/70 max-w-xl mx-auto">
-            Products and experiments — stepping stones across the river of
-            practice and craft.
-          </p>
-        </motion.div>
+      {isDesktop ? (
+        /* DESKTOP PINNED HORIZONTAL LAYOUT */
+        <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden z-10">
+          <div className="w-full max-w-7xl mx-auto px-12 md:px-24 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0 select-none">
+            {/* Left section headers */}
+            <div>
+              <p className="text-river-600/50 text-xs tracking-[0.3em] uppercase mb-2">
+                Chapter Four
+              </p>
+              <h2 className="text-4xl font-bold text-stone-900">
+                Stepping <span className="text-river-600">Stones</span>
+              </h2>
+            </div>
+            
+            {/* Category selection tabs */}
+            <div className="flex gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat.value}
+                  onClick={() => handleCategoryChange(cat.value)}
+                  className={cn(
+                    "px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-300",
+                    activeCategory === cat.value
+                      ? "bg-forest-700 text-white shadow-md shadow-forest-900/15"
+                      : "bg-white/50 text-stone-600 border border-stone-300/30 hover:bg-white/80"
+                  )}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-        {/* Filter tabs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-3 mb-12"
-        >
-          {categories.map((cat) => (
-            <motion.button
-              key={cat.value}
-              onClick={() => handleCategoryChange(cat.value)}
-              className={cn(
-                "px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300",
-                activeCategory === cat.value
-                  ? "bg-forest-700 text-white shadow-lg shadow-forest-900/20"
-                  : "bg-white/60 text-stone-600 border border-stone-300/40 hover:border-forest-400/40 hover:bg-white/80"
-              )}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              {cat.label}
-            </motion.button>
-          ))}
-        </motion.div>
+          {/* Horizontal scrolling panel */}
+          <div className="w-full overflow-hidden select-none">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeCategory}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ duration: 0.4 }}
+              >
+                <motion.div
+                  style={{ x: xTranslation }}
+                  className="flex gap-8 px-12 md:px-24 w-max py-4"
+                >
+                  {filteredProjects.map((project, index) => (
+                    <div key={project.id} className="w-[380px] shrink-0">
+                      <ProjectCard project={project} index={index} />
+                    </div>
+                  ))}
+                  
+                  {filteredProjects.length === 0 && (
+                    <div className="w-screen flex items-center justify-center py-12 pr-48">
+                      <p className="text-stone-500">No projects found in this category.</p>
+                    </div>
+                  )}
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-        {/* Projects grid */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-          >
-            {filteredProjects.map((project, index) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                index={index}
-              />
+          {/* Scrolling hint bar */}
+          <div className="w-full max-w-7xl mx-auto px-12 md:px-24 mt-8 flex justify-between items-center text-xs text-stone-400 select-none shrink-0">
+            <div className="flex items-center gap-2">
+              <span>Scroll down to step across</span>
+              <span className="animate-bounce">→</span>
+            </div>
+            <div className="flex gap-6">
+              <span>{filteredProjects.length} Stones</span>
+              <span>{Math.round(scrollProgress * 100)}% Crossed</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* MOBILE VERTICAL SCROLL LAYOUT */
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
+          {/* Section header */}
+          <div className="text-center mb-12">
+            <p className="text-river-600/50 text-sm tracking-[0.3em] uppercase mb-4">
+              Chapter Four
+            </p>
+            <h2 className="text-3xl font-bold text-stone-900 mb-4">
+              Stepping <span className="text-river-600">Stones</span>
+            </h2>
+            <p className="text-stone-600/70 max-w-xl mx-auto text-sm">
+              Products and experiments — stepping stones across the river of practice.
+            </p>
+          </div>
+
+          {/* Filter tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {categories.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => handleCategoryChange(cat.value)}
+                className={cn(
+                  "px-4 py-2 rounded-full text-xs font-medium transition-all duration-300",
+                  activeCategory === cat.value
+                    ? "bg-forest-700 text-white"
+                    : "bg-white/60 text-stone-600 border border-stone-300/40"
+                )}
+              >
+                {cat.label}
+              </button>
             ))}
-          </motion.div>
-        </AnimatePresence>
+          </div>
 
-        {filteredProjects.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <p className="text-stone-500">No projects found in this category.</p>
-          </motion.div>
-        )}
+          {/* Projects vertical grid */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeCategory}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+            >
+              {filteredProjects.map((project, index) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  index={index}
+                />
+              ))}
+            </motion.div>
+          </AnimatePresence>
 
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
-        >
+          {filteredProjects.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-stone-500">No projects found in this category.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Stats overlay (always rendered at the base of the scroll track or section) */}
+      {!isDesktop && (
+        <div className="max-w-7xl mx-auto px-6 mt-16 grid grid-cols-2 gap-4 text-center">
           {[
             { value: `${projects.length}+`, label: "Total Projects", color: "text-forest-700" },
-            { value: projects.filter((p) => p.category === "web").length.toString(), label: "Web Applications", color: "text-river-600" },
-            { value: projects.filter((p) => p.featured).length.toString(), label: "Featured Projects", color: "text-forest-700" },
-            { value: `${new Set(projects.flatMap((p) => p.technologies)).size}+`, label: "Technologies Used", color: "text-river-600" },
+            { value: `${new Set(projects.flatMap((p) => p.technologies)).size}+`, label: "Tech Used", color: "text-river-600" },
           ].map((stat) => (
-            <div key={stat.label} className="p-4 bg-white/40 backdrop-blur-sm rounded-2xl border border-stone-200/30">
-              <div className={`text-2xl md:text-3xl font-bold ${stat.color} mb-1`}>
+            <div key={stat.label} className="p-4 bg-white/40 backdrop-blur-sm rounded-xl border border-stone-200/30">
+              <div className={`text-xl font-bold ${stat.color} mb-1`}>
                 {stat.value}
               </div>
-              <div className="text-sm text-stone-500">{stat.label}</div>
+              <div className="text-xs text-stone-500">{stat.label}</div>
             </div>
           ))}
-        </motion.div>
-      </div>
+        </div>
+      )}
     </section>
   );
 };

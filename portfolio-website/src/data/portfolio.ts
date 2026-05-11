@@ -101,8 +101,7 @@ export const projects: Project[] = [
       "A curated ecosystem of React + Vite builds demonstrating polished UI, modular architecture, and focused product craft.",
     longDescription:
       "A portfolio umbrella showcasing multiple shipped applications with cohesive design language and practical functionality.",
-    image:
-      "https://images.unsplash.com/photo-1518773553398-650c184e0bb3?w=800&h=600&fit=crop",
+    image: "/images/projects/projects_studio.png",
     technologies: ["React", "Vite", "UI Engineering"],
     category: "web",
     featured: true,
@@ -203,8 +202,7 @@ export const projects: Project[] = [
       "Biotechnology pipeline for protein structure alignment with advanced structural analysis.",
     longDescription:
       "A Python-driven scientific workflow focused on protein alignment and RMSD analysis, deployed for practical use.",
-    image:
-      "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&h=600&fit=crop",
+    image: "/images/projects/mustang_pipeline.png",
     technologies: ["Python", "Bioinformatics", "Streamlit"],
     category: "other",
     featured: true,
@@ -219,8 +217,7 @@ export const projects: Project[] = [
       "Production website for a travel company with immersive storytelling and conversion-focused sections.",
     longDescription:
       "Built as a freelance engagement during a transition period, with strong focus on visual flow and deployment readiness.",
-    image:
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop",
+    image: "/images/projects/param_adventures.png",
     technologies: ["Frontend", "Responsive Design", "Deployment"],
     category: "web",
     featured: true,
