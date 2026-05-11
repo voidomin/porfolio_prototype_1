@@ -15,11 +15,11 @@ export const personalProfile: PersonalProfile = {
   headline: "Full-Stack & Data Science Engineer",
   location: "Bangalore, India",
   intro:
-    "I build practical digital products at the intersection of software engineering and data science, with a quiet preference for clarity, reliability, and useful detail.",
+    "I build practical digital products at the intersection of software engineering, data science, and computational biology, with a quiet preference for clarity, reliability, and useful detail.",
   about:
-    "I began in biotechnology and moved into software through product building, analytics, and engineering delivery. That path taught me to think carefully about data, implementation, and reliability, which now shapes how I build products across frontend, backend, and cloud workflows.",
+    "I began in biotechnology and moved into software through research, product building, analytics, and engineering delivery. During my time as a research fellow at IISc Bangalore, I worked on high-performance clustered computers using structural modeling tools like Rosetta and AlphaFold to predict protein dynamics, leading to a co-authored journal publication. That path taught me to think deeply about data, structural algorithms, and reliability, which now shapes how I build products across frontend, backend, and cloud workflows.",
   aboutExtended:
-    "Across roles, I have kept moving toward work that feels both practical and meaningful: turning ideas into usable products, making systems more dependable, and keeping the experience calm for the person using it. Today, I work on data-driven solutions while staying open to end-to-end engineering roles and product-minded collaborations.",
+    "Across my journey—from analyzing stabilizing mutations at IISc to developing software at Merck, freelancing for Param Adventures, and engineering data products at ParentOf—I have kept moving toward end-to-end engineering roles. Today, I work on robust data-driven solutions while staying open to product-minded collaborations and specialized engineering challenges.",
 };
 
 export const navigationItems: NavigationItem[] = [
@@ -63,7 +63,7 @@ export const experienceTimeline: ExperienceItem[] = [
     id: "exp-parentof",
     period: "Mar 2026 - Present",
     title: "Data Analyst -> Data Science Engineer",
-    organization: "Parent Of",
+    organization: "Parent Of Solutions",
     summary:
       "Working across analytics and ML implementation, including cloud workflows, model training, deployment pipelines, and data products.",
   },
@@ -73,15 +73,23 @@ export const experienceTimeline: ExperienceItem[] = [
     title: "Freelance Developer",
     organization: "Independent",
     summary:
-      "Built and delivered the Param Adventures website for a travel company with a production-ready frontend.",
+      "Built and delivered the Param Adventures website for a travel company with a production-ready, highly responsive frontend.",
   },
   {
     id: "exp-merck",
-    period: "Jan 2024 - Dec 2025",
-    title: "Analyst -> Test Engineer -> Development Engineer",
+    period: "Jul 2023 - Dec 2025",
+    title: "Analyst -> Development Engineer",
     organization: "Merck",
     summary:
-      "Started with analytics, moved into testing, then software development using PHP, JavaScript, SQL tooling, and CI/CD workflows.",
+      "Started as an Analyst for the first 6 months, then converted to a full-time Development Engineer for 2 years. Developed software solutions using PHP, JavaScript, SQL, and automation workflows.",
+  },
+  {
+    id: "exp-iisc",
+    period: "Jan 2023 - Jun 2023",
+    title: "Research Fellow / Computational Intern",
+    organization: "Indian Institute of Science (IISc), Bangalore",
+    summary:
+      "Utilized clustered computing systems to understand protein dynamics. Leveraged structural biology models like Rosetta and AlphaFold to predict stabilizing mutations, contributing to co-authored research.",
   },
 ];
 
@@ -346,5 +354,12 @@ export const skills: Skill[] = [
     level: 80,
     category: "other",
     color: "#DC2626",
+  },
+  {
+    id: "18",
+    name: "Rosetta & AlphaFold",
+    level: 86,
+    category: "other",
+    color: "#E11D48",
   },
 ];
