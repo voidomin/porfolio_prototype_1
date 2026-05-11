@@ -345,6 +345,20 @@ export const skills: Skill[] = [
     color: "#31A8FF",
   },
   {
+    id: "21",
+    name: "Responsive Web Design",
+    level: 85,
+    category: "design",
+    color: "#0EA5E9",
+  },
+  {
+    id: "22",
+    name: "Data Visualization",
+    level: 82,
+    category: "design",
+    color: "#10B981",
+  },
+  {
     id: "11",
     name: "GitHub",
     level: 90,
@@ -375,5 +389,26 @@ export const skills: Skill[] = [
     level: 86,
     category: "other",
     color: "#E11D48",
+  },
+  {
+    id: "23",
+    name: "Landscape Photography",
+    level: 88,
+    category: "hobbies",
+    color: "#F59E0B",
+  },
+  {
+    id: "24",
+    name: "Acoustic Guitar & Music",
+    level: 80,
+    category: "hobbies",
+    color: "#EC4899",
+  },
+  {
+    id: "25",
+    name: "Trekking & Mountain Hiking",
+    level: 85,
+    category: "hobbies",
+    color: "#10B981",
   },
 ];

@@ -160,7 +160,8 @@ export type SkillCategory =
   | "backend"
   | "design"
   | "tools"
-  | "other";
+  | "other"
+  | "hobbies";
 
 export interface FABAction {
   id: string;

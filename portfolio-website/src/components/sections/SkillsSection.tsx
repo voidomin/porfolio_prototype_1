@@ -17,6 +17,7 @@ const skillCategories: { [key in SkillCategory]: { name: string; emoji: string }
   design: { name: "Design & UI/UX", emoji: "🌻" },
   tools: { name: "Tools & DevOps", emoji: "🍃" },
   other: { name: "Other Skills", emoji: "🌾" },
+  hobbies: { name: "Hobbies & Interests", emoji: "📸" },
 };
 
 const SkillBar = ({ skill, index }: { skill: Skill; index: number }) => (
