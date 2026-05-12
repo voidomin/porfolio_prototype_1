@@ -324,8 +324,16 @@ export const ProjectsSection = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
   const [scrollRange, setScrollRange] = useState(0);
   const [containerHeight, setContainerHeight] = useState<number | null>(null);
+
+  // Refs for rAF-based smooth scroll animation (bypasses React render cycle)
+  const animatedProgress = useRef(0);
+  const targetProgress = useRef(0);
+  const rafId = useRef(0);
+  const lastReportedProgress = useRef(0);
 
   // Calculate mathematically correct pixel-based translation boundaries on mount/resize/filter!
   useEffect(() => {
@@ -357,24 +365,91 @@ export const ProjectsSection = () => {
     if (!isDesktop) {
       setScrollProgress(0);
       setPinPhase("before");
+      animatedProgress.current = 0;
+      targetProgress.current = 0;
       return;
     }
 
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    // rAF animation loop: smoothly interpolates the horizontal transform
+    const animate = () => {
+      // Lerp toward the target for smooth, eased motion
+      animatedProgress.current = lerp(
+        animatedProgress.current,
+        targetProgress.current,
+        0.1,
+      );
+
+      // Snap when close enough to prevent infinite loop
+      if (
+        Math.abs(animatedProgress.current - targetProgress.current) < 0.0005
+      ) {
+        animatedProgress.current = targetProgress.current;
+      }
+
+      const p = animatedProgress.current;
+
+      // Apply horizontal transforms directly to DOM (bypasses React render cycle)
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translateX(${-scrollRange * p}px)`;
+      }
+      if (bgRef.current) {
+        bgRef.current.style.transform = `translateX(${-scrollRange * 0.32 * p}px)`;
+      }
+
+      // Update React state only when progress changes meaningfully (>2%)
+      // This drives arrow buttons + percentage display without causing excessive re-renders
+      if (Math.abs(p - lastReportedProgress.current) > 0.02 || p === 0 || p === 1) {
+        lastReportedProgress.current = p;
+        setScrollProgress(p);
+      }
+
+      // Continue animation if not yet converged
+      if (
+        Math.abs(animatedProgress.current - targetProgress.current) > 0.0005
+      ) {
+        rafId.current = requestAnimationFrame(animate);
+      }
+    };
+
     const updateScrollState = () => {
-      if (!containerRef.current) return;
+      if (!containerRef.current || !stickyRef.current) return;
 
       const rect = containerRef.current.getBoundingClientRect();
       const scrollable = Math.max(1, rect.height - window.innerHeight);
       const progress = Math.min(1, Math.max(0, -rect.top / scrollable));
-      setScrollProgress(progress);
+      targetProgress.current = progress;
 
+      // Determine pin phase
+      let newPhase: "before" | "active" | "after";
       if (rect.top >= 0) {
-        setPinPhase("before");
+        newPhase = "before";
       } else if (rect.bottom <= window.innerHeight) {
-        setPinPhase("after");
+        newPhase = "after";
       } else {
-        setPinPhase("active");
+        newPhase = "active";
       }
+
+      // Apply position directly to DOM FIRST for instant visual response
+      const el = stickyRef.current;
+      if (newPhase === "active") {
+        el.style.position = "fixed";
+        el.style.top = "0px";
+      } else if (newPhase === "after") {
+        el.style.position = "absolute";
+        el.style.top = `${scrollRange}px`;
+      } else {
+        el.style.position = "absolute";
+        el.style.top = "0px";
+      }
+
+      // Then sync React state (re-render catches up, but DOM is already correct)
+      setPinPhase((prev) => (prev !== newPhase ? newPhase : prev));
+
+      // Start/continue the smooth lerp animation
+      cancelAnimationFrame(rafId.current);
+      rafId.current = requestAnimationFrame(animate);
     };
 
     updateScrollState();
@@ -382,14 +457,11 @@ export const ProjectsSection = () => {
     globalThis.addEventListener("resize", updateScrollState);
 
     return () => {
+      cancelAnimationFrame(rafId.current);
       globalThis.removeEventListener("scroll", updateScrollState);
       globalThis.removeEventListener("resize", updateScrollState);
     };
-  }, [isDesktop, containerHeight, activeCategory]);
-
-  const xTranslation = -scrollRange * scrollProgress;
-  // Background layer translates slower (at 32% velocity) for high-end parallax depth!
-  const bgTranslation = -scrollRange * 0.32 * scrollProgress;
+  }, [isDesktop, containerHeight, activeCategory, scrollRange]);
 
   const currentIndex = Math.max(
     0,
@@ -444,19 +516,13 @@ export const ProjectsSection = () => {
       {isDesktop ? (
         /* DESKTOP PINNED HORIZONTAL LAYOUT */
         <div
-          className={cn(
-            "h-screen flex flex-col justify-start pt-20 pb-8 overflow-hidden z-10",
-            pinPhase === "active"
-              ? "fixed left-0 right-0"
-              : "absolute left-0 right-0",
-          )}
-          style={
-            pinPhase === "after" ? { top: `${scrollRange}px` } : { top: 0 }
-          }
+          ref={stickyRef}
+          className="h-screen flex flex-col justify-start pt-20 pb-8 overflow-hidden z-10 absolute left-0 right-0"
+          style={{ top: 0 }}
         >
           {/* Parallax Background River Currents */}
-          <motion.div
-            style={{ x: bgTranslation }}
+          <div
+            ref={bgRef}
             className="absolute inset-y-0 left-0 w-[200vw] pointer-events-none select-none opacity-[0.22] z-0"
           >
             <svg
@@ -485,7 +551,7 @@ export const ProjectsSection = () => {
                 strokeDasharray="14,14"
               />
             </svg>
-          </motion.div>
+          </div>
 
           <div className="relative z-10 w-full max-w-7xl mx-auto px-12 md:px-24 mb-6 flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0 select-none">
             {/* Left section headers */}
@@ -584,9 +650,8 @@ export const ProjectsSection = () => {
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.4 }}
               >
-                <motion.div
+                <div
                   ref={trackRef}
-                  style={{ x: xTranslation }}
                   className="flex gap-8 px-12 md:px-24 w-max py-4"
                 >
                   {filteredProjects.map((project, index) => (
@@ -602,7 +667,7 @@ export const ProjectsSection = () => {
                       </p>
                     </div>
                   )}
-                </motion.div>
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>

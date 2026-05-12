@@ -51,6 +51,15 @@ export interface GalleryImage {
   height: number;
   featured: boolean;
   createdAt: string;
+  exif?: {
+    camera?: string;
+    lens?: string;
+    focalLength?: string;
+    aperture?: string;
+    shutterSpeed?: string;
+    iso?: string;
+    location?: string;
+  };
 }
 
 export interface Skill {

@@ -49,29 +49,37 @@ export const NatureScene = () => {
     [0, 0.3, 0.7, 1],
     [1, 1.2, 1.1, 0.8]
   );
+  // Sun opacity - sets nicely during Golden Hour
   const sunOpacity = useTransform(
     scrollYProgress,
-    [0, 0.1, 0.8, 1],
-    [0.6, 1, 0.8, 0]
+    [0, 0.1, 0.82, 0.92, 1],
+    [0.6, 1, 0.8, 0.15, 0]
   );
 
-  // Moon appears at the end
-  const moonOpacity = useTransform(scrollYProgress, [0.75, 0.9], [0, 0.9]);
+  // Moon opacity - starts showing as we transition past golden hour
+  const moonOpacity = useTransform(scrollYProgress, [0.82, 0.95], [0, 0.9]);
 
-  // Star visibility — fade in at the bottom
-  const starsOpacity = useTransform(scrollYProgress, [0.6, 0.85], [0, 1]);
+  // Moon position - rises gracefully from behind mountains as night falls
+  const moonXVal = useTransform(scrollYProgress, [0.8, 1], [25, 20]);
+  const moonYVal = useTransform(scrollYProgress, [0.8, 1], [42, 15]);
+  const moonRight = useTransform(moonXVal, (v) => `${v}%`);
+  const moonTop = useTransform(moonYVal, (v) => `${v}%`);
 
-  // Sky gradient
+  // Star visibility — fade in after golden hour as night settles
+  const starsOpacity = useTransform(scrollYProgress, [0.85, 0.97], [0, 1]);
+
+  // Sky gradient with inserted Golden Hour transition keyframe at 0.88
   const skyBackground = useTransform(
     scrollYProgress,
-    [0, 0.15, 0.35, 0.55, 0.75, 1],
+    [0, 0.15, 0.35, 0.55, 0.75, 0.88, 1],
     [
-      "linear-gradient(180deg, #fef7e0 0%, #fdedb7 30%, #fbdf85 60%, #f0b429 100%)",
-      "linear-gradient(180deg, #e0f0ff 0%, #93d2fd 30%, #60b8fa 60%, #3b99f5 100%)",
-      "linear-gradient(180deg, #c8e6c9 0%, #81c784 30%, #66bb6a 60%, #43a047 100%)",
-      "linear-gradient(180deg, #bbdefb 0%, #90caf9 30%, #64b5f6 60%, #42a5f5 100%)",
-      "linear-gradient(180deg, #fce8e6 0%, #f5b3af 40%, #e05d57 70%, #762b2a 100%)",
-      "linear-gradient(180deg, #1a1145 0%, #0f0d2e 40%, #0a0820 100%)",
+      "linear-gradient(180deg, #fef7e0 0%, #fdedb7 30%, #fbdf85 60%, #f0b429 100%)", // Dawn / Hero
+      "linear-gradient(180deg, #e0f0ff 0%, #93d2fd 30%, #60b8fa 60%, #3b99f5 100%)", // Forest / About
+      "linear-gradient(180deg, #c8e6c9 0%, #81c784 30%, #66bb6a 60%, #43a047 100%)", // Meadow / Skills
+      "linear-gradient(180deg, #bbdefb 0%, #90caf9 30%, #64b5f6 60%, #42a5f5 100%)", // River / Projects
+      "linear-gradient(180deg, #fce8e6 0%, #f5b3af 40%, #e05d57 70%, #762b2a 100%)", // Clearing / Publications
+      "linear-gradient(180deg, #fcdfa8 0%, #fbad60 40%, #e05d57 70%, #762b2a 100%)", // Golden Hour / Photography (Vibrant golden amber sunset)
+      "linear-gradient(180deg, #1a1145 0%, #0f0d2e 40%, #0a0820 100%)", // Night / Campfire
     ]
   );
 
@@ -125,8 +133,8 @@ export const NatureScene = () => {
           background:
             "radial-gradient(circle at 35% 35%, #e0e5ff 0%, #c7cfff 50%, rgba(199,207,255,0.3) 100%)",
           boxShadow: "0 0 40px 10px rgba(199,207,255,0.2)",
-          right: "20%",
-          top: "15%",
+          right: moonRight,
+          top: moonTop,
           opacity: moonOpacity,
         }}
       />
