@@ -1,8 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
-import { ExternalLink, Github, Eye, Feather } from "lucide-react";
+import {
+  motion,
+  AnimatePresence,
+  useTransform,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
+import { ExternalLink, Github, Feather } from "lucide-react";
 import { projects } from "@/data/portfolio";
 import { Project, type ProjectCategory } from "@/types";
 import { cn } from "@/lib/utils";
@@ -33,7 +39,9 @@ const ProjectCard = ({
 
   const activeSub = project.subProjects?.find((s) => s.id === selectedSubId);
   const displayTitle = activeSub ? activeSub.title : project.title;
-  const displayDescription = activeSub ? activeSub.description : project.description;
+  const displayDescription = activeSub
+    ? activeSub.description
+    : project.description;
   const displayImage = activeSub ? activeSub.image : project.image;
   const displayDemoUrl = activeSub ? activeSub.demoUrl : project.demoUrl;
   const displayTech = activeSub ? activeSub.technologies : project.technologies;
@@ -43,19 +51,25 @@ const ProjectCard = ({
   const y = useMotionValue(0);
 
   // Spring physics for buttery-smooth elastic reactions
-  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [12, -12]), { damping: 25, stiffness: 180 });
-  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-12, 12]), { damping: 25, stiffness: 180 });
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [12, -12]), {
+    damping: 25,
+    stiffness: 180,
+  });
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-12, 12]), {
+    damping: 25,
+    stiffness: 180,
+  });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
     const rect = el.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
-    
+
     // Normalize coordinates to range [-0.5, 0.5]
     const mouseX = e.clientX - rect.left - width / 2;
     const mouseY = e.clientY - rect.top - height / 2;
-    
+
     x.set(mouseX / width);
     y.set(mouseY / height);
 
@@ -93,10 +107,11 @@ const ProjectCard = ({
         className="group relative rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl border border-stone-200/40 bg-gradient-to-b from-[#efede6] to-[#ddd9cc] transition-shadow duration-500"
       >
         {/* Specular sheen reflection overlay */}
-        <div 
+        <div
           className="absolute inset-0 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           style={{
-            background: "radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.2) 0%, transparent 60%)"
+            background:
+              "radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.2) 0%, transparent 60%)",
           }}
         />
 
@@ -122,7 +137,7 @@ const ProjectCard = ({
                       "px-2 py-1 text-[9px] font-medium rounded-t-lg transition-all border-t border-x shrink-0 select-none",
                       selectedSubId === null
                         ? "bg-white border-stone-200/50 text-forest-800 font-bold shadow-[0_-2px_6px_rgba(0,0,0,0.03)]"
-                        : "bg-transparent border-transparent text-stone-400 hover:text-stone-600"
+                        : "bg-transparent border-transparent text-stone-400 hover:text-stone-600",
                     )}
                   >
                     ✦ Studio
@@ -138,7 +153,7 @@ const ProjectCard = ({
                         "px-2 py-1 text-[9px] font-medium rounded-t-lg transition-all border-t border-x shrink-0 select-none",
                         selectedSubId === sub.id
                           ? "bg-white border-stone-200/50 text-forest-800 font-bold shadow-[0_-2px_6px_rgba(0,0,0,0.03)]"
-                          : "bg-transparent border-transparent text-stone-400 hover:text-stone-600"
+                          : "bg-transparent border-transparent text-stone-400 hover:text-stone-600",
                       )}
                     >
                       {sub.title.split(" ")[0]}
@@ -211,7 +226,10 @@ const ProjectCard = ({
         </div>
 
         {/* Editorial Text Content Block */}
-        <div className="relative p-6 z-10 select-none" style={{ transform: "translateZ(30px)" }}>
+        <div
+          className="relative p-6 z-10 select-none"
+          style={{ transform: "translateZ(30px)" }}
+        >
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-bold text-forest-700 uppercase tracking-widest bg-forest-600/10 px-2 py-0.5 rounded-md">
               {project.category}
@@ -277,10 +295,13 @@ const ProjectCard = ({
 
 export const ProjectsSection = () => {
   const [activeCategory, setActiveCategory] = useState<ProjectCategory | "all">(
-    "all"
+    "all",
   );
   const [isDesktop, setIsDesktop] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [pinPhase, setPinPhase] = useState<"before" | "active" | "after">(
+    "before",
+  );
 
   // Responsive device detector
   useEffect(() => {
@@ -292,9 +313,10 @@ export const ProjectsSection = () => {
     return () => globalThis.removeEventListener("resize", handleResize);
   }, []);
 
-  const filteredProjects = activeCategory === "all"
-    ? projects
-    : projects.filter((project) => project.category === activeCategory);
+  const filteredProjects =
+    activeCategory === "all"
+      ? projects
+      : projects.filter((project) => project.category === activeCategory);
 
   const handleCategoryChange = (category: ProjectCategory | "all") => {
     setActiveCategory(category);
@@ -303,18 +325,23 @@ export const ProjectsSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [scrollRange, setScrollRange] = useState(0);
-
-  const { scrollYProgress } = useScroll({
-    target: isDesktop ? containerRef : undefined,
-  });
+  const [containerHeight, setContainerHeight] = useState<number | null>(null);
 
   // Calculate mathematically correct pixel-based translation boundaries on mount/resize/filter!
   useEffect(() => {
     const handleRecalculate = () => {
       if (isDesktop && trackRef.current) {
-        // Pixel translation is track width minus window view, plus precise centering padding
-        const range = trackRef.current.scrollWidth - window.innerWidth + 160;
-        setScrollRange(Math.max(0, range));
+        // The horizontal panel is full viewport width on desktop.
+        const visibleWidth = window.innerWidth;
+        const range = trackRef.current.scrollWidth - visibleWidth;
+        const safeRange = Math.max(0, range);
+        setScrollRange(safeRange);
+
+        // Ensure the pinned section height exactly matches the amount of scrolling
+        // required to translate the horizontal track across the viewport.
+        // Height = viewport height + horizontal translation distance.
+        const height = window.innerHeight + safeRange;
+        setContainerHeight(height);
       }
     };
 
@@ -327,17 +354,50 @@ export const ProjectsSection = () => {
   }, [filteredProjects, isDesktop]);
 
   useEffect(() => {
-    if (isDesktop && scrollYProgress) {
-      return scrollYProgress.on("change", (v: number) => setScrollProgress(v));
+    if (!isDesktop) {
+      setScrollProgress(0);
+      setPinPhase("before");
+      return;
     }
-  }, [isDesktop, scrollYProgress]);
 
-  // Precise pixel transforms
-  const xTranslation = useTransform(scrollYProgress, [0, 1], [0, -scrollRange]);
+    const updateScrollState = () => {
+      if (!containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const scrollable = Math.max(1, rect.height - window.innerHeight);
+      const progress = Math.min(1, Math.max(0, -rect.top / scrollable));
+      setScrollProgress(progress);
+
+      if (rect.top >= 0) {
+        setPinPhase("before");
+      } else if (rect.bottom <= window.innerHeight) {
+        setPinPhase("after");
+      } else {
+        setPinPhase("active");
+      }
+    };
+
+    updateScrollState();
+    globalThis.addEventListener("scroll", updateScrollState, { passive: true });
+    globalThis.addEventListener("resize", updateScrollState);
+
+    return () => {
+      globalThis.removeEventListener("scroll", updateScrollState);
+      globalThis.removeEventListener("resize", updateScrollState);
+    };
+  }, [isDesktop, containerHeight, activeCategory]);
+
+  const xTranslation = -scrollRange * scrollProgress;
   // Background layer translates slower (at 32% velocity) for high-end parallax depth!
-  const bgTranslation = useTransform(scrollYProgress, [0, 1], [0, -scrollRange * 0.32]);
+  const bgTranslation = -scrollRange * 0.32 * scrollProgress;
 
-  const currentIndex = Math.max(0, Math.min(filteredProjects.length - 1, Math.round(scrollProgress * (filteredProjects.length - 1 || 1))));
+  const currentIndex = Math.max(
+    0,
+    Math.min(
+      filteredProjects.length - 1,
+      Math.round(scrollProgress * (filteredProjects.length - 1 || 1)),
+    ),
+  );
   const canScrollLeft = currentIndex > 0;
   const canScrollRight = currentIndex < filteredProjects.length - 1;
 
@@ -345,11 +405,12 @@ export const ProjectsSection = () => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const absoluteTop = window.scrollY + rect.top;
-    const totalScrollHeight = containerRef.current.scrollHeight;
-    const viewportHeight = window.innerHeight;
-    const scrollableDistance = totalScrollHeight - viewportHeight;
+    const scrollableDistance = scrollRange;
 
-    const targetIndex = Math.max(0, Math.min(filteredProjects.length - 1, index));
+    const targetIndex = Math.max(
+      0,
+      Math.min(filteredProjects.length - 1, index),
+    );
     const fraction = targetIndex / (filteredProjects.length - 1 || 1);
     const targetScroll = absoluteTop + fraction * scrollableDistance;
 
@@ -365,9 +426,12 @@ export const ProjectsSection = () => {
       ref={isDesktop ? containerRef : undefined}
       className={cn(
         "relative",
-        isDesktop ? "h-[155vh] py-0 overflow-visible" : "overflow-hidden py-24 md:py-32"
+        isDesktop ? "py-0 overflow-visible" : "overflow-hidden py-24 md:py-32",
       )}
       style={{
+        height: isDesktop
+          ? `${containerHeight ?? window.innerHeight}px`
+          : undefined,
         background:
           "linear-gradient(180deg, rgba(211, 237, 158, 0.2) 0%, rgba(219, 239, 254, 0.15) 10%, rgba(239, 248, 255, 0.1) 30%, rgba(239, 248, 255, 0.1) 70%, rgba(219, 239, 254, 0.15) 90%, rgba(191, 227, 254, 0.25) 100%)",
       }}
@@ -379,17 +443,47 @@ export const ProjectsSection = () => {
 
       {isDesktop ? (
         /* DESKTOP PINNED HORIZONTAL LAYOUT */
-        <div className="sticky top-0 h-screen flex flex-col justify-center pt-20 pb-8 overflow-hidden z-10">
-          
+        <div
+          className={cn(
+            "h-screen flex flex-col justify-start pt-20 pb-8 overflow-hidden z-10",
+            pinPhase === "active"
+              ? "fixed left-0 right-0"
+              : "absolute left-0 right-0",
+          )}
+          style={
+            pinPhase === "after" ? { top: `${scrollRange}px` } : { top: 0 }
+          }
+        >
           {/* Parallax Background River Currents */}
-          <motion.div 
-            style={{ x: bgTranslation }} 
+          <motion.div
+            style={{ x: bgTranslation }}
             className="absolute inset-y-0 left-0 w-[200vw] pointer-events-none select-none opacity-[0.22] z-0"
           >
-            <svg className="w-full h-full text-river-400" xmlns="http://www.w3.org/2000/svg">
-              <path d="M 0,200 Q 400,280 800,200 T 1600,200 T 2400,200 T 3200,200" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="10,12" />
-              <path d="M 100,450 Q 500,400 900,450 T 1700,450 T 2500,450 T 3300,450" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="6,8" />
-              <path d="M 50,700 Q 450,780 850,700 T 1650,700 T 2450,700 T 3250,700" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="14,14" />
+            <svg
+              className="w-full h-full text-river-400"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M 0,200 Q 400,280 800,200 T 1600,200 T 2400,200 T 3200,200"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeDasharray="10,12"
+              />
+              <path
+                d="M 100,450 Q 500,400 900,450 T 1700,450 T 2500,450 T 3300,450"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeDasharray="6,8"
+              />
+              <path
+                d="M 50,700 Q 450,780 850,700 T 1650,700 T 2450,700 T 3250,700"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeDasharray="14,14"
+              />
             </svg>
           </motion.div>
 
@@ -403,7 +497,7 @@ export const ProjectsSection = () => {
                 Stepping <span className="text-river-600">Stones</span>
               </h2>
             </div>
-            
+
             {/* Category selection tabs */}
             <div className="flex gap-2">
               {categories.map((cat) => (
@@ -414,7 +508,7 @@ export const ProjectsSection = () => {
                     "px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-300",
                     activeCategory === cat.value
                       ? "bg-forest-700 text-white shadow-md shadow-forest-900/15"
-                      : "bg-white/50 text-stone-600 border border-stone-300/30 hover:bg-white/80"
+                      : "bg-white/50 text-stone-600 border border-stone-300/30 hover:bg-white/80",
                   )}
                 >
                   {cat.label}
@@ -425,40 +519,59 @@ export const ProjectsSection = () => {
 
           {/* Horizontal scrolling panel */}
           <div className="relative z-10 w-full select-none">
-            
             {/* Navigation Arrows */}
             <div className="absolute inset-y-0 left-0 right-0 pointer-events-none flex items-center justify-between px-10 z-30">
               {/* Left Button */}
               <motion.button
                 initial={{ opacity: 0, x: -10 }}
-                animate={{ 
-                  opacity: canScrollLeft ? 1 : 0, 
+                animate={{
+                  opacity: canScrollLeft ? 1 : 0,
                   x: canScrollLeft ? 0 : -10,
-                  pointerEvents: canScrollLeft ? "auto" : "none"
+                  pointerEvents: canScrollLeft ? "auto" : "none",
                 }}
                 onClick={() => scrollToProject(currentIndex - 1)}
                 className="p-4 rounded-full bg-white/85 hover:bg-white text-stone-850 border border-stone-200/60 backdrop-blur-md shadow-lg transition-all duration-300 pointer-events-auto hover:scale-110 active:scale-95 group/btn"
                 aria-label="Previous Project"
               >
-                <svg className="w-5 h-5 transition-transform group-hover/btn:-translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                <svg
+                  className="w-5 h-5 transition-transform group-hover/btn:-translate-x-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </motion.button>
 
               {/* Right Button */}
               <motion.button
                 initial={{ opacity: 0, x: 10 }}
-                animate={{ 
-                  opacity: canScrollRight ? 1 : 0, 
+                animate={{
+                  opacity: canScrollRight ? 1 : 0,
                   x: canScrollRight ? 0 : 10,
-                  pointerEvents: canScrollRight ? "auto" : "none"
+                  pointerEvents: canScrollRight ? "auto" : "none",
                 }}
                 onClick={() => scrollToProject(currentIndex + 1)}
                 className="p-4 rounded-full bg-white/85 hover:bg-white text-stone-850 border border-stone-200/60 backdrop-blur-md shadow-lg transition-all duration-300 pointer-events-auto hover:scale-110 active:scale-95 group/btn"
                 aria-label="Next Project"
               >
-                <svg className="w-5 h-5 transition-transform group-hover/btn:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                <svg
+                  className="w-5 h-5 transition-transform group-hover/btn:translate-x-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </motion.button>
             </div>
@@ -481,10 +594,12 @@ export const ProjectsSection = () => {
                       <ProjectCard project={project} index={index} />
                     </div>
                   ))}
-                  
+
                   {filteredProjects.length === 0 && (
                     <div className="w-screen flex items-center justify-center py-12 pr-48">
-                      <p className="text-stone-500">No projects found in this category.</p>
+                      <p className="text-stone-500">
+                        No projects found in this category.
+                      </p>
                     </div>
                   )}
                 </motion.div>
@@ -516,7 +631,8 @@ export const ProjectsSection = () => {
               Stepping <span className="text-river-600">Stones</span>
             </h2>
             <p className="text-stone-600/70 max-w-xl mx-auto text-sm">
-              Products and experiments — stepping stones across the river of practice.
+              Products and experiments — stepping stones across the river of
+              practice.
             </p>
           </div>
 
@@ -530,7 +646,7 @@ export const ProjectsSection = () => {
                   "px-4 py-2 rounded-full text-xs font-medium transition-all duration-300",
                   activeCategory === cat.value
                     ? "bg-forest-700 text-white"
-                    : "bg-white/60 text-stone-600 border border-stone-300/40"
+                    : "bg-white/60 text-stone-600 border border-stone-300/40",
                 )}
               >
                 {cat.label}
@@ -548,18 +664,16 @@ export const ProjectsSection = () => {
               className="grid grid-cols-1 sm:grid-cols-2 gap-6"
             >
               {filteredProjects.map((project, index) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={index}
-                />
+                <ProjectCard key={project.id} project={project} index={index} />
               ))}
             </motion.div>
           </AnimatePresence>
 
           {filteredProjects.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-stone-500">No projects found in this category.</p>
+              <p className="text-stone-500">
+                No projects found in this category.
+              </p>
             </div>
           )}
         </div>
@@ -569,10 +683,21 @@ export const ProjectsSection = () => {
       {!isDesktop && (
         <div className="max-w-7xl mx-auto px-6 mt-16 grid grid-cols-2 gap-4 text-center">
           {[
-            { value: `${projects.length}+`, label: "Total Projects", color: "text-forest-700" },
-            { value: `${new Set(projects.flatMap((p) => p.technologies)).size}+`, label: "Tech Used", color: "text-river-600" },
+            {
+              value: `${projects.length}+`,
+              label: "Total Projects",
+              color: "text-forest-700",
+            },
+            {
+              value: `${new Set(projects.flatMap((p) => p.technologies)).size}+`,
+              label: "Tech Used",
+              color: "text-river-600",
+            },
           ].map((stat) => (
-            <div key={stat.label} className="p-4 bg-white/40 backdrop-blur-sm rounded-xl border border-stone-200/30">
+            <div
+              key={stat.label}
+              className="p-4 bg-white/40 backdrop-blur-sm rounded-xl border border-stone-200/30"
+            >
               <div className={`text-xl font-bold ${stat.color} mb-1`}>
                 {stat.value}
               </div>

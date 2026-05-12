@@ -169,7 +169,7 @@ export const projects: Project[] = [
       "Biotechnology pipeline for protein structure alignment with advanced structural analysis.",
     longDescription:
       "A Python-driven scientific workflow focused on protein alignment and RMSD analysis, deployed for practical use.",
-    image: "/images/projects/mustang_pipeline.png",
+    image: "/images/projects/mustang.png",
     technologies: ["Python", "Bioinformatics", "Streamlit"],
     category: "other",
     featured: true,
@@ -199,12 +199,11 @@ export const projects: Project[] = [
       "AI-powered resume optimizer with parsing, tailoring, and real-time feedback.",
     longDescription:
       "An intelligent platform that analyzes resumes against job descriptions, suggesting targeted improvements and keywords to pass ATS filters.",
-    image:
-      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&h=600&fit=crop",
+    image: "/images/projects/resume.png",
     technologies: ["React", "TailwindCSS", "OpenAI API", "Node.js"],
     category: "web",
     featured: true,
-    demoUrl: "https://voidomin.github.io/react-projects./resume-ai/",
+    demoUrl: "https://resumeforge2.netlify.app/login",
     createdAt: "2026-03-20",
     updatedAt: "2026-04-22",
   },
@@ -215,12 +214,11 @@ export const projects: Project[] = [
       "Clean, visual calorie tracker and meal logging platform with smart food search.",
     longDescription:
       "A product-minded nutrition app with a focus on quick logging, macro breakdowns, and visual history tracking.",
-    image:
-      "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop",
+    image: "/images/projects/caloriq.png",
     technologies: ["React", "Vite", "Chart.js", "Firebase"],
     category: "web",
     featured: false,
-    demoUrl: "https://voidomin.github.io/react-projects./caloriq/",
+    demoUrl: "https://caloriq-project.vercel.app/auth/signin",
     createdAt: "2026-03-28",
     updatedAt: "2026-04-30",
   },

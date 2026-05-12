@@ -19,14 +19,14 @@ import { SectionDivider } from "@/components/animations/SectionDivider";
 
 export default function Home() {
   return (
-    <main className="relative overflow-hidden">
+    <main className="relative overflow-x-hidden">
       {/* Fixed nature background — sky, mountains, sun, stars */}
       <NatureScene />
 
       {/* Ambient nature overlays */}
       <BirdFlock />
       <FloatingLeaves />
-      
+
       {/* Interactive trailing micro-particles */}
       <InteractiveTrail />
 
@@ -42,37 +42,55 @@ export default function Home() {
       <HeroSection />
 
       {/* Terrain: mountain ridge → forest */}
-      <SectionDivider variant="mountain-ridge" fillColor="rgba(13, 32, 13, 0.35)" />
+      <SectionDivider
+        variant="mountain-ridge"
+        fillColor="rgba(13, 32, 13, 0.35)"
+      />
 
       {/* Chapter 2: The Forest Path */}
       <AboutSection />
 
       {/* Terrain: forest treeline → meadow */}
-      <SectionDivider variant="forest-treeline" fillColor="rgba(34, 73, 34, 0.2)" />
+      <SectionDivider
+        variant="forest-treeline"
+        fillColor="rgba(34, 73, 34, 0.2)"
+      />
 
       {/* Chapter 3: The Meadow */}
       <SkillsSection />
 
       {/* Terrain: rolling hills → river */}
-      <SectionDivider variant="rolling-hills" fillColor="rgba(211, 237, 158, 0.2)" />
+      <SectionDivider
+        variant="rolling-hills"
+        fillColor="rgba(211, 237, 158, 0.2)"
+      />
 
       {/* Chapter 4: Stepping Stones */}
       <ProjectsSection />
 
       {/* Terrain: river bank → clearing */}
-      <SectionDivider variant="river-bank" fillColor="rgba(191, 227, 254, 0.2)" />
+      <SectionDivider
+        variant="river-bank"
+        fillColor="rgba(191, 227, 254, 0.2)"
+      />
 
       {/* Chapter 5: The Clearing */}
       <PublicationsSection />
 
       {/* Terrain: rolling hills → golden hour */}
-      <SectionDivider variant="rolling-hills" fillColor="rgba(252, 232, 230, 0.2)" />
+      <SectionDivider
+        variant="rolling-hills"
+        fillColor="rgba(252, 232, 230, 0.2)"
+      />
 
       {/* Chapter 6: Golden Hour */}
       <PhotographySection />
 
       {/* Terrain: dusk horizon → campfire */}
-      <SectionDivider variant="dusk-horizon" fillColor="rgba(252, 232, 230, 0.2)" />
+      <SectionDivider
+        variant="dusk-horizon"
+        fillColor="rgba(252, 232, 230, 0.2)"
+      />
 
       {/* Chapter 7: Campfire at Dusk */}
       <ContactSection />
