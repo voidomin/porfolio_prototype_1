@@ -29,7 +29,14 @@ const ProjectCard = ({
   index: number;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [selectedSubId, setSelectedSubId] = useState<string | null>(null);
+
+  const activeSub = project.subProjects?.find((s) => s.id === selectedSubId);
+  const displayTitle = activeSub ? activeSub.title : project.title;
+  const displayDescription = activeSub ? activeSub.description : project.description;
+  const displayImage = activeSub ? activeSub.image : project.image;
+  const displayDemoUrl = activeSub ? activeSub.demoUrl : project.demoUrl;
+  const displayTech = activeSub ? activeSub.technologies : project.technologies;
 
   // 3D Tilt Coordinates
   const x = useMotionValue(0);
@@ -97,34 +104,67 @@ const ProjectCard = ({
         <div className="p-3 pb-0" style={{ transform: "translateZ(20px)" }}>
           <div className="rounded-2xl overflow-hidden shadow-inner border border-stone-200/50 bg-stone-100/40 backdrop-blur-sm">
             {/* Minimalist Tab/Header Chrome Bar */}
-            <div className="flex items-center justify-between px-3.5 py-2.5 bg-stone-100/70 backdrop-blur-md border-b border-stone-200/30">
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between px-3 pt-2 bg-stone-100/70 backdrop-blur-md border-b border-stone-200/30 overflow-visible shrink-0">
+              <div className="flex items-center gap-1 pb-2 shrink-0">
                 <div className="w-2 h-2 rounded-full bg-[#FF5F56] shadow-sm shadow-[#FF5F56]/20" />
                 <div className="w-2 h-2 rounded-full bg-[#FFBD2E] shadow-sm shadow-[#FFBD2E]/20" />
                 <div className="w-2 h-2 rounded-full bg-[#27C93F] shadow-sm shadow-[#27C93F]/20" />
               </div>
-              <span className="text-[10px] font-mono font-bold tracking-wider text-stone-400 select-none">
-                {project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.app
-              </span>
-              <div className="w-12" /> {/* Balancing space */}
+
+              {project.subProjects ? (
+                <div className="flex items-end gap-0.5 px-2 overflow-x-auto scrollbar-none max-w-[80%] -mb-[1px]">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedSubId(null);
+                    }}
+                    className={cn(
+                      "px-2 py-1 text-[9px] font-medium rounded-t-lg transition-all border-t border-x shrink-0 select-none",
+                      selectedSubId === null
+                        ? "bg-white border-stone-200/50 text-forest-800 font-bold shadow-[0_-2px_6px_rgba(0,0,0,0.03)]"
+                        : "bg-transparent border-transparent text-stone-400 hover:text-stone-600"
+                    )}
+                  >
+                    ✦ Studio
+                  </button>
+                  {project.subProjects.map((sub) => (
+                    <button
+                      key={sub.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedSubId(sub.id);
+                      }}
+                      className={cn(
+                        "px-2 py-1 text-[9px] font-medium rounded-t-lg transition-all border-t border-x shrink-0 select-none",
+                        selectedSubId === sub.id
+                          ? "bg-white border-stone-200/50 text-forest-800 font-bold shadow-[0_-2px_6px_rgba(0,0,0,0.03)]"
+                          : "bg-transparent border-transparent text-stone-400 hover:text-stone-600"
+                      )}
+                    >
+                      {sub.title.split(" ")[0]}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-[10px] font-mono font-bold tracking-wider text-stone-400 select-none pb-2">
+                  {project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.app
+                </span>
+              )}
+
+              <div className="w-6 pb-2 shrink-0" />
             </div>
 
             {/* Frame Viewport */}
             <div className="relative h-44 overflow-hidden bg-stone-900">
               <motion.img
-                src={project.image}
-                alt={project.title}
-                className={cn(
-                  "w-full h-full object-cover transition-opacity duration-700",
-                  imageLoaded ? "opacity-100" : "opacity-0"
-                )}
-                onLoad={() => setImageLoaded(true)}
-                animate={{ scale: isHovered ? 1.05 : 1 }}
-                transition={{ duration: 0.6 }}
+                key={displayImage}
+                src={displayImage}
+                alt={displayTitle}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, scale: isHovered ? 1.05 : 1 }}
+                transition={{ duration: 0.4 }}
+                className="w-full h-full object-cover"
               />
-              {!imageLoaded && (
-                <div className="absolute inset-0 bg-gradient-to-br from-stone-300 to-stone-400 animate-pulse" />
-              )}
 
               {/* Hover actions panel */}
               <motion.div
@@ -133,9 +173,9 @@ const ProjectCard = ({
                 transition={{ duration: 0.3 }}
                 className="absolute inset-0 bg-forest-950/60 backdrop-blur-[2px] flex items-center justify-center gap-3 z-30"
               >
-                {project.demoUrl && (
+                {displayDemoUrl && (
                   <motion.a
-                    href={project.demoUrl}
+                    href={displayDemoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-3 bg-white/20 hover:bg-white/35 backdrop-blur-md rounded-full text-white transition-colors border border-white/20"
@@ -181,17 +221,17 @@ const ProjectCard = ({
             </span>
           </div>
 
-          <h3 className="text-lg font-bold text-stone-900 mb-2 group-hover:text-forest-700 transition-colors">
-            {project.title}
+          <h3 className="text-lg font-bold text-stone-900 mb-2 group-hover:text-forest-700 transition-colors h-7 overflow-hidden text-ellipsis whitespace-nowrap">
+            {displayTitle}
           </h3>
 
-          <p className="text-stone-600 text-xs mb-4 leading-relaxed line-clamp-2">
-            {project.description}
+          <p className="text-stone-600 text-xs mb-4 leading-relaxed line-clamp-2 h-8">
+            {displayDescription}
           </p>
 
           {/* Core tech badges */}
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {project.technologies.slice(0, 3).map((tech) => (
+          <div className="flex flex-wrap gap-1.5 mb-4 h-[22px] overflow-hidden">
+            {displayTech.slice(0, 3).map((tech) => (
               <span
                 key={tech}
                 className="px-2 py-0.5 text-[9px] font-semibold bg-forest-50/50 text-forest-800/80 rounded-md border border-forest-200/30"
@@ -199,18 +239,18 @@ const ProjectCard = ({
                 {tech}
               </span>
             ))}
-            {project.technologies.length > 3 && (
+            {displayTech.length > 3 && (
               <span className="px-1.5 py-0.5 text-[9px] font-semibold bg-forest-50/50 text-forest-800/80 rounded-md border border-forest-200/30">
-                +{project.technologies.length - 3}
+                +{displayTech.length - 3}
               </span>
             )}
           </div>
 
           {/* Action Links */}
           <div className="flex items-center gap-4">
-            {project.demoUrl && (
+            {displayDemoUrl && (
               <a
-                href={project.demoUrl}
+                href={displayDemoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-forest-700 hover:text-forest-900 text-xs font-bold transition-colors uppercase tracking-wider border-b border-transparent hover:border-forest-700"
@@ -297,13 +337,35 @@ export const ProjectsSection = () => {
   // Background layer translates slower (at 32% velocity) for high-end parallax depth!
   const bgTranslation = useTransform(scrollYProgress, [0, 1], [0, -scrollRange * 0.32]);
 
+  const currentIndex = Math.max(0, Math.min(filteredProjects.length - 1, Math.round(scrollProgress * (filteredProjects.length - 1 || 1))));
+  const canScrollLeft = currentIndex > 0;
+  const canScrollRight = currentIndex < filteredProjects.length - 1;
+
+  const scrollToProject = (index: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const absoluteTop = window.scrollY + rect.top;
+    const totalScrollHeight = containerRef.current.scrollHeight;
+    const viewportHeight = window.innerHeight;
+    const scrollableDistance = totalScrollHeight - viewportHeight;
+
+    const targetIndex = Math.max(0, Math.min(filteredProjects.length - 1, index));
+    const fraction = targetIndex / (filteredProjects.length - 1 || 1);
+    const targetScroll = absoluteTop + fraction * scrollableDistance;
+
+    window.scrollTo({
+      top: targetScroll,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <section
       id="projects"
       ref={isDesktop ? containerRef : undefined}
       className={cn(
         "relative",
-        isDesktop ? "h-[300vh] py-0 overflow-visible" : "overflow-hidden py-24 md:py-32"
+        isDesktop ? "h-[155vh] py-0 overflow-visible" : "overflow-hidden py-24 md:py-32"
       )}
       style={{
         background:
@@ -317,7 +379,7 @@ export const ProjectsSection = () => {
 
       {isDesktop ? (
         /* DESKTOP PINNED HORIZONTAL LAYOUT */
-        <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden z-10">
+        <div className="sticky top-0 h-screen flex flex-col justify-center pt-20 pb-8 overflow-hidden z-10">
           
           {/* Parallax Background River Currents */}
           <motion.div 
@@ -331,7 +393,7 @@ export const ProjectsSection = () => {
             </svg>
           </motion.div>
 
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-12 md:px-24 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0 select-none">
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-12 md:px-24 mb-6 flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0 select-none">
             {/* Left section headers */}
             <div>
               <p className="text-river-600/50 text-xs tracking-[0.3em] uppercase mb-2">
@@ -362,7 +424,45 @@ export const ProjectsSection = () => {
           </div>
 
           {/* Horizontal scrolling panel */}
-          <div className="relative z-10 w-full overflow-hidden select-none">
+          <div className="relative z-10 w-full select-none">
+            
+            {/* Navigation Arrows */}
+            <div className="absolute inset-y-0 left-0 right-0 pointer-events-none flex items-center justify-between px-10 z-30">
+              {/* Left Button */}
+              <motion.button
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ 
+                  opacity: canScrollLeft ? 1 : 0, 
+                  x: canScrollLeft ? 0 : -10,
+                  pointerEvents: canScrollLeft ? "auto" : "none"
+                }}
+                onClick={() => scrollToProject(currentIndex - 1)}
+                className="p-4 rounded-full bg-white/85 hover:bg-white text-stone-850 border border-stone-200/60 backdrop-blur-md shadow-lg transition-all duration-300 pointer-events-auto hover:scale-110 active:scale-95 group/btn"
+                aria-label="Previous Project"
+              >
+                <svg className="w-5 h-5 transition-transform group-hover/btn:-translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </motion.button>
+
+              {/* Right Button */}
+              <motion.button
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ 
+                  opacity: canScrollRight ? 1 : 0, 
+                  x: canScrollRight ? 0 : 10,
+                  pointerEvents: canScrollRight ? "auto" : "none"
+                }}
+                onClick={() => scrollToProject(currentIndex + 1)}
+                className="p-4 rounded-full bg-white/85 hover:bg-white text-stone-850 border border-stone-200/60 backdrop-blur-md shadow-lg transition-all duration-300 pointer-events-auto hover:scale-110 active:scale-95 group/btn"
+                aria-label="Next Project"
+              >
+                <svg className="w-5 h-5 transition-transform group-hover/btn:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </motion.button>
+            </div>
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeCategory}
@@ -393,7 +493,7 @@ export const ProjectsSection = () => {
           </div>
 
           {/* Scrolling hint bar */}
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-12 md:px-24 mt-8 flex justify-between items-center text-xs text-stone-400 select-none shrink-0">
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-12 md:px-24 mt-4 flex justify-between items-center text-xs text-stone-400 select-none shrink-0">
             <div className="flex items-center gap-2">
               <span>Scroll down to step across</span>
               <span className="animate-bounce">→</span>

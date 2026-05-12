@@ -1,3 +1,12 @@
+export interface SubProject {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  demoUrl?: string;
+  technologies: string[];
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -12,6 +21,7 @@ export interface Project {
   githubUrl?: string;
   createdAt: string;
   updatedAt: string;
+  subProjects?: SubProject[];
 }
 
 export interface BlogPost {

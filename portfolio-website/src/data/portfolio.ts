@@ -109,94 +109,61 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/voidomin/react-projects",
     createdAt: "2026-01-10",
     updatedAt: "2026-05-01",
+    subProjects: [
+      {
+        id: "sub-vocab",
+        title: "Vocab Mastery",
+        description:
+          "Spaced-repetition vocabulary trainer with themed decks and smooth learning loops.",
+        image:
+          "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&h=600&fit=crop",
+        demoUrl: "https://voidomin.github.io/react-projects./vocab/",
+        technologies: ["React", "Firebase", "Vite"],
+      },
+      {
+        id: "sub-caffiend",
+        title: "Caffiend Tracker",
+        description:
+          "Caffeine monitoring app with Firebase-backed profiles and real-time intake tracking.",
+        image:
+          "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop",
+        demoUrl: "https://voidomin.github.io/react-projects./caffiend/",
+        technologies: ["React", "Firebase", "Vite"],
+      },
+      {
+        id: "sub-moviedb",
+        title: "Movie Discovery",
+        description:
+          "Cinema-grade movie explorer with real-time search, TMDB metadata, and command palette interactions.",
+        image:
+          "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=600&fit=crop",
+        demoUrl: "https://voidomin.github.io/react-projects./movie-db/",
+        technologies: ["React", "Vite", "TMDB API"],
+      },
+      {
+        id: "sub-pokedex",
+        title: "Pokedex Explorer",
+        description:
+          "Interactive Pokedex with search, type filtering, and detailed stat-rich views.",
+        image:
+          "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=800&h=600&fit=crop",
+        demoUrl: "https://voidomin.github.io/react-projects./pokedex/",
+        technologies: ["React", "Vite", "API Integration"],
+      },
+      {
+        id: "sub-todo",
+        title: "Todo Manager",
+        description:
+          "Streamlined task tracking app with filters, persistence, and a focus-first interface.",
+        image:
+          "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop",
+        demoUrl: "https://voidomin.github.io/react-projects./todo-app/",
+        technologies: ["React", "Vite"],
+      },
+    ],
   },
   {
     id: "2",
-    title: "Vocab Mastery",
-    description:
-      "Spaced-repetition vocabulary trainer with themed decks and smooth learning loops.",
-    longDescription:
-      "Built as a focused learning product with clean interactions and practical retention features.",
-    image:
-      "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&h=600&fit=crop",
-    technologies: ["React", "Firebase", "Vite"],
-    category: "web",
-    featured: true,
-    demoUrl: "https://voidomin.github.io/react-projects./vocab/",
-    githubUrl: "https://github.com/voidomin/react-projects",
-    createdAt: "2026-02-01",
-    updatedAt: "2026-03-10",
-  },
-  {
-    id: "3",
-    title: "Todo Manager",
-    description:
-      "Streamlined task tracking app with filters, persistence, and a focus-first interface.",
-    longDescription:
-      "A compact productivity app built around quick task capture and status-based workflows.",
-    image:
-      "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop",
-    technologies: ["React", "Vite"],
-    category: "web",
-    featured: false,
-    demoUrl: "https://voidomin.github.io/react-projects./todo-app/",
-    githubUrl: "https://github.com/voidomin/react-projects",
-    createdAt: "2026-02-12",
-    updatedAt: "2026-03-16",
-  },
-  {
-    id: "4",
-    title: "Pokedex Explorer",
-    description:
-      "Interactive Pokedex with search, type filtering, and detailed stat-rich views.",
-    longDescription:
-      "A data-heavy frontend experience designed for browsing and comparing large sets of Pokemon entries.",
-    image:
-      "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=800&h=600&fit=crop",
-    technologies: ["React", "Vite", "API Integration"],
-    category: "web",
-    featured: false,
-    demoUrl: "https://voidomin.github.io/react-projects./pokedex/",
-    githubUrl: "https://github.com/voidomin/react-projects",
-    createdAt: "2026-02-18",
-    updatedAt: "2026-04-02",
-  },
-  {
-    id: "5",
-    title: "Caffiend Tracker",
-    description:
-      "Caffeine monitoring app with Firebase-backed profiles and real-time intake tracking.",
-    longDescription:
-      "A health-focused tracker that combines practical daily logging with charts and history for better habit awareness.",
-    image:
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop",
-    technologies: ["React", "Firebase", "Vite"],
-    category: "web",
-    featured: true,
-    demoUrl: "https://voidomin.github.io/react-projects./caffiend/",
-    githubUrl: "https://github.com/voidomin/react-projects",
-    createdAt: "2026-02-24",
-    updatedAt: "2026-04-10",
-  },
-  {
-    id: "6",
-    title: "Movie Discovery",
-    description:
-      "Cinema-grade movie explorer with real-time search, TMDB metadata, and command palette interactions.",
-    longDescription:
-      "A polished browsing and discovery experience that blends dense movie data with performant UI workflows.",
-    image:
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=600&fit=crop",
-    technologies: ["React", "Vite", "TMDB API"],
-    category: "web",
-    featured: true,
-    demoUrl: "https://voidomin.github.io/react-projects./movie-db/",
-    githubUrl: "https://github.com/voidomin/react-projects",
-    createdAt: "2026-03-05",
-    updatedAt: "2026-04-16",
-  },
-  {
-    id: "7",
     title: "Mustang Pipeline",
     description:
       "Biotechnology pipeline for protein structure alignment with advanced structural analysis.",
@@ -211,7 +178,7 @@ export const projects: Project[] = [
     updatedAt: "2026-04-18",
   },
   {
-    id: "8",
+    id: "3",
     title: "Param Adventures",
     description:
       "Production website for a travel company with immersive storytelling and conversion-focused sections.",
@@ -224,6 +191,38 @@ export const projects: Project[] = [
     demoUrl: "https://www.paramadventures.in/",
     createdAt: "2026-01-22",
     updatedAt: "2026-02-08",
+  },
+  {
+    id: "4",
+    title: "Smart Resume AI",
+    description:
+      "AI-powered resume optimizer with parsing, tailoring, and real-time feedback.",
+    longDescription:
+      "An intelligent platform that analyzes resumes against job descriptions, suggesting targeted improvements and keywords to pass ATS filters.",
+    image:
+      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&h=600&fit=crop",
+    technologies: ["React", "TailwindCSS", "OpenAI API", "Node.js"],
+    category: "web",
+    featured: true,
+    demoUrl: "https://voidomin.github.io/react-projects./resume-ai/",
+    createdAt: "2026-03-20",
+    updatedAt: "2026-04-22",
+  },
+  {
+    id: "5",
+    title: "Caloriq",
+    description:
+      "Clean, visual calorie tracker and meal logging platform with smart food search.",
+    longDescription:
+      "A product-minded nutrition app with a focus on quick logging, macro breakdowns, and visual history tracking.",
+    image:
+      "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop",
+    technologies: ["React", "Vite", "Chart.js", "Firebase"],
+    category: "web",
+    featured: false,
+    demoUrl: "https://voidomin.github.io/react-projects./caloriq/",
+    createdAt: "2026-03-28",
+    updatedAt: "2026-04-30",
   },
 ];
 
