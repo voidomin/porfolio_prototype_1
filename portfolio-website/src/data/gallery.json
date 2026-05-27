@@ -145,5 +145,110 @@
       "iso": "3200",
       "location": "Spiti Valley, Himalayas"
     }
+  },
+  {
+    "id": "gal-7",
+    "src": "https://images.unsplash.com/photo-1511497584788-876760111969?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Misty pine forest landscape",
+    "title": "Towering Whispers",
+    "description": "Thick early morning mist weaving through pine columns in the quiet depths of the woods.",
+    "category": "nature",
+    "width": 1000,
+    "height": 1500,
+    "featured": true,
+    "createdAt": "2026-05-02",
+    "exif": {
+      "camera": "Fujifilm X-T5",
+      "lens": "XF 16-55mm F2.8 R LM WR",
+      "focalLength": "35mm",
+      "aperture": "f/4.0",
+      "shutterSpeed": "1/160s",
+      "iso": "400",
+      "location": "Black Forest, Germany"
+    }
+  },
+  {
+    "id": "gal-8",
+    "src": "https://images.unsplash.com/photo-1482862549707-f63cb32c5fd9?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Towering waterfall cutting through canyon rocky cliffs",
+    "title": "Canyon Descent",
+    "description": "Glacial waters tumbling down a volcanic canyon face beneath overcast Nordic skies.",
+    "category": "nature",
+    "width": 1080,
+    "height": 1920,
+    "featured": true,
+    "createdAt": "2026-05-05",
+    "exif": {
+      "camera": "Sony Alpha 7R V",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "focalLength": "24mm",
+      "aperture": "f/5.6",
+      "shutterSpeed": "1/80s",
+      "iso": "100",
+      "location": "Seljalandsfoss, Iceland"
+    }
+  },
+  {
+    "id": "gal-9",
+    "src": "https://images.unsplash.com/photo-1434064511983-18c6dae20ed5?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Cozy glowing camping tent under starlit mountains",
+    "title": "Wilderness Outpost",
+    "description": "A single lit shelter framing the massive scale of granite peaks under cold high-altitude air.",
+    "category": "nature",
+    "width": 1200,
+    "height": 1200,
+    "featured": false,
+    "createdAt": "2026-05-09",
+    "exif": {
+      "camera": "Canon EOS R5",
+      "lens": "RF 24-70mm F2.8 L IS USM",
+      "focalLength": "28mm",
+      "aperture": "f/2.8",
+      "shutterSpeed": "1/60s",
+      "iso": "800",
+      "location": "Yosemite Backcountry"
+    }
+  },
+  {
+    "id": "gal-10",
+    "src": "https://images.unsplash.com/photo-1504893524553-ac55fce698be?w=1600&auto=format&fit=crop&q=80",
+    "alt": "Panoramic sunset reflection over high altitude salt lake",
+    "title": "Himalayan Serenity",
+    "description": "Stretching ambers and deep indigos reflecting on the mirror-still surface of Ladakh's border waters.",
+    "category": "nature",
+    "width": 2100,
+    "height": 900,
+    "featured": true,
+    "createdAt": "2026-05-14",
+    "exif": {
+      "camera": "Sony Alpha 7R V",
+      "lens": "FE 70-200mm F2.8 GM OSS II",
+      "focalLength": "70mm",
+      "aperture": "f/8.0",
+      "shutterSpeed": "1/320s",
+      "iso": "100",
+      "location": "Pangong Tso, Ladakh"
+    }
+  },
+  {
+    "id": "gal-11",
+    "src": "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Rainy neon city streets in Tokyo at dusk",
+    "title": "Neon Raindrops",
+    "description": "Glistening reflections of alley light banners tracing the wet asphalt on a quiet rainy evening.",
+    "category": "street",
+    "width": 1000,
+    "height": 1500,
+    "featured": true,
+    "createdAt": "2026-05-18",
+    "exif": {
+      "camera": "Leica M11",
+      "lens": "Summilux-M 35mm f/1.4 ASPH",
+      "focalLength": "35mm",
+      "aperture": "f/1.4",
+      "shutterSpeed": "1/125s",
+      "iso": "1600",
+      "location": "Shinjuku, Tokyo"
+    }
   }
 ]

@@ -85,7 +85,7 @@ export default function PhotographyGalleryPage() {
   };
 
   return (
-    <main className="min-h-screen bg-stone-950 text-stone-200 font-sans p-4 md:p-6 relative overflow-hidden">
+    <main className="min-h-screen bg-stone-950 text-stone-200 font-sans pt-4 pb-6 md:pt-6 md:pb-8 px-0 relative overflow-hidden">
       {/* Golden hour glowing atmosphere */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute top-0 inset-x-0 h-[60vh] bg-[radial-gradient(ellipse_at_50%_0%,rgba(240,180,41,0.15),transparent_70%)]" />
@@ -94,7 +94,7 @@ export default function PhotographyGalleryPage() {
 
       <div className="relative z-10 w-full mx-auto flex flex-col min-h-full">
         {/* Header navigation */}
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-900 pb-8 mb-12 px-2">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-900 pb-8 mb-12 px-6 md:px-8">
           <div className="flex items-center gap-4">
             <Link
               href="/#photography"
@@ -155,7 +155,7 @@ export default function PhotographyGalleryPage() {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: Math.min(index * 0.08, 0.8) }}
-                className="cursor-pointer group relative overflow-hidden rounded-xl bg-stone-950 shadow-md hover:shadow-xl hover:shadow-stone-950/20 transition-all duration-500"
+                className="cursor-pointer group relative overflow-hidden bg-stone-950 shadow-md hover:shadow-xl hover:shadow-stone-950/20 border border-transparent hover:border-dawn-500/40 transition-all duration-500"
                 onClick={() => openLightbox(photo)}
               >
                 <img
