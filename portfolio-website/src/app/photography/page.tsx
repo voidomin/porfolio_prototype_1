@@ -14,6 +14,7 @@ import {
   Compass,
   ArrowLeft,
   Tv,
+  Sun,
 } from "lucide-react";
 import Link from "next/link";
 import Masonry from "react-masonry-css";
@@ -31,6 +32,7 @@ export default function PhotographyGalleryPage() {
   const [filterCamera, setFilterCamera] = useState("all");
   const [filterLocation, setFilterLocation] = useState("all");
   const [isCinemaMode, setIsCinemaMode] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   // Loupe States
   const [showLoupe, setShowLoupe] = useState(false);
@@ -95,15 +97,21 @@ export default function PhotographyGalleryPage() {
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (selectedPhoto) {
+          setSelectedPhoto(null);
+        } else if (isCinemaMode) {
+          setIsCinemaMode(false);
+        }
+      }
       if (!selectedPhoto) return;
       if (e.key === "ArrowRight") nextPhoto();
       if (e.key === "ArrowLeft") prevPhoto();
-      if (e.key === "Escape") setSelectedPhoto(null);
     };
 
     globalThis.addEventListener("keydown", handleKeyDown);
     return () => globalThis.removeEventListener("keydown", handleKeyDown);
-  }, [selectedPhoto, nextPhoto, prevPhoto]);
+  }, [selectedPhoto, isCinemaMode, nextPhoto, prevPhoto]);
 
   // Filmstrip horizontal scroll listener
   const filmstripContainerRef = useRef<HTMLDivElement>(null);
@@ -116,9 +124,31 @@ export default function PhotographyGalleryPage() {
       el.scrollLeft += e.deltaY * 1.2;
     };
 
+    const onScroll = () => {
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      const pct = maxScroll > 0 ? (el.scrollLeft / maxScroll) * 100 : 0;
+      setScrollProgress(pct);
+    };
+
+    onScroll();
+
     el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
+    el.addEventListener("scroll", onScroll);
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("scroll", onScroll);
+    };
   }, [viewMode, filteredPhotos]);
+
+  const scrollFilmstrip = (direction: "left" | "right") => {
+    const el = filmstripContainerRef.current;
+    if (!el) return;
+    const scrollAmount = el.clientWidth * 0.75;
+    el.scrollTo({
+      left: el.scrollLeft + (direction === "left" ? -scrollAmount : scrollAmount),
+      behavior: "smooth"
+    });
+  };
 
   // Loupe Mouse Tracking
   const handleLoupeMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -148,7 +178,14 @@ export default function PhotographyGalleryPage() {
   };
 
   return (
-    <main className="min-h-screen bg-stone-950 text-stone-200 font-sans pt-4 pb-6 md:pt-6 md:pb-8 px-0 relative overflow-hidden">
+    <main 
+      className="min-h-screen bg-stone-950 text-stone-200 font-sans pt-4 pb-6 md:pt-6 md:pb-8 px-0 relative overflow-hidden cursor-default"
+      onClick={(e) => {
+        if (isCinemaMode && e.target === e.currentTarget) {
+          setIsCinemaMode(false);
+        }
+      }}
+    >
       {/* Golden hour glowing atmosphere */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute top-0 inset-x-0 h-[60vh] bg-[radial-gradient(ellipse_at_50%_0%,rgba(240,180,41,0.15),transparent_70%)]" />
@@ -158,14 +195,25 @@ export default function PhotographyGalleryPage() {
       {isCinemaMode && (
         <button
           onClick={() => setIsCinemaMode(false)}
-          className="fixed bottom-6 right-6 z-45 px-4 py-2.5 bg-dawn-600 hover:bg-dawn-500 text-stone-950 font-extrabold text-xs uppercase tracking-widest rounded-xl shadow-2xl transition flex items-center gap-2"
+          className="fixed bottom-8 right-8 z-50 px-5 py-3 bg-stone-900 border border-stone-800 hover:border-dawn-500 text-white font-semibold text-xs uppercase tracking-widest rounded-full shadow-2xl shadow-black/80 hover:shadow-dawn-500/20 transition-all duration-300 flex items-center gap-2.5 animate-fadeIn group cursor-pointer"
         >
-          <Tv className="w-4 h-4" />
-          Exit Cinema Mode
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-dawn-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-dawn-500"></span>
+          </span>
+          <Sun className="w-4 h-4 text-dawn-400 group-hover:rotate-45 transition-transform duration-500" />
+          <span>Lights On</span>
         </button>
       )}
 
-      <div className="relative z-10 w-full mx-auto flex flex-col min-h-full">
+      <div 
+        className="relative z-10 w-full mx-auto flex flex-col min-h-full"
+        onClick={(e) => {
+          if (isCinemaMode && e.target === e.currentTarget) {
+            setIsCinemaMode(false);
+          }
+        }}
+      >
         {/* Control Dimming Wrapper */}
         <div className={`transition-opacity duration-750 ${isCinemaMode ? "opacity-5 pointer-events-none" : "opacity-100"}`}>
           {/* Header navigation */}
@@ -273,7 +321,7 @@ export default function PhotographyGalleryPage() {
 
             <button
               onClick={() => setIsCinemaMode(true)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider text-stone-400 hover:text-stone-200 bg-stone-900/30 border border-stone-850 transition flex items-center gap-2"
+              className="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider text-stone-400 hover:text-stone-200 bg-stone-900/30 border border-stone-850 transition flex items-center gap-2 cursor-pointer"
             >
               <Tv className="w-3.5 h-3.5" />
               Lights Out
@@ -291,72 +339,147 @@ export default function PhotographyGalleryPage() {
             </p>
           </div>
         ) : viewMode === "filmstrip" ? (
-          /* Cinematic Horizontal Filmstrip View */
-          <div 
-            ref={filmstripContainerRef}
-            className="flex overflow-x-auto overflow-y-hidden whitespace-nowrap h-[68vh] w-full snap-x snap-mandatory scrollbar-thin scrollbar-thumb-stone-800 scrollbar-track-stone-950 py-2 select-none"
-          >
-            {filteredPhotos.map((photo) => (
-              <div
-                key={photo.id}
-                onClick={() => openLightbox(photo)}
-                className="inline-block h-full w-auto aspect-[3/2] shrink-0 snap-start px-1 cursor-pointer relative group overflow-hidden border border-transparent hover:border-dawn-500/40 transition-all duration-500 animate-fadeIn"
+          <>
+            {/* Cinematic Horizontal Filmstrip View Container */}
+            <div className="relative group/filmstrip w-full px-4 md:px-16 my-auto">
+              {/* Scroll Left Chevron Button */}
+              <button
+                type="button"
+                onClick={() => scrollFilmstrip("left")}
+                className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-stone-950/80 border border-stone-850 text-stone-400 hover:text-white hover:border-dawn-500/50 hover:bg-stone-900 shadow-2xl backdrop-blur-md transition-all duration-300 opacity-0 group-hover/filmstrip:opacity-100 hidden md:flex items-center justify-center cursor-pointer hover:scale-105"
+                aria-label="Scroll left"
               >
-                <img
-                  src={photo.src}
-                  alt={photo.alt}
-                  className="h-full w-auto object-cover transition-transform duration-700 ease-out group-hover:scale-103"
-                  loading="lazy"
-                />
-                
-                {/* Overlay details showing EXIF metadata on hover */}
-                <div className="absolute inset-0 bg-stone-950/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-5 text-stone-350 select-none whitespace-normal">
-                  <div>
-                    <span className="text-[9px] uppercase tracking-[0.2em] text-dawn-400 font-bold block mb-1">
-                      {photo.category || "Exhibitions"}
-                    </span>
-                    <h3 className="text-sm font-extrabold text-white leading-snug">
-                      {photo.title || "Untitled"}
-                    </h3>
-                    {photo.description && (
-                      <p className="text-stone-400 text-[11px] mt-2.5 leading-relaxed line-clamp-4">
-                        {photo.description}
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2 border-t border-stone-850 pt-3">
-                    {photo.exif?.camera && (
-                      <p className="text-[10px] font-mono text-stone-300 truncate flex items-center gap-2">
-                        <Camera className="w-3.5 h-3.5 text-dawn-500 shrink-0" />
-                        {photo.exif.camera}
-                      </p>
-                    )}
-                    {photo.exif?.location && (
-                      <p className="text-[10px] text-stone-300 truncate flex items-center gap-2">
-                        <MapPin className="w-3.5 h-3.5 text-dawn-500 shrink-0" />
-                        {photo.exif.location}
-                      </p>
-                    )}
-                    <div className="flex justify-between items-center text-[9px] text-stone-500 font-mono pt-1">
-                      <span>
-                        {photo.exif?.aperture && `${photo.exif.aperture} `}
-                        {photo.exif?.shutterSpeed && `${photo.exif.shutterSpeed} `}
-                        {photo.exif?.iso && `ISO ${photo.exif.iso}`}
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+
+              {/* Scroll Right Chevron Button */}
+              <button
+                type="button"
+                onClick={() => scrollFilmstrip("right")}
+                className="absolute right-6 md:right-8 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-stone-950/80 border border-stone-850 text-stone-400 hover:text-white hover:border-dawn-500/50 hover:bg-stone-900 shadow-2xl backdrop-blur-md transition-all duration-300 opacity-0 group-hover/filmstrip:opacity-100 hidden md:flex items-center justify-center cursor-pointer hover:scale-105"
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+
+              {/* Scroll Track */}
+              <div 
+                ref={filmstripContainerRef}
+                className="flex overflow-x-auto overflow-y-hidden whitespace-nowrap h-[68vh] w-full snap-x snap-mandatory scrollbar-thin scrollbar-thumb-stone-800 scrollbar-track-stone-950 py-4 select-none scroll-smooth"
+              >
+                {filteredPhotos.map((photo, index) => (
+                  <div
+                    key={photo.id}
+                    onClick={() => openLightbox(photo)}
+                    className="inline-flex flex-col h-full snap-start px-2 cursor-pointer relative group/item overflow-hidden bg-stone-950 border border-stone-900/60 hover:border-dawn-500/40 transition-all duration-500 animate-fadeIn shrink-0"
+                    style={{
+                      aspectRatio: photo.width && photo.height ? `${photo.width}/${photo.height}` : '3/2',
+                    }}
+                  >
+                    {/* Top film edge with repeating sprocket holes */}
+                    <div 
+                      className="w-full h-5 bg-stone-900 shrink-0 relative flex items-center justify-between px-2 border-b border-black/40"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='10' viewBox='0 0 20 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='4' y='2' width='12' height='6' rx='1' fill='%230c0a09'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'repeat-x',
+                        backgroundPosition: 'left center'
+                      }}
+                    >
+                      <span className="absolute left-3 top-0.5 text-[8px] font-mono text-stone-500 tracking-widest z-10 bg-stone-900 px-1 pointer-events-none uppercase">
+                        GH-{photo.id.replace('gal-', '')}
                       </span>
-                      <span>{photo.createdAt}</span>
+                    </div>
+
+                    {/* Canvas frame container */}
+                    <div className="relative flex-1 bg-black overflow-hidden">
+                      <img
+                        src={photo.src}
+                        alt={photo.alt}
+                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover/item:scale-103"
+                        loading="lazy"
+                        draggable="false"
+                      />
+                      
+                      {/* Overlay details showing EXIF metadata on hover */}
+                      <div className="absolute inset-0 bg-stone-950/85 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-5 text-stone-350 select-none whitespace-normal z-10">
+                        <div>
+                          <span className="text-[9px] uppercase tracking-[0.2em] text-dawn-400 font-bold block mb-1">
+                            {photo.category || "Exhibitions"}
+                          </span>
+                          <h3 className="text-sm font-extrabold text-white leading-snug">
+                            {photo.title || "Untitled"}
+                          </h3>
+                          {photo.description && (
+                            <p className="text-stone-400 text-[11px] mt-2.5 leading-relaxed line-clamp-4">
+                              {photo.description}
+                            </p>
+                          )}
+                        </div>
+                        
+                        <div className="space-y-2 border-t border-stone-850 pt-3">
+                          {photo.exif?.camera && (
+                            <p className="text-[10px] font-mono text-stone-300 truncate flex items-center gap-2">
+                              <Camera className="w-3.5 h-3.5 text-dawn-500 shrink-0" />
+                              {photo.exif.camera}
+                            </p>
+                          )}
+                          {photo.exif?.location && (
+                            <p className="text-[10px] text-stone-300 truncate flex items-center gap-2">
+                              <MapPin className="w-3.5 h-3.5 text-dawn-500 shrink-0" />
+                              {photo.exif.location}
+                            </p>
+                          )}
+                          <div className="flex justify-between items-center text-[9px] text-stone-500 font-mono pt-1">
+                            <span>
+                              {photo.exif?.aperture && `${photo.exif.aperture} `}
+                              {photo.exif?.shutterSpeed && `${photo.exif.shutterSpeed} `}
+                              {photo.exif?.iso && `ISO ${photo.exif.iso}`}
+                            </span>
+                            <span>{photo.createdAt}</span>
+                          </div>
+                        </div>
+
+                        <div className="absolute top-4 right-4 p-1.5 rounded-full bg-white/5 border border-white/10 text-white opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 hover:bg-white hover:text-stone-950">
+                          <Maximize2 className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom film edge with repeating sprocket holes */}
+                    <div 
+                      className="w-full h-5 bg-stone-900 shrink-0 relative flex items-center justify-between px-2 border-t border-black/40"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='10' viewBox='0 0 20 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='4' y='2' width='12' height='6' rx='1' fill='%230c0a09'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'repeat-x',
+                        backgroundPosition: 'left center'
+                      }}
+                    >
+                      <span className="absolute right-3 bottom-0.5 text-[8px] font-mono text-stone-500 tracking-widest z-10 bg-stone-900 px-1 pointer-events-none">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  <div className="absolute top-4 right-4 p-1.5 rounded-full bg-white/5 border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white hover:text-stone-950">
-                    <Maximize2 className="w-3.5 h-3.5" />
-                  </div>
+            {/* Horizontal Scroll Progress Bar Indicator */}
+            {filteredPhotos.length > 0 && (
+              <div className="w-full max-w-7xl mx-auto px-6 md:px-8 mt-6">
+                <div className="h-[2px] w-full bg-stone-900 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-dawn-500 transition-all duration-75 ease-out" 
+                    style={{ width: `${scrollProgress}%` }}
+                  />
+                </div>
+                <div className="flex justify-between items-center text-[9px] text-stone-500 font-mono mt-2 uppercase tracking-widest">
+                  <span>Exhibition Track</span>
+                  <span>{Math.round(scrollProgress)}%</span>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         ) : (
-          /* Masonry Grid Exhibition */
           <Masonry
             breakpointCols={breakpointColumnsObj}
             className="my-masonry-grid"
