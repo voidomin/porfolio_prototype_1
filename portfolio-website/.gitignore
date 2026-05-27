@@ -4,3 +4,7 @@ node_modules/
 .DS_Store
 *.tsbuildinfo
 .tsbuildinfo
+
+# Photo upload raw images folder
+/images-to-process/
+

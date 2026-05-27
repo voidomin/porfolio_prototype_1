@@ -13,21 +13,14 @@ import {
   ChevronRight,
   X,
   Compass,
-  ArrowRight,
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
+import Masonry from "react-masonry-css";
 import { galleryImages } from "@/data/portfolio";
 import { GalleryImage } from "@/types";
 
-/* ──────────────────────────────────────────────────────────
-   PhotographySection – "Chapter 6: Golden Hour"
-   A highly elegant, premium photography portfolio.
-   Uses an art-gallery matte frame aesthetic with gentle transitions
-   and a comprehensive EXIF camera metadata lightbox.
-   No 3D tilt or card-clones - completely unique look and feel.
-   ────────────────────────────────────────────────────────── */
-
-export const PhotographySection = () => {
+export default function PhotographyGalleryPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedPhoto, setSelectedPhoto] = useState<GalleryImage | null>(null);
   const [photoIndex, setPhotoIndex] = useState<number>(0);
@@ -38,15 +31,8 @@ export const PhotographySection = () => {
     return photo.category.toLowerCase() === activeCategory.toLowerCase();
   });
 
-  // Slice for home page exhibition (featured first, max 6)
-  const featuredFilteredPhotos = filteredPhotos.filter((p) => p.featured);
-  const homepagePhotos = featuredFilteredPhotos.length > 0 
-    ? featuredFilteredPhotos.slice(0, 6) 
-    : filteredPhotos.slice(0, 6);
-
-  // Supported categories matching the upload form
   const categories = [
-    { id: "all", label: "All" },
+    { id: "all", label: "All Explorations" },
     { id: "nature", label: "Nature" },
     { id: "portrait", label: "Portrait" },
     { id: "street", label: "Street" },
@@ -56,27 +42,27 @@ export const PhotographySection = () => {
 
   // Open lightbox at specific index
   const openLightbox = (photo: GalleryImage) => {
-    const idx = homepagePhotos.findIndex((p) => p.id === photo.id);
+    const idx = filteredPhotos.findIndex((p) => p.id === photo.id);
     setPhotoIndex(idx !== -1 ? idx : 0);
     setSelectedPhoto(photo);
   };
 
   // Navigate lightbox
   const nextPhoto = useCallback(() => {
-    if (homepagePhotos.length === 0) return;
-    const nextIdx = (photoIndex + 1) % homepagePhotos.length;
+    if (filteredPhotos.length === 0) return;
+    const nextIdx = (photoIndex + 1) % filteredPhotos.length;
     setPhotoIndex(nextIdx);
-    setSelectedPhoto(homepagePhotos[nextIdx]);
-  }, [photoIndex, homepagePhotos]);
+    setSelectedPhoto(filteredPhotos[nextIdx]);
+  }, [photoIndex, filteredPhotos]);
 
   const prevPhoto = useCallback(() => {
-    if (homepagePhotos.length === 0) return;
-    const prevIdx = (photoIndex - 1 + homepagePhotos.length) % homepagePhotos.length;
+    if (filteredPhotos.length === 0) return;
+    const prevIdx = (photoIndex - 1 + filteredPhotos.length) % filteredPhotos.length;
     setPhotoIndex(prevIdx);
-    setSelectedPhoto(homepagePhotos[prevIdx]);
-  }, [photoIndex, homepagePhotos]);
+    setSelectedPhoto(filteredPhotos[prevIdx]);
+  }, [photoIndex, filteredPhotos]);
 
-  // Keyboard navigation for lightbox
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedPhoto) return;
@@ -89,40 +75,44 @@ export const PhotographySection = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedPhoto, nextPhoto, prevPhoto]);
 
+  // Masonry Breakpoints
+  const breakpointColumnsObj = {
+    default: 3,
+    1100: 2,
+    700: 1,
+  };
 
   return (
-    <section
-      id="photography"
-      className="relative py-24 md:py-32 overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(180deg, rgba(252, 232, 230, 0.2) 0%, rgba(253, 237, 183, 0.25) 15%, rgba(251, 223, 133, 0.2) 50%, rgba(253, 237, 183, 0.25) 85%, rgba(252, 232, 230, 0.2) 100%)",
-      }}
-    >
+    <main className="min-h-screen bg-stone-950 text-stone-200 font-sans p-6 md:p-12 relative overflow-hidden">
       {/* Golden hour glowing atmosphere */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(240,180,41,0.18),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_70%,rgba(251,223,133,0.12),transparent_50%)]" />
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 inset-x-0 h-[60vh] bg-[radial-gradient(ellipse_at_50%_0%,rgba(240,180,41,0.15),transparent_70%)]" />
+        <div className="absolute bottom-0 right-0 w-[50vw] h-[50vh] bg-[radial-gradient(circle_at_100%_100%,rgba(251,223,133,0.06),transparent_60%)]" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
-        {/* Section header */}
-        <div className="text-center mb-16">
-          <p className="text-dawn-700/50 text-sm tracking-[0.3em] uppercase mb-4">
-            Chapter Six
+      <div className="relative z-10 max-w-7xl mx-auto flex flex-col min-h-full">
+        {/* Header navigation */}
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-900 pb-8 mb-12">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/#photography"
+              className="group p-3 rounded-xl bg-stone-900 border border-stone-850 hover:bg-stone-800 transition text-stone-400 hover:text-white flex items-center justify-center"
+            >
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+            </Link>
+            <div>
+              <span className="text-[10px] text-dawn-500 uppercase tracking-[0.3em] font-bold">Chapter VI Exhibition</span>
+              <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-wide mt-0.5">Golden Hour Gallery</h1>
+            </div>
+          </div>
+          <p className="text-xs text-stone-500 max-w-xs leading-relaxed">
+            A comprehensive visual record of settings, light, and optics. Move your cursor over cards to view Location tags.
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4 font-sans">
-            Golden <span className="text-dawn-600">Hour</span>
-          </h2>
-          <p className="text-stone-600/60 max-w-lg mx-auto text-sm leading-relaxed">
-            Moments captured in transit. Stored with camera exposure profiles (EXIF) 
-            to preserve the exact light and setting of each memory.
-          </p>
-        </div>
+        </header>
 
-        {/* Categories tag navigation */}
-        <div className="flex justify-center mb-12">
-          <div className="inline-flex p-1.5 rounded-2xl bg-stone-900/5 backdrop-blur-md border border-stone-900/5 shadow-inner">
+        {/* Categories navigation filter */}
+        <div className="flex justify-center mb-16">
+          <div className="inline-flex flex-wrap gap-1 p-1.5 rounded-2xl bg-stone-900/40 backdrop-blur-md border border-stone-850 shadow-inner max-w-full justify-center">
             {categories.map((cat) => {
               const isActive = activeCategory === cat.id;
               return (
@@ -131,8 +121,8 @@ export const PhotographySection = () => {
                   onClick={() => setActiveCategory(cat.id)}
                   className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
                     isActive
-                      ? "bg-stone-900 text-white shadow-md"
-                      : "text-stone-600 hover:text-stone-900"
+                      ? "bg-white text-stone-950 shadow-md"
+                      : "text-stone-400 hover:text-stone-200"
                   }`}
                 >
                   {cat.label}
@@ -142,73 +132,77 @@ export const PhotographySection = () => {
           </div>
         </div>
 
-        {/* Art Gallery Photography Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence mode="popLayout">
-            {homepagePhotos.map((photo, index) => (
+        {/* Masonry Grid Exhibition */}
+        {filteredPhotos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-32 text-center text-stone-500 border border-dashed border-stone-900 rounded-2xl bg-stone-900/10">
+            <Compass className="w-12 h-12 text-stone-800 mb-4 animate-spin" style={{ animationDuration: '6s' }} />
+            <h3 className="text-base font-bold text-stone-400">Exhibition Empty</h3>
+            <p className="text-xs text-stone-600 max-w-sm mt-2">
+              No photographs have been imported under this category yet. Select another filter or import new photos via the admin panel.
+            </p>
+          </div>
+        ) : (
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className="my-masonry-grid flex w-auto -ml-8"
+            columnClassName="my-masonry-grid_column pl-8 bg-clip-padding"
+          >
+            {filteredPhotos.map((photo, index) => (
               <motion.div
-                layout
                 key={photo.id}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-                className="group cursor-pointer"
+                transition={{ duration: 0.6, delay: Math.min(index * 0.08, 0.8) }}
+                className="mb-8 cursor-pointer group"
                 onClick={() => openLightbox(photo)}
               >
                 {/* Museum Matte Frame Border Style */}
-                <div className="bg-white p-4 pb-6 rounded-xl shadow-xl shadow-stone-900/5 border border-stone-100 hover:shadow-2xl hover:shadow-stone-900/10 transition-all duration-500">
+                <div className="bg-stone-900/40 p-4 pb-6 rounded-2xl border border-stone-850 hover:border-stone-700/60 hover:bg-stone-900/60 hover:shadow-2xl hover:shadow-amber-950/5 transition-all duration-500">
                   {/* Photo Canvas Frame */}
-                  <div className="relative aspect-[3/2] rounded-lg overflow-hidden bg-stone-100">
+                  <div className="relative rounded-lg overflow-hidden bg-stone-950">
                     <img
                       src={photo.src}
                       alt={photo.alt}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      className="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                       loading="lazy"
                     />
 
                     {/* Dark glass warm overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-between p-4">
+                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-between p-4">
                       {photo.exif?.location && (
-                        <span className="text-white text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 drop-shadow-sm">
+                        <span className="text-white text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 drop-shadow-md">
                           <MapPin className="w-3.5 h-3.5 text-dawn-400" />
                           {photo.exif.location}
                         </span>
                       )}
-                      <span className="p-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-stone-900 transition-all duration-300 shadow">
+                      <span className="p-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-stone-950 transition-all duration-300 shadow">
                         <Maximize2 className="w-3.5 h-3.5" />
                       </span>
                     </div>
                   </div>
 
                   {/* Clean text strip below like an exhibition print */}
-                  <div className="mt-4 px-1 text-center">
-                    <h3 className="text-stone-800 font-semibold tracking-wide text-sm font-sans">
+                  <div className="mt-4 px-1">
+                    <h3 className="text-stone-200 font-semibold tracking-wide text-sm font-sans group-hover:text-white transition-colors">
                       {photo.title || "Untitled"}
                     </h3>
-                    {photo.exif?.camera && (
-                      <p className="text-stone-400/80 text-[10px] tracking-widest uppercase mt-1">
-                        {photo.exif.camera}
-                      </p>
-                    )}
+                    <div className="flex justify-between items-center mt-2.5">
+                      {photo.exif?.camera ? (
+                        <p className="text-stone-500 text-[9px] tracking-widest uppercase">
+                          {photo.exif.camera}
+                        </p>
+                      ) : (
+                        <span />
+                      )}
+                      <span className="text-[9px] text-stone-600 font-mono">
+                        {photo.createdAt}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </motion.div>
             ))}
-          </AnimatePresence>
-        </div>
-
-        {/* View More Button for full gallery page */}
-        {filteredPhotos.length > 6 && (
-          <div className="flex justify-center mt-16">
-            <Link
-              href="/photography"
-              className="group inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl bg-stone-900 text-white border border-stone-800 hover:bg-stone-850 hover:border-stone-700 text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-lg shadow-stone-900/10 hover:shadow-stone-900/25"
-            >
-              View More Explorations
-              <ArrowRight className="w-4 h-4 text-dawn-500 group-hover:translate-x-1 transition-transform duration-300" />
-            </Link>
-          </div>
+          </Masonry>
         )}
       </div>
 
@@ -219,7 +213,7 @@ export const PhotographySection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-stone-950/95 backdrop-blur-xl"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-stone-950/98 backdrop-blur-xl"
             role="dialog"
             aria-modal="true"
           >
@@ -369,6 +363,6 @@ export const PhotographySection = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </section>
+    </main>
   );
-};
+}
