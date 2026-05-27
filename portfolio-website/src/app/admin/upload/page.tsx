@@ -19,6 +19,8 @@ import {
   FileText
 } from "lucide-react";
 import Link from "next/link";
+import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 
 interface ExifData {
   camera?: string;
@@ -60,6 +62,15 @@ export default function AdminUploadPage() {
     location: "",
   });
 
+  // Cropper States
+  const [crop, setCrop] = useState<Crop>();
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
+  const [imgRef, setImgRef] = useState<HTMLImageElement | null>(null);
+
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    setImgRef(e.currentTarget);
+  };
+
   // Fetch pending files
   const fetchPendingFiles = async () => {
     setIsLoadingFiles(true);
@@ -87,6 +98,11 @@ export default function AdminUploadPage() {
     setSelectedFile(filename);
     setStatusMessage(null);
     setIsExtractingExif(true);
+
+    // Reset crop states
+    setCrop(undefined);
+    setCompletedCrop(null);
+    setImgRef(null);
 
     // Auto-generate safe ID
     const baseName = filename
@@ -157,6 +173,19 @@ export default function AdminUploadPage() {
     setIsProcessing(true);
     setStatusMessage(null);
 
+    // Calculate natural (original) size crop coordinates if crop is present
+    let cropData = undefined;
+    if (completedCrop && imgRef && completedCrop.width > 0 && completedCrop.height > 0) {
+      const scaleX = imgRef.naturalWidth / imgRef.width;
+      const scaleY = imgRef.naturalHeight / imgRef.height;
+      cropData = {
+        left: Math.max(0, Math.round(completedCrop.x * scaleX)),
+        top: Math.max(0, Math.round(completedCrop.y * scaleY)),
+        width: Math.min(imgRef.naturalWidth, Math.round(completedCrop.width * scaleX)),
+        height: Math.min(imgRef.naturalHeight, Math.round(completedCrop.height * scaleY)),
+      };
+    }
+
     try {
       const res = await fetch("/api/admin/process", {
         method: "POST",
@@ -171,6 +200,7 @@ export default function AdminUploadPage() {
           featured,
           createdAt,
           exif,
+          crop: cropData,
         }),
       });
 
@@ -332,6 +362,33 @@ export default function AdminUploadPage() {
                   </div>
                 ) : (
                   <>
+                    {/* Interactive Cropper Canvas Workspace */}
+                    <div className="bg-stone-950 p-6 rounded-2xl border border-stone-850 flex flex-col items-center justify-center min-h-[250px] overflow-hidden">
+                      <span className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold mb-4">
+                        Cropping Laboratory (Free-Crop)
+                      </span>
+                      <div className="max-w-full overflow-auto max-h-[400px] flex items-center justify-center rounded-lg border border-stone-900 bg-stone-900/20 p-2">
+                        <ReactCrop
+                          crop={crop}
+                          onChange={(c) => setCrop(c)}
+                          onComplete={(c) => setCompletedCrop(c)}
+                        >
+                          <img 
+                            src={`/api/admin/view?file=${encodeURIComponent(selectedFile)}`} 
+                            alt="Interactive crop preview" 
+                            onLoad={onImageLoad}
+                            className="max-h-[350px] object-contain rounded-lg pointer-events-auto"
+                          />
+                        </ReactCrop>
+                      </div>
+                      <p className="text-[10px] text-stone-500 mt-3 text-center max-w-md leading-relaxed">
+                        Drag your cursor directly over the preview to draw a custom cropping boundary. 
+                        Leave it unselected to import the full image as is.
+                      </p>
+                    </div>
+
+                    <hr className="border-stone-800" />
+
                     {/* Database Identity */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>

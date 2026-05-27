@@ -282,3 +282,21 @@ html { scroll-behavior: smooth; }
     text-shadow: none !important;
   }
 }
+
+/* ─── Pinterest Masonry Gallery Grid ─── */
+.my-masonry-grid {
+  display: flex;
+  margin-left: -24px; /* Gutter width offset */
+  width: auto;
+}
+
+.my-masonry-grid_column {
+  padding-left: 24px; /* Gutter width */
+  background-clip: padding-box;
+}
+
+/* Style your individual items */
+.my-masonry-grid_column > div {
+  margin-bottom: 24px;
+}
+

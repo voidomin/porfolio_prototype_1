@@ -13,6 +13,13 @@ interface ExifMetadata {
   location?: string;
 }
 
+interface CropCoordinates {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
 interface ProcessRequestBody {
   filename: string;
   id: string;
@@ -23,6 +30,7 @@ interface ProcessRequestBody {
   featured: boolean;
   createdAt: string;
   exif: ExifMetadata;
+  crop?: CropCoordinates;
 }
 
 export async function POST(request: NextRequest) {
@@ -38,6 +46,7 @@ export async function POST(request: NextRequest) {
       featured,
       createdAt,
       exif,
+      crop,
     } = body;
 
     // Validate inputs
@@ -62,9 +71,18 @@ export async function POST(request: NextRequest) {
     const outputPath = path.join(outputDir, outputFilename);
     const webpSrcPath = `/images/photography/${outputFilename}`;
 
-    // Process image using sharp: resize to max 1920 width, convert to webp (quality 80)
+    // Process image using sharp: extract crop if specified, resize to max 1920 width, convert to webp (quality 82)
     // withoutEnlargement: true prevents upscaling smaller images
     const imageProcessor = sharp(inputPath);
+    if (crop && crop.width > 0 && crop.height > 0) {
+      imageProcessor.extract({
+        left: Math.round(crop.left),
+        top: Math.round(crop.top),
+        width: Math.round(crop.width),
+        height: Math.round(crop.height),
+      });
+    }
+
     const imageInfo = await imageProcessor
       .resize({ width: 1920, withoutEnlargement: true })
       .webp({ quality: 82 })
