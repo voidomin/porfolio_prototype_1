@@ -20,6 +20,19 @@ interface CropCoordinates {
   height: number;
 }
 
+interface ImageAdjustments {
+  brightness?: number; // 0.5 to 2.0
+  contrast?: number;   // 0.5 to 2.0
+  saturation?: number; // 0.5 to 2.0
+  rotation?: number;   // 0, 90, 180, 270
+}
+
+interface WatermarkOptions {
+  enabled: boolean;
+  text?: string;
+  position?: "southeast" | "southwest" | "northeast" | "northwest";
+}
+
 interface ProcessRequestBody {
   filename: string;
   id: string;
@@ -31,6 +44,8 @@ interface ProcessRequestBody {
   createdAt: string;
   exif: ExifMetadata;
   crop?: CropCoordinates;
+  adjustments?: ImageAdjustments;
+  watermark?: WatermarkOptions;
 }
 
 export async function POST(request: NextRequest) {
@@ -47,6 +62,8 @@ export async function POST(request: NextRequest) {
       createdAt,
       exif,
       crop,
+      adjustments,
+      watermark,
     } = body;
 
     // Validate inputs
@@ -72,8 +89,9 @@ export async function POST(request: NextRequest) {
     const webpSrcPath = `/images/photography/${outputFilename}`;
 
     // Process image using sharp: extract crop if specified, resize to max 1920 width, convert to webp (quality 82)
-    // withoutEnlargement: true prevents upscaling smaller images
     const imageProcessor = sharp(inputPath);
+    
+    // 1. Crop
     if (crop && crop.width > 0 && crop.height > 0) {
       imageProcessor.extract({
         left: Math.round(crop.left),
@@ -83,8 +101,68 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // 2. Rotation (applied after crop based on view coordinates)
+    if (adjustments?.rotation !== undefined && adjustments.rotation !== 0) {
+      imageProcessor.rotate(adjustments.rotation);
+    }
+
+    // 3. Brightness & Saturation modulation
+    if (adjustments) {
+      const modulateOpts: { brightness?: number; saturation?: number } = {};
+      if (adjustments.brightness !== undefined) modulateOpts.brightness = adjustments.brightness;
+      if (adjustments.saturation !== undefined) modulateOpts.saturation = adjustments.saturation;
+      if (Object.keys(modulateOpts).length > 0) {
+        imageProcessor.modulate(modulateOpts);
+      }
+    }
+
+    // 4. Contrast modulation (linear transform centered around 128 for 8-bit dynamic range)
+    if (adjustments?.contrast !== undefined && adjustments.contrast !== 1.0) {
+      const C = adjustments.contrast;
+      imageProcessor.linear(C, 128 * (1 - C));
+    }
+
+    // 5. Resize to max 1920px width (maintaining aspect ratio)
+    imageProcessor.resize({ width: 1920, withoutEnlargement: true });
+
+    // 6. Signature watermark overlay compositing
+    if (watermark?.enabled) {
+      const watermarkText = watermark.text || "© Akash Photography";
+      const svgWidth = 500;
+      const svgHeight = 80;
+      
+      // Determine text anchor and alignment coordinates based on gravity position
+      const isWest = watermark.position === "southwest" || watermark.position === "northwest";
+      const textAnchor = isWest ? "start" : "end";
+      const textX = isWest ? 20 : 480;
+
+      const svg = `
+        <svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+          <style>
+            .watermark-text {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+              font-size: 16px;
+              font-weight: 500;
+              letter-spacing: 0.15em;
+              fill: #ffffff;
+              fill-opacity: 0.45;
+              text-anchor: ${textAnchor};
+            }
+          </style>
+          <text x="${textX}" y="45" class="watermark-text" style="text-shadow: 0px 1px 3px rgba(0,0,0,0.5);">${watermarkText}</text>
+        </svg>
+      `;
+      const watermarkBuffer = Buffer.from(svg);
+      imageProcessor.composite([
+        {
+          input: watermarkBuffer,
+          gravity: watermark.position || "southeast",
+        }
+      ]);
+    }
+
+    // 7. Output WebP
     const imageInfo = await imageProcessor
-      .resize({ width: 1920, withoutEnlargement: true })
       .webp({ quality: 82 })
       .toFile(outputPath);
 

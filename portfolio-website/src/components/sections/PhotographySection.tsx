@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Camera,
   MapPin,
   Calendar,
   Aperture,
-  Sliders,
   Maximize2,
   ChevronLeft,
   ChevronRight,
@@ -18,6 +17,8 @@ import {
 import Link from "next/link";
 import { galleryImages } from "@/data/portfolio";
 import { GalleryImage } from "@/types";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 /* ──────────────────────────────────────────────────────────
    PhotographySection – "Chapter 6: Golden Hour"
@@ -31,6 +32,11 @@ export const PhotographySection = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedPhoto, setSelectedPhoto] = useState<GalleryImage | null>(null);
   const [photoIndex, setPhotoIndex] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const carouselContainerRef = useRef<HTMLDivElement>(null);
+  const carouselTrackRef = useRef<HTMLDivElement>(null);
+  const [dragConstraintsLeft, setDragConstraintsLeft] = useState(0);
 
   // Filter photos based on active category
   const filteredPhotos = galleryImages.filter((photo) => {
@@ -89,6 +95,66 @@ export const PhotographySection = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedPhoto, nextPhoto, prevPhoto]);
 
+  // Update drag constraints
+  useEffect(() => {
+    const updateConstraints = () => {
+      if (carouselTrackRef.current && carouselContainerRef.current) {
+        const trackWidth = carouselTrackRef.current.scrollWidth;
+        const containerWidth = carouselContainerRef.current.offsetWidth;
+        const maxScroll = trackWidth - containerWidth;
+        setDragConstraintsLeft(maxScroll > 0 ? -maxScroll : 0);
+      }
+    };
+
+    updateConstraints();
+    const timer = setTimeout(updateConstraints, 1000);
+    window.addEventListener("resize", updateConstraints);
+    return () => {
+      window.removeEventListener("resize", updateConstraints);
+      clearTimeout(timer);
+    };
+  }, [homepagePhotos]);
+
+  // GSAP scroll trigger entry animations
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const titleEl = document.querySelector("#photography .section-title-wrap");
+    if (titleEl) {
+      gsap.fromTo(
+        titleEl,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: "#photography",
+            start: "top 80%",
+          },
+        }
+      );
+    }
+
+    if (carouselContainerRef.current) {
+      gsap.fromTo(
+        carouselContainerRef.current,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: "#photography",
+            start: "top 70%",
+          },
+        }
+      );
+    }
+  }, []);
+
 
   return (
     <section
@@ -107,7 +173,7 @@ export const PhotographySection = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
         {/* Section header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 section-title-wrap">
           <p className="text-dawn-700/50 text-sm tracking-[0.3em] uppercase mb-4">
             Chapter Six
           </p>
@@ -142,19 +208,30 @@ export const PhotographySection = () => {
           </div>
         </div>
 
-        {/* Art Gallery Photography Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence mode="popLayout">
+        {/* Art Gallery Photography Carousel */}
+        <div 
+          ref={carouselContainerRef} 
+          className="relative w-full overflow-hidden py-4"
+        >
+          <motion.div
+            ref={carouselTrackRef}
+            drag="x"
+            dragConstraints={{ left: dragConstraintsLeft, right: 0 }}
+            dragElastic={0.25}
+            dragTransition={{ power: 0.3, timeConstant: 250 }}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
+            className="flex gap-8 cursor-grab active:cursor-grabbing w-max px-4"
+          >
             {homepagePhotos.map((photo, index) => (
-              <motion.div
-                layout
+              <div
                 key={photo.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-                className="group cursor-pointer"
-                onClick={() => openLightbox(photo)}
+                className="group select-none w-[280px] sm:w-[360px] md:w-[420px] shrink-0"
+                onClick={() => {
+                  if (!isDragging) {
+                    openLightbox(photo);
+                  }
+                }}
               >
                 {/* Museum Matte Frame Border Style */}
                 <div className="bg-white p-4 pb-6 rounded-xl shadow-xl shadow-stone-900/5 border border-stone-100 hover:shadow-2xl hover:shadow-stone-900/10 transition-all duration-500">
@@ -163,7 +240,7 @@ export const PhotographySection = () => {
                     <img
                       src={photo.src}
                       alt={photo.alt}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                       loading="lazy"
                     />
 
@@ -193,9 +270,9 @@ export const PhotographySection = () => {
                     )}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </AnimatePresence>
+          </motion.div>
         </div>
 
         {/* View More Button for full gallery page */}

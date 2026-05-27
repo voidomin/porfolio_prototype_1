@@ -62,6 +62,17 @@ export default function AdminUploadPage() {
     location: "",
   });
 
+  // Adjustments States
+  const [brightness, setBrightness] = useState(1.0);
+  const [contrast, setContrast] = useState(1.0);
+  const [saturation, setSaturation] = useState(1.0);
+  const [rotation, setRotation] = useState(0);
+
+  // Watermark States
+  const [watermarkEnabled, setWatermarkEnabled] = useState(false);
+  const [watermarkText, setWatermarkText] = useState("© Akash Photography");
+  const [watermarkPosition, setWatermarkPosition] = useState<"southeast" | "southwest" | "northeast" | "northwest">("southeast");
+
   // Cropper States
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
@@ -103,6 +114,15 @@ export default function AdminUploadPage() {
     setCrop(undefined);
     setCompletedCrop(null);
     setImgRef(null);
+
+    // Reset adjustments
+    setBrightness(1.0);
+    setContrast(1.0);
+    setSaturation(1.0);
+    setRotation(0);
+    setWatermarkEnabled(false);
+    setWatermarkText("© Akash Photography");
+    setWatermarkPosition("southeast");
 
     // Auto-generate safe ID
     const baseName = filename
@@ -201,6 +221,17 @@ export default function AdminUploadPage() {
           createdAt,
           exif,
           crop: cropData,
+          adjustments: {
+            brightness,
+            contrast,
+            saturation,
+            rotation,
+          },
+          watermark: {
+            enabled: watermarkEnabled,
+            text: watermarkText,
+            position: watermarkPosition,
+          },
         }),
       });
 
@@ -210,9 +241,17 @@ export default function AdminUploadPage() {
           type: "success",
           text: `Successfully processed and imported "${title}" to your gallery!`,
         });
+        
+        const finishedFile = selectedFile;
         setSelectedFile(null);
-        // Refresh list
-        fetchPendingFiles();
+        
+        // Automatically load the next file in the queue
+        const remainingQueue = pendingFiles.filter(f => f !== finishedFile);
+        await fetchPendingFiles();
+        
+        if (remainingQueue.length > 0) {
+          handleSelectFile(remainingQueue[0]);
+        }
       } else {
         setStatusMessage({
           type: "error",
@@ -280,10 +319,17 @@ export default function AdminUploadPage() {
           
           {/* Left Column: Pending files list (span 4) */}
           <div className="lg:col-span-4 bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6">
-            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-              <Compass className="w-5 h-5 text-dawn-500" />
-              Pending Uploads
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Compass className="w-5 h-5 text-dawn-500" />
+                Pending Uploads
+              </h2>
+              {pendingFiles.length > 0 && (
+                <span className="text-[10px] bg-dawn-950/40 border border-dawn-900/50 px-2 py-0.5 rounded-full text-dawn-400 font-bold font-mono">
+                  Queue: {pendingFiles.length}
+                </span>
+              )}
+            </div>
             <p className="text-xs text-stone-500 mb-6 leading-relaxed">
               Place raw camera photos in the local project directory under <code className="bg-stone-950 px-1.5 py-0.5 rounded text-dawn-400 font-mono">/images-to-process/</code> to import them.
             </p>
@@ -377,7 +423,11 @@ export default function AdminUploadPage() {
                             src={`/api/admin/view?file=${encodeURIComponent(selectedFile)}`} 
                             alt="Interactive crop preview" 
                             onLoad={onImageLoad}
-                            className="max-h-[350px] object-contain rounded-lg pointer-events-auto"
+                            className="max-h-[350px] object-contain rounded-lg pointer-events-auto transition-all"
+                            style={{ 
+                              filter: `brightness(${brightness}) contrast(${contrast}) saturate(${saturation})`,
+                              transform: `rotate(${rotation}deg)`,
+                            }}
                           />
                         </ReactCrop>
                       </div>
@@ -577,6 +627,135 @@ export default function AdminUploadPage() {
                           placeholder="e.g. Kashmir Great Lakes, India"
                         />
                       </div>
+                    </div>
+
+                    {/* Live Adjustments Laboratory */}
+                    <div className="bg-stone-950 p-6 rounded-2xl border border-stone-850">
+                      <h3 className="text-xs uppercase tracking-wider text-dawn-500 font-bold mb-4 flex items-center gap-1.5">
+                        <Sliders className="w-4 h-4" />
+                        Luminance & Color Adjustments
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Brightness */}
+                        <div>
+                          <div className="flex justify-between text-[10px] font-mono text-stone-400 mb-1.5">
+                            <span>BRIGHTNESS</span>
+                            <span>{brightness.toFixed(1)}x</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.5"
+                            max="2.0"
+                            step="0.1"
+                            value={brightness}
+                            onChange={(e) => setBrightness(parseFloat(e.target.value))}
+                            className="w-full accent-dawn-500 h-1 bg-stone-800 rounded-lg appearance-none cursor-pointer"
+                          />
+                        </div>
+                        {/* Contrast */}
+                        <div>
+                          <div className="flex justify-between text-[10px] font-mono text-stone-400 mb-1.5">
+                            <span>CONTRAST</span>
+                            <span>{contrast.toFixed(1)}x</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.5"
+                            max="2.0"
+                            step="0.1"
+                            value={contrast}
+                            onChange={(e) => setContrast(parseFloat(e.target.value))}
+                            className="w-full accent-dawn-500 h-1 bg-stone-800 rounded-lg appearance-none cursor-pointer"
+                          />
+                        </div>
+                        {/* Saturation */}
+                        <div>
+                          <div className="flex justify-between text-[10px] font-mono text-stone-400 mb-1.5">
+                            <span>SATURATION</span>
+                            <span>{saturation.toFixed(1)}x</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.5"
+                            max="2.0"
+                            step="0.1"
+                            value={saturation}
+                            onChange={(e) => setSaturation(parseFloat(e.target.value))}
+                            className="w-full accent-dawn-500 h-1 bg-stone-800 rounded-lg appearance-none cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="mt-5 pt-4 border-t border-stone-900 flex justify-between items-center">
+                        <span className="text-[10px] text-stone-500 font-mono">ROTATION</span>
+                        <div className="flex gap-2">
+                          {[0, 90, 180, 270].map((angle) => (
+                            <button
+                              key={angle}
+                              type="button"
+                              onClick={() => setRotation(angle)}
+                              className={`px-3 py-1.5 rounded-lg text-[10px] font-mono border transition ${
+                                rotation === angle
+                                  ? "bg-dawn-600 text-stone-950 border-dawn-600 font-bold"
+                                  : "bg-stone-900 border-stone-800 text-stone-400 hover:text-white"
+                              }`}
+                            >
+                              {angle}°
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Signature Watermarking */}
+                    <div className="bg-stone-950 p-6 rounded-2xl border border-stone-850">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xs uppercase tracking-wider text-dawn-500 font-bold flex items-center gap-1.5">
+                          <FileText className="w-4 h-4" />
+                          Signature Watermarking
+                        </h3>
+                        <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-stone-300 select-none">
+                          <input
+                            type="checkbox"
+                            checked={watermarkEnabled}
+                            onChange={(e) => setWatermarkEnabled(e.target.checked)}
+                            className="w-4.5 h-4.5 bg-stone-900 border border-stone-800 rounded text-dawn-600 focus:ring-dawn-500"
+                          />
+                          Enable
+                        </label>
+                      </div>
+                      
+                      {watermarkEnabled && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                          <div>
+                            <label className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono">
+                              Watermark Text
+                            </label>
+                            <input
+                              type="text"
+                              value={watermarkText}
+                              onChange={(e) => setWatermarkText(e.target.value)}
+                              className="w-full bg-stone-950 border border-stone-850 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+                              placeholder="e.g. © Akash Photography"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono">
+                              Position / Gravity
+                            </label>
+                            <select
+                              value={watermarkPosition}
+                              onChange={(e) => setWatermarkPosition(e.target.value as any)}
+                              className="w-full bg-stone-950 border border-stone-850 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+                            >
+                              <option value="southeast">Bottom Right (Southeast)</option>
+                              <option value="southwest">Bottom Left (Southwest)</option>
+                              <option value="northeast">Top Right (Northeast)</option>
+                              <option value="northwest">Top Left (Northwest)</option>
+                            </select>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Options */}
