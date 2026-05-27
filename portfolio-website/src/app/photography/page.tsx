@@ -7,7 +7,6 @@ import {
   MapPin,
   Calendar,
   Aperture,
-  Sliders,
   Maximize2,
   ChevronLeft,
   ChevronRight,
@@ -43,7 +42,7 @@ export default function PhotographyGalleryPage() {
   // Open lightbox at specific index
   const openLightbox = (photo: GalleryImage) => {
     const idx = filteredPhotos.findIndex((p) => p.id === photo.id);
-    setPhotoIndex(idx !== -1 ? idx : 0);
+    setPhotoIndex(idx === -1 ? 0 : idx);
     setSelectedPhoto(photo);
   };
 
@@ -71,8 +70,8 @@ export default function PhotographyGalleryPage() {
       if (e.key === "Escape") setSelectedPhoto(null);
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    globalThis.addEventListener("keydown", handleKeyDown);
+    return () => globalThis.removeEventListener("keydown", handleKeyDown);
   }, [selectedPhoto, nextPhoto, prevPhoto]);
 
   // Masonry Breakpoints for edge-to-edge collage
@@ -231,9 +230,11 @@ export default function PhotographyGalleryPage() {
             aria-modal="true"
           >
             {/* Background close click */}
-            <div
-              className="absolute inset-0 cursor-default"
+            <button
+              type="button"
+              className="absolute inset-0 w-full h-full cursor-default bg-transparent border-0 focus:outline-none"
               onClick={() => setSelectedPhoto(null)}
+              aria-label="Close lightbox"
             />
 
             {/* Navigation buttons */}
