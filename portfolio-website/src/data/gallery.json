@@ -250,5 +250,194 @@
       "iso": "1600",
       "location": "Shinjuku, Tokyo"
     }
+  },
+  {
+    "id": "gal-12",
+    "src": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Symmetric architectural spiral concrete staircase",
+    "title": "Vortex of Concrete",
+    "description": "A perfect mathematical spiral looking down the center of a modern brutalist staircase.",
+    "category": "architecture",
+    "width": 1000,
+    "height": 1500,
+    "featured": true,
+    "createdAt": "2026-05-19",
+    "exif": {
+      "camera": "Hasselblad X2D 100C",
+      "lens": "XCD 21mm F4",
+      "focalLength": "21mm",
+      "aperture": "f/8.0",
+      "shutterSpeed": "1/30s",
+      "iso": "64",
+      "location": "Copenhagen, Denmark"
+    }
+  },
+  {
+    "id": "gal-13",
+    "src": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Minimalistic warm architectural archway with sharp shadows",
+    "title": "Lines of Light",
+    "description": "Sunbeams tracing geometric silhouettes across custom plastered arches in a desert villa.",
+    "category": "architecture",
+    "width": 1800,
+    "height": 900,
+    "featured": true,
+    "createdAt": "2026-05-20",
+    "exif": {
+      "camera": "Sony Alpha 7R V",
+      "lens": "FE 35mm F1.4 GM",
+      "focalLength": "35mm",
+      "aperture": "f/4.0",
+      "shutterSpeed": "1/250s",
+      "iso": "100",
+      "location": "Marrakesh, Morocco"
+    }
+  },
+  {
+    "id": "gal-14",
+    "src": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Modern concrete exterior angles pointing to the sky",
+    "title": "Brutalist Zenith",
+    "description": "Raw concrete panels clashing at dynamic angles, framed by a deep blue evening sky.",
+    "category": "architecture",
+    "width": 1200,
+    "height": 1600,
+    "featured": false,
+    "createdAt": "2026-05-21",
+    "exif": {
+      "camera": "Fujifilm GFX 100S",
+      "lens": "GF 23mm F4 R LM WR",
+      "focalLength": "18mm",
+      "aperture": "f/11",
+      "shutterSpeed": "1/4s",
+      "iso": "100",
+      "location": "Berlin, Germany"
+    }
+  },
+  {
+    "id": "gal-15",
+    "src": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Expressive portrait under dramatic natural side-lighting",
+    "title": "Silent Stories",
+    "description": "Capturing subtle emotion in soft, directional window light with a shallow depth of field.",
+    "category": "portrait",
+    "width": 1000,
+    "height": 1333,
+    "featured": true,
+    "createdAt": "2026-05-22",
+    "exif": {
+      "camera": "Canon EOS R5",
+      "lens": "RF 85mm F1.2 L USM",
+      "focalLength": "85mm",
+      "aperture": "f/1.2",
+      "shutterSpeed": "1/500s",
+      "iso": "100",
+      "location": "Studio, Mumbai"
+    }
+  },
+  {
+    "id": "gal-16",
+    "src": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Moody portrait of a man half-shadowed by neon warm light",
+    "title": "Shadow Self",
+    "description": "An exploration of identity and contrast using harsh street lighting and dark environments.",
+    "category": "portrait",
+    "width": 1000,
+    "height": 1500,
+    "featured": true,
+    "createdAt": "2026-05-23",
+    "exif": {
+      "camera": "Sony Alpha 7R V",
+      "lens": "FE 50mm F1.2 GM",
+      "focalLength": "50mm",
+      "aperture": "f/1.2",
+      "shutterSpeed": "1/160s",
+      "iso": "400",
+      "location": "Brooklyn, New York"
+    }
+  },
+  {
+    "id": "gal-17",
+    "src": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Vibrant profile close-up portrait of a woman laughing",
+    "title": "Gilded Grace",
+    "description": "Warm golden light catching the contours of a candid laugh during late afternoon sun.",
+    "category": "portrait",
+    "width": 1200,
+    "height": 1200,
+    "featured": false,
+    "createdAt": "2026-05-24",
+    "exif": {
+      "camera": "Leica M11",
+      "lens": "Noctilux-M 50mm f/0.95 ASPH",
+      "focalLength": "50mm",
+      "aperture": "f/0.95",
+      "shutterSpeed": "1/1000s",
+      "iso": "64",
+      "location": "Paris, France"
+    }
+  },
+  {
+    "id": "gal-18",
+    "src": "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Cyberpunk inspired city street at night with neon signs",
+    "title": "Chroma Grid",
+    "description": "Reflections of magenta and teal light panels on a wet crosswalk in a bustling metropolis.",
+    "category": "street",
+    "width": 1920,
+    "height": 1080,
+    "featured": true,
+    "createdAt": "2026-05-25",
+    "exif": {
+      "camera": "Leica Q3",
+      "lens": "Summilux 28mm f/1.7 ASPH",
+      "focalLength": "28mm",
+      "aperture": "f/1.7",
+      "shutterSpeed": "1/80s",
+      "iso": "800",
+      "location": "Akihabara, Tokyo"
+    }
+  },
+  {
+    "id": "gal-19",
+    "src": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Geometric stark shadows falling on architectural details",
+    "title": "Abstract Horizon",
+    "description": "High contrast shadow play creating crisp monochromatic lines against plaster walls.",
+    "category": "street",
+    "width": 1000,
+    "height": 1500,
+    "featured": false,
+    "createdAt": "2026-05-26",
+    "exif": {
+      "camera": "Fujifilm X-T5",
+      "lens": "XF 27mm F2.8 R WR",
+      "focalLength": "27mm",
+      "aperture": "f/8.0",
+      "shutterSpeed": "1/500s",
+      "iso": "200",
+      "location": "Jaipur, India"
+    }
+  },
+  {
+    "id": "gal-20",
+    "src": "https://images.unsplash.com/photo-1453728013993-6d66e9c9123a?w=1200&auto=format&fit=crop&q=80",
+    "alt": "Intense macro bokeh reflection in a glass lens optic",
+    "title": "Refracted Realities",
+    "description": "Experimental macro capture looking directly through a vintage optical element to warp ambient light.",
+    "category": "other",
+    "width": 1200,
+    "height": 800,
+    "featured": true,
+    "createdAt": "2026-05-27",
+    "exif": {
+      "camera": "Sony Alpha 7R V",
+      "lens": "FE 90mm F2.8 Macro G OSS",
+      "focalLength": "90mm",
+      "aperture": "f/2.8",
+      "shutterSpeed": "1/60s",
+      "iso": "320",
+      "location": "Macro Studio"
+    }
   }
 ]
