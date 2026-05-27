@@ -75,24 +75,26 @@ export default function PhotographyGalleryPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedPhoto, nextPhoto, prevPhoto]);
 
-  // Masonry Breakpoints
+  // Masonry Breakpoints for edge-to-edge collage
   const breakpointColumnsObj = {
-    default: 3,
-    1100: 2,
-    700: 1,
+    default: 5,
+    1500: 4,
+    1100: 3,
+    700: 2,
+    500: 1,
   };
 
   return (
-    <main className="min-h-screen bg-stone-950 text-stone-200 font-sans p-6 md:p-12 relative overflow-hidden">
+    <main className="min-h-screen bg-stone-950 text-stone-200 font-sans p-4 md:p-6 relative overflow-hidden">
       {/* Golden hour glowing atmosphere */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute top-0 inset-x-0 h-[60vh] bg-[radial-gradient(ellipse_at_50%_0%,rgba(240,180,41,0.15),transparent_70%)]" />
         <div className="absolute bottom-0 right-0 w-[50vw] h-[50vh] bg-[radial-gradient(circle_at_100%_100%,rgba(251,223,133,0.06),transparent_60%)]" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto flex flex-col min-h-full">
+      <div className="relative z-10 w-full mx-auto flex flex-col min-h-full">
         {/* Header navigation */}
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-900 pb-8 mb-12">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-900 pb-8 mb-12 px-2">
           <div className="flex items-center gap-4">
             <Link
               href="/#photography"
@@ -106,12 +108,12 @@ export default function PhotographyGalleryPage() {
             </div>
           </div>
           <p className="text-xs text-stone-500 max-w-xs leading-relaxed">
-            A comprehensive visual record of settings, light, and optics. Move your cursor over cards to view Location tags.
+            A comprehensive visual record of settings, light, and optics. Move your cursor over cards to view details.
           </p>
         </header>
 
         {/* Categories navigation filter */}
-        <div className="flex justify-center mb-16">
+        <div className="flex justify-center mb-12">
           <div className="inline-flex flex-wrap gap-1 p-1.5 rounded-2xl bg-stone-900/40 backdrop-blur-md border border-stone-850 shadow-inner max-w-full justify-center">
             {categories.map((cat) => {
               const isActive = activeCategory === cat.id;
@@ -144,8 +146,8 @@ export default function PhotographyGalleryPage() {
         ) : (
           <Masonry
             breakpointCols={breakpointColumnsObj}
-            className="my-masonry-grid flex w-auto -ml-8"
-            columnClassName="my-masonry-grid_column pl-8 bg-clip-padding"
+            className="my-masonry-grid"
+            columnClassName="my-masonry-grid_column"
           >
             {filteredPhotos.map((photo, index) => (
               <motion.div
@@ -153,51 +155,62 @@ export default function PhotographyGalleryPage() {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: Math.min(index * 0.08, 0.8) }}
-                className="mb-8 cursor-pointer group"
+                className="cursor-pointer group relative overflow-hidden rounded-xl bg-stone-950 shadow-md hover:shadow-xl hover:shadow-stone-950/20 transition-all duration-500"
                 onClick={() => openLightbox(photo)}
               >
-                {/* Museum Matte Frame Border Style */}
-                <div className="bg-stone-900/40 p-4 pb-6 rounded-2xl border border-stone-850 hover:border-stone-700/60 hover:bg-stone-900/60 hover:shadow-2xl hover:shadow-amber-950/5 transition-all duration-500">
-                  {/* Photo Canvas Frame */}
-                  <div className="relative rounded-lg overflow-hidden bg-stone-950">
-                    <img
-                      src={photo.src}
-                      alt={photo.alt}
-                      className="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                      loading="lazy"
-                    />
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  className="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  loading="lazy"
+                />
 
-                    {/* Dark glass warm overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-between p-4">
-                      {photo.exif?.location && (
-                        <span className="text-white text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 drop-shadow-md">
-                          <MapPin className="w-3.5 h-3.5 text-dawn-400" />
-                          {photo.exif.location}
-                        </span>
-                      )}
-                      <span className="p-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-stone-950 transition-all duration-300 shadow">
-                        <Maximize2 className="w-3.5 h-3.5" />
+                {/* Translucent Dark Glass Overlay displaying metadata on hover */}
+                <div className="absolute inset-0 bg-stone-950/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-5 md:p-6 text-stone-350 select-none">
+                  {/* Top: Category & Exhibition Title & Description */}
+                  <div>
+                    <span className="text-[9px] uppercase tracking-[0.2em] text-dawn-400 font-bold block mb-1.5">
+                      {photo.category || "Exhibitions"}
+                    </span>
+                    <h3 className="text-sm md:text-base font-extrabold text-white leading-snug">
+                      {photo.title || "Untitled"}
+                    </h3>
+                    {photo.description && (
+                      <p className="text-stone-400 text-[11px] mt-2.5 leading-relaxed line-clamp-4">
+                        {photo.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Bottom: Technical EXIF profile & Capture location */}
+                  <div className="space-y-2 border-t border-stone-850 pt-3">
+                    {photo.exif?.camera && (
+                      <p className="text-[10px] font-mono text-stone-300 truncate flex items-center gap-2">
+                        <Camera className="w-3.5 h-3.5 text-dawn-500 shrink-0" />
+                        {photo.exif.camera}
+                      </p>
+                    )}
+                    
+                    {photo.exif?.location && (
+                      <p className="text-[10px] text-stone-300 truncate flex items-center gap-2">
+                        <MapPin className="w-3.5 h-3.5 text-dawn-500 shrink-0" />
+                        {photo.exif.location}
+                      </p>
+                    )}
+                    
+                    <div className="flex justify-between items-center text-[9px] text-stone-500 font-mono pt-1">
+                      <span>
+                        {photo.exif?.aperture && `${photo.exif.aperture} `}
+                        {photo.exif?.shutterSpeed && `${photo.exif.shutterSpeed} `}
+                        {photo.exif?.iso && `ISO ${photo.exif.iso}`}
                       </span>
+                      <span>{photo.createdAt}</span>
                     </div>
                   </div>
 
-                  {/* Clean text strip below like an exhibition print */}
-                  <div className="mt-4 px-1">
-                    <h3 className="text-stone-200 font-semibold tracking-wide text-sm font-sans group-hover:text-white transition-colors">
-                      {photo.title || "Untitled"}
-                    </h3>
-                    <div className="flex justify-between items-center mt-2.5">
-                      {photo.exif?.camera ? (
-                        <p className="text-stone-500 text-[9px] tracking-widest uppercase">
-                          {photo.exif.camera}
-                        </p>
-                      ) : (
-                        <span />
-                      )}
-                      <span className="text-[9px] text-stone-600 font-mono">
-                        {photo.createdAt}
-                      </span>
-                    </div>
+                  {/* Center Maximize Icon indicator (floating right top) */}
+                  <div className="absolute top-4 right-4 p-1.5 rounded-full bg-white/5 border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white hover:text-stone-950">
+                    <Maximize2 className="w-3.5 h-3.5" />
                   </div>
                 </div>
               </motion.div>
