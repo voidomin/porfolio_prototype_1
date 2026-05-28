@@ -11,7 +11,9 @@ import {
   CheckCircle2, 
   Image as ImageIcon, 
   AlertCircle, 
-  FileText
+  FileText,
+  Plus,
+  Trash2
 } from "lucide-react";
 import Link from "next/link";
 import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
@@ -342,9 +344,11 @@ interface StudioHeaderProps {
   readonly selectedFile: string | null;
   readonly isSidebarOpen: boolean;
   readonly setIsSidebarOpen: (open: boolean) => void;
+  readonly adminTab: "photos" | "projects";
 }
 
-function StudioHeader({ selectedFile, isSidebarOpen, setIsSidebarOpen }: Readonly<StudioHeaderProps>) {
+function StudioHeader({ selectedFile, isSidebarOpen, setIsSidebarOpen, adminTab }: Readonly<StudioHeaderProps>) {
+  const isPhotos = adminTab === "photos";
   return (
     <header className="flex justify-between items-center border-b border-stone-800 pb-6 mb-10">
       <div className="flex items-center gap-4">
@@ -356,11 +360,13 @@ function StudioHeader({ selectedFile, isSidebarOpen, setIsSidebarOpen }: Readonl
         </Link>
         <div>
           <span className="text-[10px] text-dawn-500 uppercase tracking-widest font-bold">Studio Dashboard</span>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white">Golden Hour Photo Lab</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white">
+            {isPhotos ? "Golden Hour Photo Lab" : "Portfolio Projects Lab"}
+          </h1>
         </div>
       </div>
       <div className="flex items-center gap-3">
-        {selectedFile && (
+        {isPhotos && selectedFile && (
           <button
             type="button"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -570,6 +576,531 @@ function WatermarkSection({
   );
 }
 
+interface SubProject {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  demoUrl?: string;
+  technologies: string[];
+}
+
+interface ProjectData {
+  id: string;
+  title: string;
+  description: string;
+  longDescription?: string;
+  image: string;
+  technologies: string[];
+  category: string;
+  featured: boolean;
+  demoUrl?: string;
+  githubUrl?: string;
+  createdAt: string;
+  subProjects?: SubProject[];
+}
+
+interface ProjectsQueueProps {
+  readonly projects: readonly ProjectData[];
+  readonly selectedId: string | null;
+  readonly onSelect: (project: ProjectData) => void;
+  readonly onCreateNew: () => void;
+}
+
+function ProjectsQueue({
+  projects,
+  selectedId,
+  onSelect,
+  onCreateNew,
+}: Readonly<ProjectsQueueProps>) {
+  return (
+    <div className="space-y-4">
+      <button
+        type="button"
+        onClick={onCreateNew}
+        className="w-full py-2.5 px-4 bg-stone-800 hover:bg-stone-750 text-dawn-400 border border-stone-700 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+      >
+        <Plus className="w-4 h-4" />
+        New Project
+      </button>
+
+      <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+        {projects.map((project) => {
+          const isSelected = selectedId === project.id;
+          return (
+            <button
+              key={project.id}
+              type="button"
+              onClick={() => onSelect(project)}
+              className={`w-full text-left p-3 rounded-xl border flex items-center gap-3 transition ${
+                isSelected 
+                  ? "bg-dawn-950/20 border-dawn-700 text-white shadow-lg" 
+                  : "bg-stone-950/40 border-stone-850 text-stone-400 hover:bg-stone-900/60 hover:text-stone-200"
+              }`}
+            >
+              <div className="w-10 h-10 rounded-lg overflow-hidden bg-stone-900 shrink-0 border border-stone-800/40">
+                <img 
+                  src={project.image || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=100&h=100&fit=crop"} 
+                  alt="" 
+                  className="w-full h-full object-cover" 
+                />
+              </div>
+              <div className="overflow-hidden flex-1">
+                <p className="text-xs font-semibold truncate">{project.title || "Untitled"}</p>
+                <p className="text-[9px] text-stone-600 font-mono mt-0.5 truncate uppercase tracking-wider">{project.category} app</p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface ProjectEditorProps {
+  readonly isEdit: boolean;
+  readonly isProcessing: boolean;
+  readonly onSubmit: (e: React.FormEvent) => void;
+  readonly onCancel: () => void;
+  readonly onDelete: () => void;
+  readonly confirmDelete: boolean;
+  readonly setConfirmDelete: (val: boolean) => void;
+
+  readonly title: string;
+  readonly setTitle: (val: string) => void;
+  readonly description: string;
+  readonly setDescription: (val: string) => void;
+  readonly longDescription: string;
+  readonly setLongDescription: (val: string) => void;
+  readonly image: string;
+  readonly setImage: (val: string) => void;
+  readonly category: string;
+  readonly setCategory: (val: string) => void;
+  readonly featured: boolean;
+  readonly setFeatured: (val: boolean) => void;
+  readonly demoUrl: string;
+  readonly setDemoUrl: (val: string) => void;
+  readonly githubUrl: string;
+  readonly setGithubUrl: (val: string) => void;
+  readonly createdAt: string;
+  readonly setCreatedAt: (val: string) => void;
+  readonly technologies: string;
+  readonly setTechnologies: (val: string) => void;
+  readonly subProjects: readonly SubProject[];
+  readonly setSubProjects: (val: SubProject[]) => void;
+}
+
+function ProjectEditor({
+  isEdit,
+  isProcessing,
+  onSubmit,
+  onCancel,
+  onDelete,
+  confirmDelete,
+  setConfirmDelete,
+  title,
+  setTitle,
+  description,
+  setDescription,
+  longDescription,
+  setLongDescription,
+  image,
+  setImage,
+  category,
+  setCategory,
+  featured,
+  setFeatured,
+  demoUrl,
+  setDemoUrl,
+  githubUrl,
+  setGithubUrl,
+  createdAt,
+  setCreatedAt,
+  technologies,
+  setTechnologies,
+  subProjects,
+  setSubProjects,
+}: Readonly<ProjectEditorProps>) {
+  const renderSubmitContent = () => {
+    if (isProcessing) {
+      return (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Saving...
+        </>
+      );
+    }
+    return isEdit ? "Save Changes" : "Create Project";
+  };
+
+  const handleAddSubProject = () => {
+    const newSub: SubProject = {
+      id: `sub-${Date.now()}`,
+      title: "",
+      description: "",
+      image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&h=600&fit=crop",
+      demoUrl: "",
+      technologies: [],
+    };
+    setSubProjects([...subProjects, newSub]);
+  };
+
+  const handleUpdateSubProject = (index: number, fields: Partial<SubProject>) => {
+    const updated = [...subProjects];
+    updated[index] = { ...updated[index], ...fields };
+    setSubProjects(updated);
+  };
+
+  const handleRemoveSubProject = (index: number) => {
+    setSubProjects(subProjects.filter((_, i) => i !== index));
+  };
+
+  return (
+    <form onSubmit={onSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
+      {/* Left Column: Image Preview & Sub-projects list */}
+      <div className="lg:col-span-8 space-y-6">
+        <div className="bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6">
+          <span className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold mb-3 block text-center">
+            Project Cover Image Preview
+          </span>
+          <div className="w-full overflow-hidden rounded-xl border border-stone-950 bg-stone-900/20 p-2 flex justify-center">
+            <img 
+              src={image || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop"} 
+              alt="Project preview" 
+              className="max-h-[300px] object-contain rounded-xl shadow-lg border border-stone-950"
+              onError={(e) => {
+                e.currentTarget.src = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop";
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Sub-projects list */}
+        <div className="bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6 space-y-4">
+          <div className="flex justify-between items-center border-b border-stone-800 pb-3">
+            <h3 className="text-sm uppercase tracking-wider text-dawn-500 font-bold">
+              Sub-projects / Ecosystem Builds ({subProjects.length})
+            </h3>
+            <button
+              type="button"
+              onClick={handleAddSubProject}
+              className="px-3 py-1 bg-stone-800 border border-stone-700 hover:bg-stone-750 text-xs font-semibold rounded-lg text-dawn-400 transition cursor-pointer flex items-center gap-1.5"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Sub-Project
+            </button>
+          </div>
+
+          {subProjects.length === 0 ? (
+            <p className="text-xs text-stone-500 text-center py-6">No sub-projects added yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {subProjects.map((sub, index) => (
+                <div key={sub.id} className="bg-stone-950/60 p-4 rounded-xl border border-stone-850 relative space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSubProject(index)}
+                    className="absolute top-4 right-4 p-1.5 bg-stone-905 border border-stone-800 text-stone-500 hover:text-rose-400 rounded-lg hover:border-rose-950 transition cursor-pointer"
+                    aria-label="Delete sub-project"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor={`sub-title-${sub.id}`} className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono">
+                        Sub-Project Title
+                      </label>
+                      <input
+                        id={`sub-title-${sub.id}`}
+                        type="text"
+                        required
+                        value={sub.title}
+                        onChange={(e) => handleUpdateSubProject(index, { title: e.target.value })}
+                        className="w-full bg-stone-950 border border-stone-850 rounded-lg px-3.5 py-1.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+                        placeholder="e.g. Vocab Mastery"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`sub-image-${sub.id}`} className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono">
+                        Image URL
+                      </label>
+                      <input
+                        id={`sub-image-${sub.id}`}
+                        type="text"
+                        required
+                        value={sub.image}
+                        onChange={(e) => handleUpdateSubProject(index, { image: e.target.value })}
+                        className="w-full bg-stone-950 border border-stone-850 rounded-lg px-3.5 py-1.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+                        placeholder="Image URL"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor={`sub-desc-${sub.id}`} className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono">
+                      Description
+                    </label>
+                    <input
+                      id={`sub-desc-${sub.id}`}
+                      type="text"
+                      required
+                      value={sub.description}
+                      onChange={(e) => handleUpdateSubProject(index, { description: e.target.value })}
+                      className="w-full bg-stone-950 border border-stone-850 rounded-lg px-3.5 py-1.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+                      placeholder="Short description"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor={`sub-demo-${sub.id}`} className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono">
+                        Demo URL
+                      </label>
+                      <input
+                        id={`sub-demo-${sub.id}`}
+                        type="text"
+                        value={sub.demoUrl || ""}
+                        onChange={(e) => handleUpdateSubProject(index, { demoUrl: e.target.value })}
+                        className="w-full bg-stone-950 border border-stone-850 rounded-lg px-3.5 py-1.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+                        placeholder="Live Link"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`sub-tech-${sub.id}`} className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono">
+                        Technologies (comma-separated)
+                      </label>
+                      <input
+                        id={`sub-tech-${sub.id}`}
+                        type="text"
+                        required
+                        value={sub.technologies.join(", ")}
+                        onChange={(e) => handleUpdateSubProject(index, { 
+                          technologies: e.target.value.split(",").map(t => t.trim()).filter(Boolean) 
+                        })}
+                        className="w-full bg-stone-950 border border-stone-850 rounded-lg px-3.5 py-1.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+                        placeholder="React, Firebase, Vite"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Right Column: Metadata Form Fields */}
+      <div className="lg:col-span-4 bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6 md:p-8 space-y-6">
+        <h2 className="text-lg font-bold text-white border-b border-stone-800 pb-4 flex items-center gap-2">
+          <FileText className="w-5 h-5 text-dawn-500" />
+          Project Configuration
+        </h2>
+
+        <div>
+          <label htmlFor="proj-title" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Project Title
+          </label>
+          <input
+            id="proj-title"
+            type="text"
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+            placeholder="e.g. React Projects Studio"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="proj-desc" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Short Description
+          </label>
+          <textarea
+            id="proj-desc"
+            required
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition resize-none"
+            placeholder="One-sentence description of the build..."
+          />
+        </div>
+
+        <div>
+          <label htmlFor="proj-longdesc" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Long Description / Story (Optional)
+          </label>
+          <textarea
+            id="proj-longdesc"
+            value={longDescription}
+            onChange={(e) => setLongDescription(e.target.value)}
+            rows={3}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition resize-none"
+            placeholder="Explain what the project accomplishes and any background details..."
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="proj-cat" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+              Category
+            </label>
+            <select
+              id="proj-cat"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition cursor-pointer"
+            >
+              <option value="web">Web App</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="proj-date" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+              Creation Date
+            </label>
+            <input
+              id="proj-date"
+              type="date"
+              required
+              value={createdAt}
+              onChange={(e) => setCreatedAt(e.target.value)}
+              className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="proj-image" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Cover Image Path / URL
+          </label>
+          <input
+            id="proj-image"
+            type="text"
+            required
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+            placeholder="e.g. /images/projects/photo.png"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="proj-tech" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Technologies (comma-separated list)
+          </label>
+          <input
+            id="proj-tech"
+            type="text"
+            required
+            value={technologies}
+            onChange={(e) => setTechnologies(e.target.value)}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+            placeholder="e.g. React, Next.js, Tailwinds"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="proj-demo" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+              Demo URL
+            </label>
+            <input
+              id="proj-demo"
+              type="text"
+              value={demoUrl}
+              onChange={(e) => setDemoUrl(e.target.value)}
+              className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+              placeholder="Live app link"
+            />
+          </div>
+          <div>
+            <label htmlFor="proj-github" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+              GitHub URL
+            </label>
+            <input
+              id="proj-github"
+              type="text"
+              value={githubUrl}
+              onChange={(e) => setGithubUrl(e.target.value)}
+              className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+              placeholder="Codebase repository"
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 bg-stone-950/40 p-4 rounded-xl border border-stone-850">
+          <label htmlFor="proj-featured" className="flex items-center gap-3 cursor-pointer text-xs font-semibold text-stone-300">
+            <input
+              id="proj-featured"
+              type="checkbox"
+              checked={featured}
+              onChange={(e) => setFeatured(e.target.checked)}
+              className="w-4.5 h-4.5 bg-stone-900 border border-stone-800 rounded text-dawn-600 focus:ring-dawn-500"
+            />
+            <span>Feature on Main Landing Page</span>
+          </label>
+        </div>
+
+        {/* Actions bar */}
+        <div className="flex items-center justify-between gap-3 pt-4 border-t border-stone-850">
+          {isEdit ? (
+            <div className="flex items-center gap-2">
+              {confirmDelete ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={onDelete}
+                    disabled={isProcessing}
+                    className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-stone-950 font-bold text-xs transition cursor-pointer"
+                  >
+                    Yes, Delete
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(false)}
+                    className="px-4 py-2 rounded-xl border border-stone-850 text-stone-450 hover:text-white text-xs transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="px-4 py-2 rounded-xl bg-rose-950/40 border border-rose-900/60 hover:bg-rose-900/40 text-rose-350 font-bold text-xs transition cursor-pointer"
+                >
+                  Delete Project
+                </button>
+              )}
+            </div>
+          ) : (
+            <div />
+          )}
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-5 py-2.5 rounded-xl border border-stone-805 text-xs font-bold text-stone-400 hover:text-white hover:bg-stone-900 transition cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isProcessing}
+              className="px-6 py-2.5 rounded-xl bg-dawn-600 hover:bg-dawn-500 disabled:bg-stone-800 font-bold text-xs text-stone-950 disabled:text-stone-600 transition flex items-center gap-2 shadow-lg shadow-dawn-900/10 cursor-pointer"
+            >
+              {renderSubmitContent()}
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  );
+}
+
 interface PublishedQueueProps {
   readonly photos: readonly any[];
   readonly selectedId: string | null;
@@ -634,7 +1165,116 @@ function PublishedQueue({
   );
 }
 
-export default function AdminUploadPage() {
+async function apiFetchPendingFiles() {
+  try {
+    const res = await fetch("/api/admin/pending");
+    const data = await res.json();
+    return data.files || [];
+  } catch (err) {
+    console.error("Failed to load files", err);
+    return [];
+  }
+}
+
+async function apiFetchPublishedPhotos() {
+  try {
+    const res = await fetch("/api/admin/published");
+    const data = await res.json();
+    return data.photos || [];
+  } catch (err) {
+    console.error("Failed to load published photos", err);
+    return [];
+  }
+}
+
+async function apiFetchProjects() {
+  try {
+    const res = await fetch("/api/admin/projects");
+    const data = await res.json();
+    return data.projects || [];
+  } catch (err) {
+    console.error("Failed to load projects", err);
+    return [];
+  }
+}
+
+async function apiDeletePhoto(id: string) {
+  try {
+    const res = await fetch(`/api/admin/published?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    return { ok: res.ok && data.success, error: data.error };
+  } catch (err: any) {
+    return { ok: false, error: err.message };
+  }
+}
+
+async function apiDeleteProject(id: string) {
+  try {
+    const res = await fetch(`/api/admin/projects?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    return { ok: res.ok && data.success, error: data.error };
+  } catch (err: any) {
+    return { ok: false, error: err.message };
+  }
+}
+
+async function apiSubmitProject(payload: any, isNew: boolean) {
+  try {
+    const res = await fetch("/api/admin/projects", {
+      method: isNew ? "POST" : "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return { ok: res.ok && data.success, error: data.error };
+  } catch (err: any) {
+    return { ok: false, error: err.message };
+  }
+}
+
+async function apiUpdatePublishedPhoto(payload: any) {
+  try {
+    const res = await fetch("/api/admin/published", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return { ok: res.ok && data.success, error: data.error };
+  } catch (err: any) {
+    return { ok: false, error: err.message };
+  }
+}
+
+async function apiProcessNewPhoto(payload: any) {
+  try {
+    const res = await fetch("/api/admin/process", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return { ok: res.ok && data.success, error: data.error };
+  } catch (err: any) {
+    return { ok: false, error: err.message };
+  }
+}
+
+async function apiFetchExif(filename: string) {
+  try {
+    const res = await fetch(`/api/admin/exif?file=${encodeURIComponent(filename)}`);
+    const data = await res.json();
+    return { ok: res.ok, exif: data.exif, createdAt: data.createdAt, error: data.error };
+  } catch (err: any) {
+    return { ok: false, error: err.message };
+  }
+}
+
+function useAdminDashboardState() {
   const [pendingFiles, setPendingFiles] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -643,13 +1283,29 @@ export default function AdminUploadPage() {
   const [isExtractingExif, setIsExtractingExif] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // CMS States
   const [activeTab, setActiveTab] = useState<"pending" | "published">("pending");
   const [publishedPhotos, setPublishedPhotos] = useState<any[]>([]);
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  // Form Fields
+  const [adminTab, setAdminTab] = useState<"photos" | "projects">("photos");
+  const [projectsList, setProjectsList] = useState<ProjectData[]>([]);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [isProjectsLoading, setIsProjectsLoading] = useState(false);
+  const [confirmProjectDelete, setConfirmProjectDelete] = useState(false);
+
+  const [projTitle, setProjTitle] = useState("");
+  const [projDescription, setProjDescription] = useState("");
+  const [projLongDescription, setProjLongDescription] = useState("");
+  const [projImage, setProjImage] = useState("");
+  const [projCategory, setProjCategory] = useState("web");
+  const [projFeatured, setProjFeatured] = useState(false);
+  const [projDemoUrl, setProjDemoUrl] = useState("");
+  const [projGithubUrl, setProjGithubUrl] = useState("");
+  const [projCreatedAt, setProjCreatedAt] = useState("");
+  const [projTechnologies, setProjTechnologies] = useState("");
+  const [projSubProjects, setProjSubProjects] = useState<SubProject[]>([]);
+
   const [photoId, setPhotoId] = useState("");
   const [title, setTitle] = useState("");
   const [alt, setAlt] = useState("");
@@ -667,18 +1323,15 @@ export default function AdminUploadPage() {
     location: "",
   });
 
-  // Adjustments States
   const [brightness, setBrightness] = useState(1);
   const [contrast, setContrast] = useState(1);
   const [saturation, setSaturation] = useState(1);
   const [rotation, setRotation] = useState(0);
 
-  // Watermark States
   const [watermarkEnabled, setWatermarkEnabled] = useState(false);
   const [watermarkText, setWatermarkText] = useState("© Akash Photography");
   const [watermarkPosition, setWatermarkPosition] = useState<WatermarkPosition>("southeast");
 
-  // Cropper States
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
   const [imgRef, setImgRef] = useState<HTMLImageElement | null>(null);
@@ -687,40 +1340,29 @@ export default function AdminUploadPage() {
     setImgRef(e.currentTarget);
   };
 
-  // Fetch pending files
   const fetchPendingFiles = async () => {
     setIsLoadingFiles(true);
-    try {
-      const res = await fetch("/api/admin/pending");
-      const data = await res.json();
-      if (data.files) {
-        setPendingFiles(data.files);
-      } else if (data.error) {
-        console.error("Error fetching files:", data.error);
-      }
-    } catch (err) {
-      console.error("Failed to load files", err);
-    } finally {
-      setIsLoadingFiles(false);
-    }
+    const files = await apiFetchPendingFiles();
+    setPendingFiles(files);
+    setIsLoadingFiles(false);
   };
 
-  // Fetch published photos
   const fetchPublishedPhotos = async () => {
-    try {
-      const res = await fetch("/api/admin/published");
-      const data = await res.json();
-      if (data.photos) {
-        setPublishedPhotos(data.photos);
-      }
-    } catch (err) {
-      console.error("Failed to load published photos", err);
-    }
+    const photos = await apiFetchPublishedPhotos();
+    setPublishedPhotos(photos);
+  };
+
+  const fetchProjects = async () => {
+    setIsProjectsLoading(true);
+    const projects = await apiFetchProjects();
+    setProjectsList(projects);
+    setIsProjectsLoading(false);
   };
 
   useEffect(() => {
     fetchPendingFiles();
     fetchPublishedPhotos();
+    fetchProjects();
   }, []);
 
   useEffect(() => {
@@ -729,13 +1371,117 @@ export default function AdminUploadPage() {
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    if (adminTab === "projects") {
+      fetchProjects();
+    }
+  }, [adminTab]);
+
+  const handleSelectProject = (project: ProjectData) => {
+    setSelectedProjectId(project.id);
+    setConfirmProjectDelete(false);
+    setStatusMessage(null);
+
+    setProjTitle(project.title || "");
+    setProjDescription(project.description || "");
+    setProjLongDescription(project.longDescription || "");
+    setProjImage(project.image || "");
+    setProjCategory(project.category || "web");
+    setProjFeatured(project.featured || false);
+    setProjDemoUrl(project.demoUrl || "");
+    setProjGithubUrl(project.githubUrl || "");
+    setProjCreatedAt(project.createdAt || new Date().toISOString().split("T")[0]);
+    setProjTechnologies(project.technologies ? project.technologies.join(", ") : "");
+    setProjSubProjects(project.subProjects || []);
+  };
+
+  const handleCreateNewProject = () => {
+    setSelectedProjectId("new");
+    setConfirmProjectDelete(false);
+    setStatusMessage(null);
+
+    setProjTitle("");
+    setProjDescription("");
+    setProjLongDescription("");
+    setProjImage("https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop");
+    setProjCategory("web");
+    setProjFeatured(false);
+    setProjDemoUrl("");
+    setProjGithubUrl("");
+    setProjCreatedAt(new Date().toISOString().split("T")[0]);
+    setProjTechnologies("");
+    setProjSubProjects([]);
+  };
+
+  const handleCancelProjectEdit = () => {
+    setSelectedProjectId(null);
+    setConfirmProjectDelete(false);
+  };
+
+  const handleProjectSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    setStatusMessage(null);
+
+    const payload = {
+      id: selectedProjectId === "new" ? undefined : selectedProjectId,
+      title: projTitle,
+      description: projDescription,
+      longDescription: projLongDescription,
+      image: projImage,
+      category: projCategory,
+      featured: projFeatured,
+      demoUrl: projDemoUrl,
+      githubUrl: projGithubUrl,
+      createdAt: projCreatedAt,
+      technologies: projTechnologies.split(",").map((t) => t.trim()).filter(Boolean),
+      subProjects: projSubProjects,
+    };
+
+    const res = await apiSubmitProject(payload, selectedProjectId === "new");
+    if (res.ok) {
+      setStatusMessage({
+        type: "success",
+        text: `Successfully ${selectedProjectId === "new" ? "created" : "updated"} project "${projTitle}"!`,
+      });
+      setSelectedProjectId(null);
+      fetchProjects();
+    } else {
+      setStatusMessage({
+        type: "error",
+        text: res.error || "Failed to save project.",
+      });
+    }
+    setIsProcessing(false);
+  };
+
+  const handleProjectDelete = async () => {
+    if (!selectedProjectId || selectedProjectId === "new") return;
+    setIsProcessing(true);
+    const res = await apiDeleteProject(selectedProjectId);
+    if (res.ok) {
+      setStatusMessage({
+        type: "success",
+        text: `Successfully deleted project from your portfolio.`,
+      });
+      setSelectedProjectId(null);
+      setConfirmProjectDelete(false);
+      fetchProjects();
+    } else {
+      setStatusMessage({
+        type: "error",
+        text: res.error || "Failed to delete project.",
+      });
+    }
+    setIsProcessing(false);
+  };
+
   const handleSelectPublishedFile = (photo: any) => {
     setEditingPhotoId(photo.id);
     setSelectedFile(photo.src);
     setStatusMessage(null);
     setConfirmDelete(false);
 
-    // Reset crop & adjustments (since it is already processed)
     setCrop(undefined);
     setCompletedCrop(null);
     setImgRef(null);
@@ -745,7 +1491,6 @@ export default function AdminUploadPage() {
     setRotation(0);
     setWatermarkEnabled(false);
 
-    // Populate metadata
     setPhotoId(photo.id);
     setTitle(photo.title || "");
     setAlt(photo.alt || "");
@@ -767,48 +1512,34 @@ export default function AdminUploadPage() {
   const handleDelete = async () => {
     if (!editingPhotoId) return;
     setIsProcessing(true);
-    try {
-      const res = await fetch(`/api/admin/published?id=${encodeURIComponent(editingPhotoId)}`, {
-        method: "DELETE",
+    const res = await apiDeletePhoto(editingPhotoId);
+    if (res.ok) {
+      setStatusMessage({
+        type: "success",
+        text: `Successfully deleted photo from your exhibition.`,
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setStatusMessage({
-          type: "success",
-          text: `Successfully deleted photo from your exhibition.`,
-        });
-        setEditingPhotoId(null);
-        setSelectedFile(null);
-        setConfirmDelete(false);
-        fetchPublishedPhotos();
-      } else {
-        setStatusMessage({
-          type: "error",
-          text: data.error || "Failed to delete photo.",
-        });
-      }
-    } catch (err: any) {
+      setEditingPhotoId(null);
+      setSelectedFile(null);
+      setConfirmDelete(false);
+      fetchPublishedPhotos();
+    } else {
       setStatusMessage({
         type: "error",
-        text: err.message || "An error occurred while deleting photo.",
+        text: res.error || "Failed to delete photo.",
       });
-    } finally {
-      setIsProcessing(false);
     }
+    setIsProcessing(false);
   };
 
-  // Handle select pending file
   const handleSelectFile = async (filename: string) => {
     setSelectedFile(filename);
     setStatusMessage(null);
     setIsExtractingExif(true);
 
-    // Reset crop states
     setCrop(undefined);
     setCompletedCrop(null);
     setImgRef(null);
 
-    // Reset adjustments
     setBrightness(1);
     setContrast(1);
     setSaturation(1);
@@ -817,12 +1548,11 @@ export default function AdminUploadPage() {
     setWatermarkText("© Akash Photography");
     setWatermarkPosition("southeast");
 
-    // Auto-generate safe ID
     const baseName = filename
       .toLowerCase()
-      .replace(/\.[^/.]+$/, "") // remove extension
-      .replace(/[^a-z0-9]+/g, "-") // replace non-alphanumeric with hyphen
-      .replace(/(^-|-$)/g, ""); // trim hyphens
+      .replace(/\.[^/.]+$/, "") 
+      .replace(/[^a-z0-9]+/g, "-") 
+      .replace(/(^-|-$)/g, ""); 
     
     setPhotoId(`gal-${baseName}`);
     setTitle(
@@ -836,36 +1566,25 @@ export default function AdminUploadPage() {
     setCategory("nature");
     setFeatured(true);
 
-    // Fetch EXIF metadata
-    try {
-      const res = await fetch(`/api/admin/exif?file=${encodeURIComponent(filename)}`);
-      const data = await res.json();
-      if (res.ok && data.exif) {
-        setExif({
-          camera: data.exif.camera || "",
-          lens: data.exif.lens || "",
-          focalLength: data.exif.focalLength || "",
-          aperture: data.exif.aperture || "",
-          shutterSpeed: data.exif.shutterSpeed || "",
-          iso: data.exif.iso || "",
-          location: data.exif.location || "",
-        });
-        if (data.createdAt) {
-          setCreatedAt(data.createdAt);
-        }
-      } else {
-        console.warn("Could not retrieve EXIF data or error:", data.error);
-        resetExifForm();
+    const res = await apiFetchExif(filename);
+    if (res.ok && res.exif) {
+      setExif({
+        camera: res.exif.camera || "",
+        lens: res.exif.lens || "",
+        focalLength: res.exif.focalLength || "",
+        aperture: res.exif.aperture || "",
+        shutterSpeed: res.exif.shutterSpeed || "",
+        iso: res.exif.iso || "",
+        location: res.exif.location || "",
+      });
+      if (res.createdAt) {
+        setCreatedAt(res.createdAt);
       }
-    } catch (err) {
-      console.error("Failed to fetch EXIF metadata", err);
+    } else {
       resetExifForm();
-    } finally {
-      setIsExtractingExif(false);
     }
+    setIsExtractingExif(false);
   };
-
-
 
   const resetExifForm = () => {
     setCreatedAt(new Date().toISOString().split("T")[0]);
@@ -881,47 +1600,34 @@ export default function AdminUploadPage() {
   };
 
   const updatePublishedPhoto = async () => {
-    try {
-      const res = await fetch("/api/admin/published", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: photoId,
-          title,
-          alt,
-          description,
-          category,
-          featured,
-          createdAt,
-          exif,
-        }),
+    const payload = {
+      id: photoId,
+      title,
+      alt,
+      description,
+      category,
+      featured,
+      createdAt,
+      exif,
+    };
+    const res = await apiUpdatePublishedPhoto(payload);
+    if (res.ok) {
+      setStatusMessage({
+        type: "success",
+        text: `Successfully updated metadata for "${title}"!`,
       });
-
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setStatusMessage({
-          type: "success",
-          text: `Successfully updated metadata for "${title}"!`,
-        });
-        setEditingPhotoId(null);
-        setSelectedFile(null);
-        fetchPublishedPhotos();
-      } else {
-        setStatusMessage({
-          type: "error",
-          text: data.error || "Failed to update metadata.",
-        });
-      }
-    } catch (err: any) {
+      setEditingPhotoId(null);
+      setSelectedFile(null);
+      fetchPublishedPhotos();
+    } else {
       setStatusMessage({
         type: "error",
-        text: err.message || "An error occurred while updating metadata.",
+        text: res.error || "Failed to update metadata.",
       });
     }
   };
 
   const processNewPhoto = async () => {
-    // Calculate natural (original) size crop coordinates if crop is present
     let cropData = undefined;
     if (completedCrop && imgRef && completedCrop.width > 0 && completedCrop.height > 0) {
       const scaleX = imgRef.naturalWidth / imgRef.width;
@@ -934,67 +1640,54 @@ export default function AdminUploadPage() {
       };
     }
 
-    try {
-      const res = await fetch("/api/admin/process", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: selectedFile,
-          id: photoId,
-          title,
-          alt,
-          description,
-          category,
-          featured,
-          createdAt,
-          exif,
-          crop: cropData,
-          adjustments: {
-            brightness,
-            contrast,
-            saturation,
-            rotation,
-          },
-          watermark: {
-            enabled: watermarkEnabled,
-            text: watermarkText,
-            position: watermarkPosition,
-          },
-        }),
-      });
+    const payload = {
+      filename: selectedFile,
+      id: photoId,
+      title,
+      alt,
+      description,
+      category,
+      featured,
+      createdAt,
+      exif,
+      crop: cropData,
+      adjustments: {
+        brightness,
+        contrast,
+        saturation,
+        rotation,
+      },
+      watermark: {
+        enabled: watermarkEnabled,
+        text: watermarkText,
+        position: watermarkPosition,
+      },
+    };
 
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setStatusMessage({
-          type: "success",
-          text: `Successfully processed and imported "${title}" to your gallery!`,
-        });
-        
-        const finishedFile = selectedFile;
-        setSelectedFile(null);
-        
-        // Automatically load the next file in the queue
-        const remainingQueue = pendingFiles.filter(f => f !== finishedFile);
-        await fetchPendingFiles();
-        
-        if (remainingQueue.length > 0) {
-          handleSelectFile(remainingQueue[0]);
-        }
-      } else {
-        setStatusMessage({
-          type: "error",
-          text: data.error || "Failed to process image.",
-        });
+    const res = await apiProcessNewPhoto(payload);
+    if (res.ok) {
+      setStatusMessage({
+        type: "success",
+        text: `Successfully processed and imported "${title}" to your gallery!`,
+      });
+      
+      const finishedFile = selectedFile;
+      setSelectedFile(null);
+      
+      const remainingQueue = pendingFiles.filter(f => f !== finishedFile);
+      await fetchPendingFiles();
+      
+      if (remainingQueue.length > 0) {
+        handleSelectFile(remainingQueue[0]);
       }
-    } catch (err: any) {
+    } else {
       setStatusMessage({
         type: "error",
-        text: err.message || "An error occurred during image processing.",
+        text: res.error || "Failed to process image.",
       });
     }
   };
 
-  // Submit process
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) return;
@@ -1010,12 +1703,699 @@ export default function AdminUploadPage() {
     setIsProcessing(false);
   };
 
-  let submitButtonText = "";
-  if (editingPhotoId) {
-    submitButtonText = "Save Changes";
-  } else {
-    submitButtonText = "Process & Save to Exhibition";
+  return {
+    pendingFiles,
+    selectedFile,
+    setSelectedFile,
+    isSidebarOpen,
+    setIsSidebarOpen,
+    isLoadingFiles,
+    isProcessing,
+    isExtractingExif,
+    statusMessage,
+    setStatusMessage,
+    activeTab,
+    setActiveTab,
+    publishedPhotos,
+    editingPhotoId,
+    setEditingPhotoId,
+    confirmDelete,
+    setConfirmDelete,
+    adminTab,
+    setAdminTab,
+    projectsList,
+    selectedProjectId,
+    isProjectsLoading,
+    confirmProjectDelete,
+    setConfirmProjectDelete,
+    projTitle,
+    setProjTitle,
+    projDescription,
+    setProjDescription,
+    projLongDescription,
+    setProjLongDescription,
+    projImage,
+    setProjImage,
+    projCategory,
+    setProjCategory,
+    projFeatured,
+    setProjFeatured,
+    projDemoUrl,
+    setProjDemoUrl,
+    projGithubUrl,
+    setProjGithubUrl,
+    projCreatedAt,
+    setProjCreatedAt,
+    projTechnologies,
+    setProjTechnologies,
+    projSubProjects,
+    setProjSubProjects,
+    photoId,
+    setPhotoId,
+    title,
+    setTitle,
+    alt,
+    setAlt,
+    description,
+    setDescription,
+    category,
+    setCategory,
+    featured,
+    setFeatured,
+    createdAt,
+    setCreatedAt,
+    exif,
+    setExif,
+    brightness,
+    setBrightness,
+    contrast,
+    setContrast,
+    saturation,
+    setSaturation,
+    rotation,
+    setRotation,
+    watermarkEnabled,
+    setWatermarkEnabled,
+    watermarkText,
+    setWatermarkText,
+    watermarkPosition,
+    setWatermarkPosition,
+    crop,
+    setCrop,
+    setCompletedCrop,
+    onImageLoad,
+    fetchPendingFiles,
+    fetchPublishedPhotos,
+    handleSelectProject,
+    handleCreateNewProject,
+    handleCancelProjectEdit,
+    handleProjectSubmit,
+    handleProjectDelete,
+    handleSelectPublishedFile,
+    handleDelete,
+    handleSelectFile,
+    handleSubmit,
+  };
+}
+
+interface DeletePhotoActionsProps {
+  readonly editingPhotoId: string | null;
+  readonly confirmDelete: boolean;
+  readonly setConfirmDelete: (val: boolean) => void;
+  readonly handleDelete: () => void;
+  readonly isProcessing: boolean;
+}
+
+function DeletePhotoActions({
+  editingPhotoId,
+  confirmDelete,
+  setConfirmDelete,
+  handleDelete,
+  isProcessing,
+}: DeletePhotoActionsProps) {
+  if (!editingPhotoId) return <div />;
+
+  if (confirmDelete) {
+    return (
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={isProcessing}
+          className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-stone-950 font-bold text-xs transition cursor-pointer"
+        >
+          Yes, Delete
+        </button>
+        <button
+          type="button"
+          onClick={() => setConfirmDelete(false)}
+          className="px-4 py-2 rounded-xl border border-stone-850 text-stone-455 hover:text-white text-xs transition cursor-pointer"
+        >
+          Cancel
+        </button>
+      </div>
+    );
   }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setConfirmDelete(true)}
+      className="px-4 py-2 rounded-xl bg-rose-955/40 border border-rose-900/60 hover:bg-rose-900/40 text-rose-355 font-bold text-xs transition cursor-pointer"
+    >
+      Delete Photo
+    </button>
+  );
+}
+
+interface SubmitPhotoActionsProps {
+  readonly isProcessing: boolean;
+  readonly editingPhotoId: string | null;
+  readonly submitButtonText: string;
+}
+
+function SubmitPhotoActions({
+  isProcessing,
+  editingPhotoId,
+  submitButtonText,
+}: SubmitPhotoActionsProps) {
+  if (isProcessing) {
+    return (
+      <>
+        <Loader2 className="w-4 h-4 animate-spin" />
+        {editingPhotoId ? "Saving..." : "Optimizing & Importing..."}
+      </>
+    );
+  }
+  return <>{submitButtonText}</>;
+}
+
+interface PhotoMetadataFormFieldsProps {
+  readonly state: ReturnType<typeof useAdminDashboardState>;
+}
+
+function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
+  const {
+    editingPhotoId,
+    photoId,
+    setPhotoId,
+    title,
+    setTitle,
+    category,
+    setCategory,
+    createdAt,
+    setCreatedAt,
+    alt,
+    setAlt,
+    description,
+    setDescription,
+    exif,
+    setExif,
+    watermarkEnabled,
+    setWatermarkEnabled,
+    watermarkText,
+    setWatermarkText,
+    watermarkPosition,
+    setWatermarkPosition,
+    featured,
+    setFeatured,
+    isProcessing,
+    confirmDelete,
+    setConfirmDelete,
+    handleDelete,
+    setSelectedFile,
+    setEditingPhotoId,
+  } = state;
+
+  const submitButtonText = editingPhotoId ? "Save Changes" : "Process & Save to Exhibition";
+
+  return (
+    <>
+      {/* Database Identity */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="photoId" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Unique ID (for URL and filename)
+          </label>
+          <input
+            id="photoId"
+            type="text"
+            required
+            disabled={!!editingPhotoId}
+            value={photoId}
+            onChange={(e) => setPhotoId(e.target.value)}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition disabled:text-stone-500 disabled:border-stone-900 disabled:bg-stone-950/60 disabled:cursor-not-allowed"
+            placeholder="e.g. gal-kashmir-dawn"
+          />
+        </div>
+        <div>
+          <label htmlFor="title" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Exhibition Title
+          </label>
+          <input
+            id="title"
+            type="text"
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+            placeholder="e.g. Alpine Awakening"
+          />
+        </div>
+      </div>
+
+      {/* Image Details */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="category" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Gallery Category
+          </label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition cursor-pointer"
+          >
+            <option value="nature">Nature & Wilderness</option>
+            <option value="portrait">Portrait & Human</option>
+            <option value="street">Street & Urban</option>
+            <option value="architecture">Architecture & Structure</option>
+            <option value="other">Other Explorations</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="createdAt" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Capture Date
+          </label>
+          <input
+            id="createdAt"
+            type="date"
+            required
+            value={createdAt}
+            onChange={(e) => setCreatedAt(e.target.value)}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition cursor-pointer"
+          />
+        </div>
+      </div>
+
+      {/* Alt Text & Story */}
+      <div className="grid grid-cols-1 gap-4">
+        <div>
+          <label htmlFor="alt" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Accessibility Alt Text (For screen readers)
+          </label>
+          <input
+            id="alt"
+            type="text"
+            required
+            value={alt}
+            onChange={(e) => setAlt(e.target.value)}
+            className="w-full bg-stone-950 border border-stone-805 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+            placeholder="Mist-shrouded mountain peaks at dawn..."
+          />
+        </div>
+        <div>
+          <label htmlFor="description" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Backstory / Description (Optional)
+          </label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition resize-none"
+            placeholder="A brief sentence about when or why you took this shot..."
+          />
+        </div>
+      </div>
+
+      <hr className="border-stone-800" />
+
+      {/* EXIF Metadata Block */}
+      <ExifMetadataSection
+        exif={exif}
+        onChange={setExif}
+      />
+
+      <hr className="border-stone-800" />
+
+      {/* Signature Watermarking */}
+      <WatermarkSection
+        enabled={watermarkEnabled}
+        setEnabled={setWatermarkEnabled}
+        text={watermarkText}
+        setText={setWatermarkText}
+        position={watermarkPosition}
+        setPosition={setWatermarkPosition}
+      />
+
+      {/* Options */}
+      <div className="flex items-center gap-6 bg-stone-950/40 p-4 rounded-xl border border-stone-850">
+        <label htmlFor="featured" className="flex items-center gap-3 cursor-pointer text-xs font-semibold text-stone-300">
+          <input
+            id="featured"
+            type="checkbox"
+            checked={featured}
+            onChange={(e) => setFeatured(e.target.checked)}
+            className="w-4.5 h-4.5 bg-stone-900 border border-stone-800 rounded text-dawn-600 focus:ring-dawn-500"
+          />
+          <span>Feature on Main Portfolio Landing Page</span>
+        </label>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center justify-between gap-3 pt-4 border-t border-stone-850">
+        <DeletePhotoActions
+          editingPhotoId={editingPhotoId}
+          confirmDelete={confirmDelete}
+          setConfirmDelete={setConfirmDelete}
+          handleDelete={handleDelete}
+          isProcessing={isProcessing}
+        />
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedFile(null);
+              setEditingPhotoId(null);
+              setConfirmDelete(false);
+            }}
+            className="px-5 py-2.5 rounded-xl border border-stone-805 text-xs font-bold text-stone-400 hover:text-white hover:bg-stone-900 transition cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isProcessing}
+            className="px-6 py-2.5 rounded-xl bg-dawn-600 hover:bg-dawn-500 disabled:bg-stone-800 font-bold text-xs text-stone-950 disabled:text-stone-600 transition flex items-center gap-2 shadow-lg shadow-dawn-900/10 cursor-pointer"
+          >
+            <SubmitPhotoActions
+              isProcessing={isProcessing}
+              editingPhotoId={editingPhotoId}
+              submitButtonText={submitButtonText}
+            />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+interface PhotoExhibitionWorkspaceProps {
+  readonly state: ReturnType<typeof useAdminDashboardState>;
+}
+
+function PhotoExhibitionWorkspace({ state }: PhotoExhibitionWorkspaceProps) {
+  const {
+    selectedFile,
+    isSidebarOpen,
+    isExtractingExif,
+    crop,
+    setCrop,
+    setCompletedCrop,
+    onImageLoad,
+    brightness,
+    setBrightness,
+    contrast,
+    setContrast,
+    saturation,
+    setSaturation,
+    rotation,
+    setRotation,
+    editingPhotoId,
+    handleSubmit,
+  } = state;
+
+  if (!selectedFile) return null;
+
+  return (
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
+      {/* Column 2: Sticky Image Workspace & Adjustments */}
+      <div className={`${isSidebarOpen ? "lg:col-span-8" : "lg:col-span-9"} lg:sticky lg:top-6 space-y-6`}>
+        <div className="bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6">
+          <WorkspaceCanvas
+            editingPhotoId={editingPhotoId}
+            selectedFile={selectedFile}
+            crop={crop}
+            setCrop={setCrop}
+            setCompletedCrop={setCompletedCrop}
+            onImageLoad={onImageLoad}
+            brightness={brightness}
+            setBrightness={setBrightness}
+            contrast={contrast}
+            setContrast={setContrast}
+            saturation={saturation}
+            setSaturation={setSaturation}
+            rotation={rotation}
+            setRotation={setRotation}
+          />
+        </div>
+      </div>
+
+      {/* Column 3: Metadata & Exif Form */}
+      <div className={`${isSidebarOpen ? "lg:col-span-4" : "lg:col-span-3"} bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6 md:p-8 space-y-6`}>
+        <div className="flex justify-between items-center border-b border-stone-800 pb-4 mb-4">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <Sliders className="w-5 h-5 text-dawn-500" />
+            Configure Image & Metadata
+          </h2>
+          <span className="text-[11px] bg-stone-800 border border-stone-750 px-2.5 py-1 rounded-full font-mono text-stone-400 max-w-[150px] truncate">
+            {selectedFile}
+          </span>
+        </div>
+
+        {isExtractingExif ? (
+          <div className="flex flex-col items-center justify-center py-20 text-stone-500">
+            <Loader2 className="w-8 h-8 animate-spin text-dawn-500 mb-2" />
+            <span className="text-xs">Extracting image EXIF profile...</span>
+          </div>
+        ) : (
+          <PhotoMetadataFormFields state={state} />
+        )}
+      </div>
+    </form>
+  );
+}
+
+interface ExhibitionSidebarProps {
+  readonly state: ReturnType<typeof useAdminDashboardState>;
+}
+
+function ExhibitionSidebar({ state }: ExhibitionSidebarProps) {
+  const {
+    isSidebarOpen,
+    selectedFile,
+    setSelectedFile,
+    activeTab,
+    setActiveTab,
+    setStatusMessage,
+    setEditingPhotoId,
+    pendingFiles,
+    isLoadingFiles,
+    fetchPendingFiles,
+    handleSelectFile,
+    publishedPhotos,
+    editingPhotoId,
+    handleSelectPublishedFile,
+    fetchPublishedPhotos,
+  } = state;
+
+  return (
+    <div className={`${(isSidebarOpen || !selectedFile) ? "lg:col-span-3" : "hidden"} bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6`}>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold text-white flex items-center gap-2">
+          <Compass className="w-5 h-5 text-dawn-500" />
+          Exhibition Manager
+        </h2>
+      </div>
+
+      {/* Tab Swapper */}
+      <div className="flex gap-1.5 p-1 bg-stone-950 rounded-xl mb-6 border border-stone-850">
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("pending");
+            setSelectedFile(null);
+            setEditingPhotoId(null);
+            setStatusMessage(null);
+          }}
+          className={`flex-1 py-1.5 text-center text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+            activeTab === "pending"
+              ? "bg-stone-850 text-white shadow"
+              : "text-stone-500 hover:text-stone-300"
+          }`}
+        >
+          Queue ({pendingFiles.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("published");
+            setSelectedFile(null);
+            setEditingPhotoId(null);
+            setStatusMessage(null);
+          }}
+          className={`flex-1 py-1.5 text-center text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+            activeTab === "published"
+              ? "bg-stone-850 text-white shadow"
+              : "text-stone-500 hover:text-stone-300"
+          }`}
+        >
+          Published ({publishedPhotos.length})
+        </button>
+      </div>
+
+      {activeTab === "pending" ? (
+        <>
+          <p className="text-xs text-stone-500 mb-6 leading-relaxed">
+            Place raw camera photos in the local project directory under <code className="bg-stone-950 px-1.5 py-0.5 rounded text-dawn-400 font-mono">/images-to-process/</code> to import them.
+          </p>
+          <PendingQueue
+            isLoadingFiles={isLoadingFiles}
+            pendingFiles={pendingFiles}
+            selectedFile={selectedFile}
+            handleSelectFile={handleSelectFile}
+            fetchPendingFiles={fetchPendingFiles}
+          />
+        </>
+      ) : (
+        <>
+          <p className="text-xs text-stone-500 mb-6 leading-relaxed">
+            Manage your imported portfolio photos. Click any photo below to update its exhibition metadata or remove it.
+          </p>
+          <PublishedQueue
+            photos={publishedPhotos}
+            selectedId={editingPhotoId}
+            onSelect={handleSelectPublishedFile}
+            onRefresh={fetchPublishedPhotos}
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
+interface PhotoExhibitionLabProps {
+  readonly state: ReturnType<typeof useAdminDashboardState>;
+}
+
+function PhotoExhibitionLab({ state }: Readonly<PhotoExhibitionLabProps>) {
+  const { selectedFile, isSidebarOpen } = state;
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Column 1: Pending & Published list (span 3) */}
+      <ExhibitionSidebar state={state} />
+
+      {/* Form and Workspace Area */}
+      <div className={`${(isSidebarOpen || !selectedFile) ? "lg:col-span-9" : "lg:col-span-12"} transition-all duration-350`}>
+        {selectedFile ? (
+          <PhotoExhibitionWorkspace state={state} />
+        ) : (
+          <EmptyWorkspaceState />
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface ProjectsPortfolioLabProps {
+  readonly state: ReturnType<typeof useAdminDashboardState>;
+}
+
+function ProjectsPortfolioLab({ state }: Readonly<ProjectsPortfolioLabProps>) {
+  const {
+    isProjectsLoading,
+    projectsList,
+    selectedProjectId,
+    handleSelectProject,
+    handleCreateNewProject,
+    isProcessing,
+    handleProjectSubmit,
+    handleCancelProjectEdit,
+    handleProjectDelete,
+    confirmProjectDelete,
+    setConfirmProjectDelete,
+    projTitle,
+    setProjTitle,
+    projDescription,
+    setProjDescription,
+    projLongDescription,
+    setProjLongDescription,
+    projImage,
+    setProjImage,
+    projCategory,
+    setProjCategory,
+    projFeatured,
+    setProjFeatured,
+    projDemoUrl,
+    setProjDemoUrl,
+    projGithubUrl,
+    setProjGithubUrl,
+    projCreatedAt,
+    setProjCreatedAt,
+    projTechnologies,
+    setProjTechnologies,
+    projSubProjects,
+    setProjSubProjects,
+  } = state;
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Sidebar: Projects Queue */}
+      <div className="lg:col-span-3 bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6">
+        <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+          <FileText className="w-5 h-5 text-dawn-500" />
+          Projects Queue
+        </h2>
+        {isProjectsLoading ? (
+          <div className="flex flex-col items-center justify-center py-12 text-stone-500">
+            <Loader2 className="w-8 h-8 animate-spin text-dawn-500 mb-2" />
+            <span className="text-xs">Loading projects...</span>
+          </div>
+        ) : (
+          <ProjectsQueue
+            projects={projectsList}
+            selectedId={selectedProjectId}
+            onSelect={handleSelectProject}
+            onCreateNew={handleCreateNewProject}
+          />
+        )}
+      </div>
+
+      {/* Workspace Area: Project Editor */}
+      <div className="lg:col-span-9">
+        {selectedProjectId ? (
+          <div className="bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6 md:p-8">
+            <ProjectEditor
+              isEdit={selectedProjectId !== "new"}
+              isProcessing={isProcessing}
+              onSubmit={handleProjectSubmit}
+              onCancel={handleCancelProjectEdit}
+              onDelete={handleProjectDelete}
+              confirmDelete={confirmProjectDelete}
+              setConfirmDelete={setConfirmProjectDelete}
+              title={projTitle}
+              setTitle={setProjTitle}
+              description={projDescription}
+              setDescription={setProjDescription}
+              longDescription={projLongDescription}
+              setLongDescription={setProjLongDescription}
+              image={projImage}
+              setImage={setProjImage}
+              category={projCategory}
+              setCategory={setProjCategory}
+              featured={projFeatured}
+              setFeatured={setProjFeatured}
+              demoUrl={projDemoUrl}
+              setDemoUrl={setProjDemoUrl}
+              githubUrl={projGithubUrl}
+              setGithubUrl={setProjGithubUrl}
+              createdAt={projCreatedAt}
+              setCreatedAt={setProjCreatedAt}
+              technologies={projTechnologies}
+              setTechnologies={setProjTechnologies}
+              subProjects={projSubProjects}
+              setSubProjects={setProjSubProjects}
+            />
+          </div>
+        ) : (
+          <div className="bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6 md:p-8 flex flex-col items-center justify-center py-32 text-center text-stone-500">
+            <Sliders className="w-12 h-12 text-stone-700 mb-4 animate-pulse" />
+            <h3 className="text-base font-bold text-stone-400">No Project Selected</h3>
+            <p className="text-xs text-stone-600 max-w-sm mt-2">
+              Select a project from the sidebar to edit its config, technology stack, and sub-projects list, or create a brand new project.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function AdminUploadPage() {
+  const state = useAdminDashboardState();
 
   return (
     <div className="min-h-screen bg-stone-950 text-stone-200 font-sans p-6 md:p-12 relative overflow-hidden">
@@ -1028,340 +2408,54 @@ export default function AdminUploadPage() {
       <div className="relative z-10 max-w-[1600px] xl:max-w-[1850px] w-full mx-auto flex flex-col min-h-full">
         {/* Navigation & Header */}
         <StudioHeader 
-          selectedFile={selectedFile}
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
+          selectedFile={state.selectedFile}
+          isSidebarOpen={state.isSidebarOpen}
+          setIsSidebarOpen={state.setIsSidebarOpen}
+          adminTab={state.adminTab}
         />
 
         {/* Status Notification Alert */}
-        <StatusBanner statusMessage={statusMessage} />
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                 {/* Column 1: Pending & Published list (span 3) */}
-          <div className={`${(isSidebarOpen || !selectedFile) ? "lg:col-span-3" : "hidden"} bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6`}>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Compass className="w-5 h-5 text-dawn-500" />
-                Exhibition Manager
-              </h2>
-            </div>
+        <StatusBanner statusMessage={state.statusMessage} />
 
-            {/* Tab Swapper */}
-            <div className="flex gap-1.5 p-1 bg-stone-950 rounded-xl mb-6 border border-stone-850">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab("pending");
-                  setSelectedFile(null);
-                  setEditingPhotoId(null);
-                  setStatusMessage(null);
-                }}
-                className={`flex-1 py-1.5 text-center text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
-                  activeTab === "pending"
-                    ? "bg-stone-850 text-white shadow"
-                    : "text-stone-500 hover:text-stone-300"
-                }`}
-              >
-                Queue ({pendingFiles.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab("published");
-                  setSelectedFile(null);
-                  setEditingPhotoId(null);
-                  setStatusMessage(null);
-                }}
-                className={`flex-1 py-1.5 text-center text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
-                  activeTab === "published"
-                    ? "bg-stone-850 text-white shadow"
-                    : "text-stone-500 hover:text-stone-300"
-                }`}
-              >
-                Published ({publishedPhotos.length})
-              </button>
-            </div>
-
-            {activeTab === "pending" ? (
-              <>
-                <p className="text-xs text-stone-500 mb-6 leading-relaxed">
-                  Place raw camera photos in the local project directory under <code className="bg-stone-950 px-1.5 py-0.5 rounded text-dawn-400 font-mono">/images-to-process/</code> to import them.
-                </p>
-                <PendingQueue
-                  isLoadingFiles={isLoadingFiles}
-                  pendingFiles={pendingFiles}
-                  selectedFile={selectedFile}
-                  handleSelectFile={handleSelectFile}
-                  fetchPendingFiles={fetchPendingFiles}
-                />
-              </>
-            ) : (
-              <>
-                <p className="text-xs text-stone-500 mb-6 leading-relaxed">
-                  Manage your imported portfolio photos. Click any photo below to update its exhibition metadata or remove it.
-                </p>
-                <PublishedQueue
-                  photos={publishedPhotos}
-                  selectedId={editingPhotoId}
-                  onSelect={handleSelectPublishedFile}
-                  onRefresh={fetchPublishedPhotos}
-                />
-              </>
-            )}
-          </div>
-
-          {/* Form and Workspace Area */}
-          <div className={`${(isSidebarOpen || !selectedFile) ? "lg:col-span-9" : "lg:col-span-12"} transition-all duration-350`}>
-            {selectedFile ? (
-              <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
-                
-                {/* Column 2: Sticky Image Workspace & Adjustments */}
-                <div className={`${isSidebarOpen ? "lg:col-span-8" : "lg:col-span-9"} lg:sticky lg:top-6 space-y-6`}>
-                  {/* Unified Canvas & Color Laboratory Card (Vertical Layout with Horizontal Sliders) */}
-                  <div className="bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6">
-                    <WorkspaceCanvas
-                      editingPhotoId={editingPhotoId}
-                      selectedFile={selectedFile}
-                      crop={crop}
-                      setCrop={setCrop}
-                      setCompletedCrop={setCompletedCrop}
-                      onImageLoad={onImageLoad}
-                      brightness={brightness}
-                      setBrightness={setBrightness}
-                      contrast={contrast}
-                      setContrast={setContrast}
-                      saturation={saturation}
-                      setSaturation={setSaturation}
-                      rotation={rotation}
-                      setRotation={setRotation}
-                    />
-                  </div>
-                </div>
-
-                {/* Column 3: Metadata & Exif Form */}
-                <div className={`${isSidebarOpen ? "lg:col-span-4" : "lg:col-span-3"} bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6 md:p-8 space-y-6`}>
-                  <div className="flex justify-between items-center border-b border-stone-800 pb-4 mb-4">
-                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                      <Sliders className="w-5 h-5 text-dawn-500" />
-                      Configure Image & Metadata
-                    </h2>
-                    <span className="text-[11px] bg-stone-800 border border-stone-750 px-2.5 py-1 rounded-full font-mono text-stone-400 max-w-[150px] truncate">
-                      {selectedFile}
-                    </span>
-                  </div>
-
-                  {isExtractingExif ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-stone-500">
-                      <Loader2 className="w-8 h-8 animate-spin text-dawn-500 mb-2" />
-                      <span className="text-xs">Extracting image EXIF profile...</span>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Database Identity */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor="photoId" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
-                            Unique ID (for URL and filename)
-                          </label>
-                          <input
-                            id="photoId"
-                            type="text"
-                            required
-                            disabled={!!editingPhotoId}
-                            value={photoId}
-                            onChange={(e) => setPhotoId(e.target.value)}
-                            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition disabled:text-stone-500 disabled:border-stone-900 disabled:bg-stone-950/60 disabled:cursor-not-allowed"
-                            placeholder="e.g. gal-kashmir-dawn"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="title" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
-                            Exhibition Title
-                          </label>
-                          <input
-                            id="title"
-                            type="text"
-                            required
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
-                            placeholder="e.g. Alpine Awakening"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Image Details */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor="category" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
-                            Gallery Category
-                          </label>
-                          <select
-                            id="category"
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition cursor-pointer"
-                          >
-                            <option value="nature">Nature & Wilderness</option>
-                            <option value="portrait">Portrait & Human</option>
-                            <option value="street">Street & Urban</option>
-                            <option value="architecture">Architecture & Structure</option>
-                            <option value="other">Other Explorations</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label htmlFor="createdAt" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
-                            Capture Date
-                          </label>
-                          <input
-                            id="createdAt"
-                            type="date"
-                            required
-                            value={createdAt}
-                            onChange={(e) => setCreatedAt(e.target.value)}
-                            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition cursor-pointer"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Alt Text & Story */}
-                      <div className="grid grid-cols-1 gap-4">
-                        <div>
-                          <label htmlFor="alt" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
-                            Accessibility Alt Text (For screen readers)
-                          </label>
-                          <input
-                            id="alt"
-                            type="text"
-                            required
-                            value={alt}
-                            onChange={(e) => setAlt(e.target.value)}
-                            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
-                            placeholder="Mist-shrouded mountain peaks at dawn..."
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="description" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
-                            Backstory / Description (Optional)
-                          </label>
-                          <textarea
-                            id="description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            rows={2}
-                            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition resize-none"
-                            placeholder="A brief sentence about when or why you took this shot..."
-                          />
-                        </div>
-                      </div>
-
-                      <hr className="border-stone-800" />
-
-                      {/* EXIF Metadata Block */}
-                      <ExifMetadataSection
-                        exif={exif}
-                        onChange={setExif}
-                      />
-
-                      <hr className="border-stone-800" />
-
-                      {/* Signature Watermarking */}
-                      <WatermarkSection
-                        enabled={watermarkEnabled}
-                        setEnabled={setWatermarkEnabled}
-                        text={watermarkText}
-                        setText={setWatermarkText}
-                        position={watermarkPosition}
-                        setPosition={setWatermarkPosition}
-                      />
-
-                      {/* Options */}
-                      <div className="flex items-center gap-6 bg-stone-950/40 p-4 rounded-xl border border-stone-850">
-                        <label htmlFor="featured" className="flex items-center gap-3 cursor-pointer text-xs font-semibold text-stone-300">
-                          <input
-                            id="featured"
-                            type="checkbox"
-                            checked={featured}
-                            onChange={(e) => setFeatured(e.target.checked)}
-                            className="w-4.5 h-4.5 bg-stone-900 border border-stone-800 rounded text-dawn-600 focus:ring-dawn-500"
-                          />
-                          <span>Feature on Main Portfolio Landing Page</span>
-                        </label>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center justify-between gap-3 pt-4 border-t border-stone-850">
-                        {editingPhotoId ? (
-                          <div className="flex items-center gap-2">
-                            {confirmDelete ? (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={handleDelete}
-                                  disabled={isProcessing}
-                                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-stone-950 font-bold text-xs transition cursor-pointer"
-                                >
-                                  Yes, Delete
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setConfirmDelete(false)}
-                                  className="px-4 py-2 rounded-xl border border-stone-850 text-stone-450 hover:text-white text-xs transition cursor-pointer"
-                                >
-                                  Cancel
-                                </button>
-                              </>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => setConfirmDelete(true)}
-                                className="px-4 py-2 rounded-xl bg-rose-950/40 border border-rose-900/60 hover:bg-rose-900/40 text-rose-350 font-bold text-xs transition cursor-pointer"
-                              >
-                                Delete Photo
-                              </button>
-                            )}
-                          </div>
-                        ) : (
-                          <div />
-                        )}
-
-                        <div className="flex items-center gap-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedFile(null);
-                              setEditingPhotoId(null);
-                              setConfirmDelete(false);
-                            }}
-                            className="px-5 py-2.5 rounded-xl border border-stone-805 text-xs font-bold text-stone-400 hover:text-white hover:bg-stone-900 transition cursor-pointer"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="submit"
-                            disabled={isProcessing}
-                            className="px-6 py-2.5 rounded-xl bg-dawn-600 hover:bg-dawn-500 disabled:bg-stone-800 font-bold text-xs text-stone-950 disabled:text-stone-600 transition flex items-center gap-2 shadow-lg shadow-dawn-900/10 cursor-pointer"
-                          >
-                            {isProcessing ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                {editingPhotoId ? "Saving..." : "Optimizing & Importing..."}
-                              </>
-                            ) : (
-                              submitButtonText
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </form>
-            ) : (
-              <EmptyWorkspaceState />
-            )}
-          </div>
-
+        {/* Tab Selector between Photo Exhibition Lab and Projects Portfolio Lab */}
+        <div className="flex gap-2 p-1 bg-stone-900/80 backdrop-blur-md rounded-2xl mb-8 border border-stone-850 max-w-md relative z-20">
+          <button
+            type="button"
+            onClick={() => {
+              state.setAdminTab("photos");
+              state.setStatusMessage(null);
+            }}
+            className={`flex-1 py-3 text-center text-xs font-extrabold uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
+              state.adminTab === "photos"
+                ? "bg-dawn-600 text-stone-950 shadow-lg shadow-dawn-500/10"
+                : "text-stone-400 hover:text-stone-200 hover:bg-stone-850/40"
+            }`}
+          >
+            <Camera className="w-4 h-4" />
+            Exhibition Photos
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              state.setAdminTab("projects");
+              state.setStatusMessage(null);
+            }}
+            className={`flex-1 py-3 text-center text-xs font-extrabold uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
+              state.adminTab === "projects"
+                ? "bg-dawn-600 text-stone-950 shadow-lg shadow-dawn-500/10"
+                : "text-stone-400 hover:text-stone-200 hover:bg-stone-850/40"
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            Portfolio Projects
+          </button>
         </div>
+
+        {state.adminTab === "photos" ? (
+          <PhotoExhibitionLab state={state} />
+        ) : (
+          <ProjectsPortfolioLab state={state} />
+        )}
       </div>
     </div>
   );
