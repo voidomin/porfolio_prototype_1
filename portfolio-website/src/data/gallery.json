@@ -210,27 +210,6 @@
     }
   },
   {
-    "id": "gal-10",
-    "src": "https://images.unsplash.com/photo-1504893524553-ac55fce698be?w=1600&auto=format&fit=crop&q=80",
-    "alt": "Panoramic sunset reflection over high altitude salt lake",
-    "title": "Himalayan Serenity",
-    "description": "Stretching ambers and deep indigos reflecting on the mirror-still surface of Ladakh's border waters.",
-    "category": "nature",
-    "width": 2100,
-    "height": 900,
-    "featured": true,
-    "createdAt": "2026-05-14",
-    "exif": {
-      "camera": "Sony Alpha 7R V",
-      "lens": "FE 70-200mm F2.8 GM OSS II",
-      "focalLength": "70mm",
-      "aperture": "f/8.0",
-      "shutterSpeed": "1/320s",
-      "iso": "100",
-      "location": "Pangong Tso, Ladakh"
-    }
-  },
-  {
     "id": "gal-11",
     "src": "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=1200&auto=format&fit=crop&q=80",
     "alt": "Rainy neon city streets in Tokyo at dusk",
