@@ -344,11 +344,18 @@ interface StudioHeaderProps {
   readonly selectedFile: string | null;
   readonly isSidebarOpen: boolean;
   readonly setIsSidebarOpen: (open: boolean) => void;
-  readonly adminTab: "photos" | "projects";
+  readonly adminTab: "photos" | "projects" | "experiences";
 }
+
+const DASHBOARD_TITLES: Record<string, string> = {
+  photos: "Golden Hour Photo Lab",
+  projects: "Portfolio Projects Lab",
+  experiences: "Work Experience Lab",
+};
 
 function StudioHeader({ selectedFile, isSidebarOpen, setIsSidebarOpen, adminTab }: Readonly<StudioHeaderProps>) {
   const isPhotos = adminTab === "photos";
+  const dashboardTitle = DASHBOARD_TITLES[adminTab] || "Studio";
   return (
     <header className="flex justify-between items-center border-b border-stone-800 pb-6 mb-10">
       <div className="flex items-center gap-4">
@@ -361,7 +368,7 @@ function StudioHeader({ selectedFile, isSidebarOpen, setIsSidebarOpen, adminTab 
         <div>
           <span className="text-[10px] text-dawn-500 uppercase tracking-widest font-bold">Studio Dashboard</span>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white">
-            {isPhotos ? "Golden Hour Photo Lab" : "Portfolio Projects Lab"}
+            {dashboardTitle}
           </h1>
         </div>
       </div>
@@ -1274,6 +1281,51 @@ async function apiFetchExif(filename: string) {
   }
 }
 
+interface ExperienceData {
+  id: string;
+  period: string;
+  title: string;
+  organization: string;
+  summary: string;
+}
+
+async function apiFetchExperiences() {
+  try {
+    const res = await fetch("/api/admin/experience");
+    const data = await res.json();
+    return data.experiences || [];
+  } catch (err) {
+    console.error("Failed to load experiences", err);
+    return [];
+  }
+}
+
+async function apiDeleteExperience(id: string) {
+  try {
+    const res = await fetch(`/api/admin/experience?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    return { ok: res.ok && data.success, error: data.error };
+  } catch (err: any) {
+    return { ok: false, error: err.message };
+  }
+}
+
+async function apiSubmitExperience(payload: any, isNew: boolean) {
+  try {
+    const res = await fetch("/api/admin/experience", {
+      method: isNew ? "POST" : "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return { ok: res.ok && data.success, error: data.error };
+  } catch (err: any) {
+    return { ok: false, error: err.message };
+  }
+}
+
 function useAdminDashboardState() {
   const [pendingFiles, setPendingFiles] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -1288,11 +1340,21 @@ function useAdminDashboardState() {
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const [adminTab, setAdminTab] = useState<"photos" | "projects">("photos");
+  const [adminTab, setAdminTab] = useState<"photos" | "projects" | "experiences">("photos");
   const [projectsList, setProjectsList] = useState<ProjectData[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [isProjectsLoading, setIsProjectsLoading] = useState(false);
   const [confirmProjectDelete, setConfirmProjectDelete] = useState(false);
+
+  const [experiencesList, setExperiencesList] = useState<ExperienceData[]>([]);
+  const [selectedExperienceId, setSelectedExperienceId] = useState<string | null>(null);
+  const [isExperiencesLoading, setIsExperiencesLoading] = useState(false);
+  const [confirmExperienceDelete, setConfirmExperienceDelete] = useState(false);
+
+  const [expPeriod, setExpPeriod] = useState("");
+  const [expTitle, setExpTitle] = useState("");
+  const [expOrganization, setExpOrganization] = useState("");
+  const [expSummary, setExpSummary] = useState("");
 
   const [projTitle, setProjTitle] = useState("");
   const [projDescription, setProjDescription] = useState("");
@@ -1359,10 +1421,18 @@ function useAdminDashboardState() {
     setIsProjectsLoading(false);
   };
 
+  const fetchExperiences = async () => {
+    setIsExperiencesLoading(true);
+    const experiences = await apiFetchExperiences();
+    setExperiencesList(experiences);
+    setIsExperiencesLoading(false);
+  };
+
   useEffect(() => {
     fetchPendingFiles();
     fetchPublishedPhotos();
     fetchProjects();
+    fetchExperiences();
   }, []);
 
   useEffect(() => {
@@ -1374,6 +1444,8 @@ function useAdminDashboardState() {
   useEffect(() => {
     if (adminTab === "projects") {
       fetchProjects();
+    } else if (adminTab === "experiences") {
+      fetchExperiences();
     }
   }, [adminTab]);
 
@@ -1416,6 +1488,84 @@ function useAdminDashboardState() {
   const handleCancelProjectEdit = () => {
     setSelectedProjectId(null);
     setConfirmProjectDelete(false);
+  };
+
+  const handleSelectExperience = (exp: ExperienceData) => {
+    setSelectedExperienceId(exp.id);
+    setConfirmExperienceDelete(false);
+    setStatusMessage(null);
+
+    setExpPeriod(exp.period || "");
+    setExpTitle(exp.title || "");
+    setExpOrganization(exp.organization || "");
+    setExpSummary(exp.summary || "");
+  };
+
+  const handleCreateNewExperience = () => {
+    setSelectedExperienceId("new");
+    setConfirmExperienceDelete(false);
+    setStatusMessage(null);
+
+    setExpPeriod("");
+    setExpTitle("");
+    setExpOrganization("");
+    setExpSummary("");
+  };
+
+  const handleCancelExperienceEdit = () => {
+    setSelectedExperienceId(null);
+    setConfirmExperienceDelete(false);
+  };
+
+  const handleExperienceSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    setStatusMessage(null);
+
+    const payload = {
+      id: selectedExperienceId === "new" ? undefined : selectedExperienceId,
+      period: expPeriod,
+      title: expTitle,
+      organization: expOrganization,
+      summary: expSummary,
+    };
+
+    const res = await apiSubmitExperience(payload, selectedExperienceId === "new");
+    if (res.ok) {
+      setStatusMessage({
+        type: "success",
+        text: `Successfully ${selectedExperienceId === "new" ? "created" : "updated"} experience event for "${expTitle}"!`,
+      });
+      setSelectedExperienceId(null);
+      fetchExperiences();
+    } else {
+      setStatusMessage({
+        type: "error",
+        text: res.error || "Failed to save experience timeline event.",
+      });
+    }
+    setIsProcessing(false);
+  };
+
+  const handleExperienceDelete = async () => {
+    if (!selectedExperienceId || selectedExperienceId === "new") return;
+    setIsProcessing(true);
+    const res = await apiDeleteExperience(selectedExperienceId);
+    if (res.ok) {
+      setStatusMessage({
+        type: "success",
+        text: `Successfully deleted experience event from your timeline.`,
+      });
+      setSelectedExperienceId(null);
+      setConfirmExperienceDelete(false);
+      fetchExperiences();
+    } else {
+      setStatusMessage({
+        type: "error",
+        text: res.error || "Failed to delete experience timeline event.",
+      });
+    }
+    setIsProcessing(false);
   };
 
   const handleProjectSubmit = async (e: React.FormEvent) => {
@@ -1795,6 +1945,24 @@ function useAdminDashboardState() {
     handleDelete,
     handleSelectFile,
     handleSubmit,
+    experiencesList,
+    selectedExperienceId,
+    isExperiencesLoading,
+    confirmExperienceDelete,
+    setConfirmExperienceDelete,
+    expPeriod,
+    setExpPeriod,
+    expTitle,
+    setExpTitle,
+    expOrganization,
+    setExpOrganization,
+    expSummary,
+    setExpSummary,
+    handleSelectExperience,
+    handleCreateNewExperience,
+    handleCancelExperienceEdit,
+    handleExperienceSubmit,
+    handleExperienceDelete,
   };
 }
 
@@ -2394,6 +2562,316 @@ function ProjectsPortfolioLab({ state }: Readonly<ProjectsPortfolioLabProps>) {
   );
 }
 
+interface ExperiencesTimelineLabProps {
+  readonly state: ReturnType<typeof useAdminDashboardState>;
+}
+
+function ExperiencesTimelineLab({ state }: Readonly<ExperiencesTimelineLabProps>) {
+  const {
+    isExperiencesLoading,
+    experiencesList,
+    selectedExperienceId,
+    handleSelectExperience,
+    handleCreateNewExperience,
+    isProcessing,
+    handleExperienceSubmit,
+    handleCancelExperienceEdit,
+    handleExperienceDelete,
+    confirmExperienceDelete,
+    setConfirmExperienceDelete,
+    expPeriod,
+    setExpPeriod,
+    expTitle,
+    setExpTitle,
+    expOrganization,
+    setExpOrganization,
+    expSummary,
+    setExpSummary,
+  } = state;
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Sidebar: Experiences Queue */}
+      <div className="lg:col-span-3 bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6">
+        <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+          <FileText className="w-5 h-5 text-dawn-500" />
+          Experiences
+        </h2>
+        {isExperiencesLoading ? (
+          <div className="flex flex-col items-center justify-center py-12 text-stone-500">
+            <Loader2 className="w-8 h-8 animate-spin text-dawn-500 mb-2" />
+            <span className="text-xs">Loading experience timeline...</span>
+          </div>
+        ) : (
+          <ExperiencesQueue
+            experiences={experiencesList}
+            selectedId={selectedExperienceId}
+            onSelect={handleSelectExperience}
+            onCreateNew={handleCreateNewExperience}
+          />
+        )}
+      </div>
+
+      {/* Workspace Area: Experience Editor */}
+      <div className="lg:col-span-9">
+        {selectedExperienceId ? (
+          <div className="bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6 md:p-8">
+            <ExperienceEditor
+              isEdit={selectedExperienceId !== "new"}
+              isProcessing={isProcessing}
+              onSubmit={handleExperienceSubmit}
+              onCancel={handleCancelExperienceEdit}
+              onDelete={handleExperienceDelete}
+              confirmDelete={confirmExperienceDelete}
+              setConfirmDelete={setConfirmExperienceDelete}
+              period={expPeriod}
+              setPeriod={setExpPeriod}
+              title={expTitle}
+              setTitle={setExpTitle}
+              organization={expOrganization}
+              setOrganization={setExpOrganization}
+              summary={expSummary}
+              setSummary={setExpSummary}
+            />
+          </div>
+        ) : (
+          <div className="bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6 md:p-8 flex flex-col items-center justify-center py-32 text-center text-stone-500">
+            <Sliders className="w-12 h-12 text-stone-700 mb-4 animate-pulse" />
+            <h3 className="text-base font-bold text-stone-400">No Experience Selected</h3>
+            <p className="text-xs text-stone-600 max-w-sm mt-2">
+              Select an experience from the timeline to edit its title, organization, dates, and summary, or create a brand new timeline event.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface ExperiencesQueueProps {
+  readonly experiences: readonly ExperienceData[];
+  readonly selectedId: string | null;
+  readonly onSelect: (exp: ExperienceData) => void;
+  readonly onCreateNew: () => void;
+}
+
+function ExperiencesQueue({
+  experiences,
+  selectedId,
+  onSelect,
+  onCreateNew,
+}: Readonly<ExperiencesQueueProps>) {
+  return (
+    <div className="space-y-4">
+      <button
+        type="button"
+        onClick={onCreateNew}
+        className="w-full py-2.5 px-4 bg-stone-800 hover:bg-stone-750 text-dawn-400 border border-stone-700 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+      >
+        <Plus className="w-4 h-4" />
+        New Experience
+      </button>
+
+      <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+        {experiences.map((exp) => {
+          const isSelected = selectedId === exp.id;
+          return (
+            <button
+              key={exp.id}
+              type="button"
+              onClick={() => onSelect(exp)}
+              className={`w-full text-left p-3 rounded-xl border flex items-center gap-3 transition ${
+                isSelected 
+                  ? "bg-dawn-950/20 border-dawn-700 text-white shadow-lg" 
+                  : "bg-stone-950/40 border-stone-850 text-stone-400 hover:bg-stone-900/60 hover:text-stone-200"
+              }`}
+            >
+              <div className="overflow-hidden flex-1">
+                <p className="text-xs font-semibold truncate">{exp.title || "Untitled"}</p>
+                <p className="text-[9px] text-stone-600 font-mono mt-0.5 truncate uppercase tracking-wider">{exp.organization}</p>
+                <p className="text-[8px] text-dawn-600/80 font-mono mt-0.5">{exp.period}</p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface ExperienceEditorProps {
+  readonly isEdit: boolean;
+  readonly isProcessing: boolean;
+  readonly onSubmit: (e: React.FormEvent) => void;
+  readonly onCancel: () => void;
+  readonly onDelete: () => void;
+  readonly confirmDelete: boolean;
+  readonly setConfirmDelete: (val: boolean) => void;
+  readonly period: string;
+  readonly setPeriod: (val: string) => void;
+  readonly title: string;
+  readonly setTitle: (val: string) => void;
+  readonly organization: string;
+  readonly setOrganization: (val: string) => void;
+  readonly summary: string;
+  readonly setSummary: (val: string) => void;
+}
+
+function ExperienceEditor({
+  isEdit,
+  isProcessing,
+  onSubmit,
+  onCancel,
+  onDelete,
+  confirmDelete,
+  setConfirmDelete,
+  period,
+  setPeriod,
+  title,
+  setTitle,
+  organization,
+  setOrganization,
+  summary,
+  setSummary,
+}: Readonly<ExperienceEditorProps>) {
+  const renderSubmitContent = () => {
+    if (isProcessing) {
+      return (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Saving...
+        </>
+      );
+    }
+    return isEdit ? "Save Changes" : "Create Event";
+  };
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-6 max-w-4xl">
+      <h2 className="text-lg font-bold text-white border-b border-stone-800 pb-4 flex items-center gap-2">
+        <FileText className="w-5 h-5 text-dawn-500" />
+        {isEdit ? "Edit Experience Event" : "Create Experience Event"}
+      </h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label htmlFor="exp-period" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Timeline Period (Dates)
+          </label>
+          <input
+            id="exp-period"
+            type="text"
+            required
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+            placeholder="e.g. Mar 2026 - Present"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="exp-org" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            Organization / Company
+          </label>
+          <input
+            id="exp-org"
+            type="text"
+            required
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
+            className="w-full bg-stone-950 border border-stone-805 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+            placeholder="e.g. Merck"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="exp-title" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          Job Title / Role
+        </label>
+        <input
+          id="exp-title"
+          type="text"
+          required
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
+          placeholder="e.g. Data Science Engineer"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="exp-summary" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          Role Summary / Description
+        </label>
+        <textarea
+          id="exp-summary"
+          required
+          value={summary}
+          onChange={(e) => setSummary(e.target.value)}
+          rows={5}
+          className="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition resize-none"
+          placeholder="Explain your key accomplishments, software languages used, and projects delivered in this role..."
+        />
+      </div>
+
+      {/* Actions bar */}
+      <div className="flex items-center justify-between gap-3 pt-4 border-t border-stone-850">
+        {isEdit ? (
+          <div className="flex items-center gap-2">
+            {confirmDelete ? (
+              <>
+                <button
+                  type="button"
+                  onClick={onDelete}
+                  disabled={isProcessing}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-stone-950 font-bold text-xs transition cursor-pointer"
+                >
+                  Yes, Delete
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(false)}
+                  className="px-4 py-2 rounded-xl border border-stone-850 text-stone-450 hover:text-white text-xs transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="px-4 py-2 rounded-xl bg-rose-955/40 border border-rose-900/60 hover:bg-rose-900/40 text-rose-350 font-bold text-xs transition cursor-pointer"
+              >
+                Delete Event
+              </button>
+            )}
+          </div>
+        ) : (
+          <div />
+        )}
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-5 py-2.5 rounded-xl border border-stone-855 text-xs font-bold text-stone-400 hover:text-white hover:bg-stone-900 transition cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isProcessing}
+            className="px-6 py-2.5 rounded-xl bg-dawn-600 hover:bg-dawn-500 disabled:bg-stone-800 font-bold text-xs text-stone-950 disabled:text-stone-600 transition flex items-center gap-2 shadow-lg shadow-dawn-900/10 cursor-pointer"
+          >
+            {renderSubmitContent()}
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+}
+
 export default function AdminUploadPage() {
   const state = useAdminDashboardState();
 
@@ -2417,8 +2895,8 @@ export default function AdminUploadPage() {
         {/* Status Notification Alert */}
         <StatusBanner statusMessage={state.statusMessage} />
 
-        {/* Tab Selector between Photo Exhibition Lab and Projects Portfolio Lab */}
-        <div className="flex gap-2 p-1 bg-stone-900/80 backdrop-blur-md rounded-2xl mb-8 border border-stone-850 max-w-md relative z-20">
+        {/* Tab Selector between Photo Exhibition, Portfolio Projects, and Work History */}
+        <div className="flex gap-2 p-1 bg-stone-900/80 backdrop-blur-md rounded-2xl mb-8 border border-stone-850 max-w-lg relative z-20">
           <button
             type="button"
             onClick={() => {
@@ -2449,13 +2927,26 @@ export default function AdminUploadPage() {
             <FileText className="w-4 h-4" />
             Portfolio Projects
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              state.setAdminTab("experiences");
+              state.setStatusMessage(null);
+            }}
+            className={`flex-1 py-3 text-center text-xs font-extrabold uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
+              state.adminTab === "experiences"
+                ? "bg-dawn-600 text-stone-950 shadow-lg shadow-dawn-500/10"
+                : "text-stone-400 hover:text-stone-200 hover:bg-stone-850/40"
+            }`}
+          >
+            <Sliders className="w-4 h-4" />
+            Work History
+          </button>
         </div>
 
-        {state.adminTab === "photos" ? (
-          <PhotoExhibitionLab state={state} />
-        ) : (
-          <ProjectsPortfolioLab state={state} />
-        )}
+        {state.adminTab === "photos" && <PhotoExhibitionLab state={state} />}
+        {state.adminTab === "projects" && <ProjectsPortfolioLab state={state} />}
+        {state.adminTab === "experiences" && <ExperiencesTimelineLab state={state} />}
       </div>
     </div>
   );

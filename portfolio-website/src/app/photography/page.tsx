@@ -15,6 +15,8 @@ import {
   ArrowLeft,
   Tv,
   Sun,
+  Play,
+  Pause,
 } from "lucide-react";
 import Link from "next/link";
 import Masonry from "react-masonry-css";
@@ -33,6 +35,11 @@ export default function PhotographyGalleryPage() {
   const [filterLocation, setFilterLocation] = useState("all");
   const [isCinemaMode, setIsCinemaMode] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+
+  // Autoplay / Slideshow States
+  const [isAutoplay, setIsAutoplay] = useState(false);
+  const [autoplayPacing, setAutoplayPacing] = useState<number>(5);
+  const [dominantColor, setDominantColor] = useState<string>("rgba(240, 180, 41, 0.15)");
 
   // Loupe States
   const [showLoupe, setShowLoupe] = useState(false);
@@ -114,6 +121,88 @@ export default function PhotographyGalleryPage() {
     globalThis.addEventListener("keydown", handleKeyDown);
     return () => globalThis.removeEventListener("keydown", handleKeyDown);
   }, [selectedPhoto, isCinemaMode, nextPhoto, prevPhoto]);
+
+  // Dynamic dominant color extraction for active photo in lightbox
+  useEffect(() => {
+    if (!selectedPhoto) {
+      setIsAutoplay(false); // Turn off autoplay when closing the modal
+      return;
+    }
+
+    // Default category fallback mapping
+    const categoryColors: Record<string, string> = {
+      nature: "rgba(16, 185, 129, 0.15)",      // emerald
+      portrait: "rgba(236, 72, 153, 0.15)",    // pink
+      street: "rgba(99, 102, 241, 0.15)",      // indigo
+      architecture: "rgba(245, 158, 11, 0.15)",  // amber
+      other: "rgba(168, 85, 247, 0.15)",       // purple
+    };
+    
+    const cat = selectedPhoto.category?.toLowerCase() || "";
+    const fallbackColor = categoryColors[cat] || "rgba(240, 180, 41, 0.15)";
+    setDominantColor(fallbackColor);
+
+    // Try dynamic canvas extraction (supports CORS dynamically)
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = selectedPhoto.src;
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = 10;
+        canvas.height = 10;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        ctx.drawImage(img, 0, 0, 10, 10);
+        const imgData = ctx.getImageData(0, 0, 10, 10).data;
+
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let i = 0; i < imgData.length; i += 4) {
+          const pr = imgData[i];
+          const pg = imgData[i + 1];
+          const pb = imgData[i + 2];
+          const pa = imgData[i + 3];
+
+          if (pa < 150) continue; // skip highly transparent pixels
+
+          r += pr;
+          g += pg;
+          b += pb;
+          count++;
+        }
+
+        if (count > 0) {
+          r = Math.round(r / count);
+          g = Math.round(g / count);
+          b = Math.round(b / count);
+          setDominantColor(`rgba(${r}, ${g}, ${b}, 0.22)`); // soft ambient glow
+        }
+      } catch {
+        // Canvas extraction failed (e.g. CORS); fallback color already set
+        console.debug("Dominant color extraction skipped — using category fallback.");
+      }
+    };
+  }, [selectedPhoto]);
+
+  // Autoplay timer effect
+  useEffect(() => {
+    if (!isAutoplay || !selectedPhoto) return;
+
+    const timer = setInterval(() => {
+      nextPhoto();
+    }, autoplayPacing * 1000);
+
+    return () => clearInterval(timer);
+  }, [isAutoplay, selectedPhoto, autoplayPacing, nextPhoto]);
+
+  // Helper to start the slideshow from the main page controls
+  const startSlideshow = () => {
+    if (filteredPhotos.length === 0) return;
+    setPhotoIndex(0);
+    setSelectedPhoto(filteredPhotos[0]);
+    setIsAutoplay(true);
+  };
 
   // Handle global click to exit cinema mode when clicking background
   useEffect(() => {
@@ -561,13 +650,23 @@ export default function PhotographyGalleryPage() {
               </button>
             </div>
 
-            <button
-              onClick={() => setIsCinemaMode(true)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider text-stone-400 hover:text-stone-200 bg-stone-900/30 border border-stone-850 transition flex items-center gap-2 cursor-pointer"
-            >
-              <Tv className="w-3.5 h-3.5" />
-              Lights Out
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={startSlideshow}
+                className="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider text-dawn-400 hover:text-dawn-200 bg-stone-900/30 border border-stone-850 hover:border-dawn-500/30 transition flex items-center gap-2 cursor-pointer"
+              >
+                <Play className="w-3.5 h-3.5" />
+                Play Slideshow
+              </button>
+
+              <button
+                onClick={() => setIsCinemaMode(true)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider text-stone-400 hover:text-stone-200 bg-stone-900/30 border border-stone-850 transition flex items-center gap-2 cursor-pointer"
+              >
+                <Tv className="w-3.5 h-3.5" />
+                Lights Out
+              </button>
+            </div>
           </div>
         </div>
 
@@ -592,6 +691,14 @@ export default function PhotographyGalleryPage() {
               className="absolute inset-0 w-full h-full cursor-default bg-transparent border-0 focus:outline-none"
               onClick={() => setSelectedPhoto(null)}
               aria-label="Close lightbox"
+            />
+
+            {/* Soft dynamic ambient glow backdrop */}
+            <div
+              className="absolute inset-0 transition-all duration-1000 ease-in-out pointer-events-none z-0 filter blur-[120px] opacity-40"
+              style={{
+                background: `radial-gradient(circle, ${dominantColor} 0%, transparent 65%)`
+              }}
             />
 
             {/* Navigation buttons */}
@@ -657,11 +764,78 @@ export default function PhotographyGalleryPage() {
                     }}
                   />
                 )}
+                {/* Autoplay progress bar */}
+                {isAutoplay && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-30">
+                    <motion.div
+                      key={`${selectedPhoto.id}-${autoplayPacing}`}
+                      initial={{ width: "0%" }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: autoplayPacing, ease: "linear" }}
+                      className="h-full bg-dawn-500"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Technical EXIF Metadata Drawer (Right 1/3) */}
               <div className="p-6 md:p-8 bg-stone-900/90 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-white/5 text-stone-300">
                 <div className="space-y-6">
+                  {/* Slideshow Playback Controls */}
+                  <div className="bg-stone-950/60 p-4 rounded-xl border border-white/5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-stone-400 font-bold">
+                        Slideshow Autoplay
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsAutoplay(!isAutoplay)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
+                          isAutoplay
+                            ? "bg-dawn-500 text-stone-950 shadow-md font-bold"
+                            : "text-stone-300 bg-white/5 border border-white/10 hover:bg-white/10"
+                        }`}
+                      >
+                        {isAutoplay ? (
+                          <>
+                            <Pause className="w-3.5 h-3.5 fill-current" />
+                            Playing
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-3.5 h-3.5 fill-current" />
+                            Paused
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 border-t border-white/5 pt-3">
+                      <span className="text-[9px] uppercase tracking-[0.15em] text-stone-500 font-semibold">
+                        Pacing
+                      </span>
+                      <div className="inline-flex gap-1 p-0.5 rounded-lg bg-stone-900 border border-white/5">
+                        {([3, 5, 10] as const).map((secs) => {
+                          const isSel = autoplayPacing === secs;
+                          return (
+                            <button
+                              key={secs}
+                              type="button"
+                              onClick={() => setAutoplayPacing(secs)}
+                              className={`px-2.5 py-1 rounded-md text-[9px] font-mono tracking-wider transition ${
+                                isSel
+                                  ? "bg-white/15 text-white font-bold"
+                                  : "text-stone-400 hover:text-stone-250"
+                              }`}
+                            >
+                              {secs}s
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Photo Title */}
                   <div>
                     <span className="text-[10px] uppercase tracking-[0.25em] text-dawn-400 font-bold">

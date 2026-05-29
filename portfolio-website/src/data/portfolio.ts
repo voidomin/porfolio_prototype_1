@@ -58,49 +58,17 @@ export const aboutStats = [
   { label: "Core Focus", value: "Data + Product" },
 ];
 
-export const experienceTimeline: ExperienceItem[] = [
-  {
-    id: "exp-parentof",
-    period: "Mar 2026 - Present",
-    title: "Data Analyst -> Data Science Engineer",
-    organization: "Parent Of Solutions",
-    summary:
-      "Working across analytics and ML implementation, including cloud workflows, model training, deployment pipelines, and data products.",
-  },
-  {
-    id: "exp-freelance",
-    period: "Dec 2025 - Mar 2026",
-    title: "Freelance Developer",
-    organization: "Independent",
-    summary:
-      "Built and delivered the Param Adventures website for a travel company with a production-ready, highly responsive frontend.",
-  },
-  {
-    id: "exp-merck",
-    period: "Jul 2023 - Dec 2025",
-    title: "Analyst -> Development Engineer",
-    organization: "Merck",
-    summary:
-      "Started as an Analyst for the first 6 months, then converted to a full-time Development Engineer for 2 years. Developed software solutions using PHP, JavaScript, SQL, and automation workflows.",
-  },
-  {
-    id: "exp-iisc",
-    period: "Jan 2023 - Jun 2023",
-    title: "Research Fellow / Computational Intern",
-    organization: "Indian Institute of Science (IISc), Bangalore",
-    summary:
-      "Utilized clustered computing systems to understand protein dynamics. Leveraged structural biology models like Rosetta and AlphaFold to predict stabilizing mutations, contributing to co-authored research.",
-  },
-];
+import experienceData from "./experience.json";
+export const experienceTimeline: ExperienceItem[] = experienceData;
 
 import projectsData from "./projects.json";
-export const projects: Project[] = projectsData as Project[];
+export const projects: Project[] = projectsData;
 
 export const blogPosts: BlogPost[] = [];
 
 import galleryData from "./gallery.json";
 
-export const galleryImages: GalleryImage[] = galleryData as GalleryImage[];
+export const galleryImages: GalleryImage[] = galleryData;
 
 
 export const publications: Publication[] = [

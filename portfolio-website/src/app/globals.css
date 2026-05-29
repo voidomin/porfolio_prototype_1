@@ -300,3 +300,45 @@ html { scroll-behavior: smooth; }
   margin-bottom: 4px;
 }
 
+/* ─── River Flowing Currents ─── */
+.animate-river-flow-1 {
+  animation: riverFlow1 30s linear infinite;
+}
+.animate-river-flow-2 {
+  animation: riverFlow2 45s linear infinite;
+}
+.animate-river-flow-3 {
+  animation: riverFlow3 60s linear infinite;
+}
+
+@keyframes riverFlow1 {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 200; }
+}
+
+@keyframes riverFlow2 {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -200; }
+}
+
+@keyframes riverFlow3 {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 350; }
+}
+
+/* ─── Stepping Stones Floating ─── */
+.animate-stone-float {
+  animation: stoneFloat 6s ease-in-out infinite;
+}
+
+@keyframes stoneFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(0.5deg); }
+}
+
+/* Delay modifiers for staggered float look */
+.float-delay-1 { animation-delay: 1.5s; }
+.float-delay-2 { animation-delay: 3s; }
+.float-delay-3 { animation-delay: 4.5s; }
+
+
