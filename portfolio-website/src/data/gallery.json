@@ -1,26 +1,5 @@
 [
   {
-    "id": "gal-img-3163",
-    "src": "/images/photography/gal-img-3163.webp",
-    "alt": "Photograph titled IMG 3163",
-    "title": "IMG 3163",
-    "description": "",
-    "category": "nature",
-    "width": 1920,
-    "height": 1280,
-    "featured": true,
-    "createdAt": "2025-12-01",
-    "exif": {
-      "camera": "Canon EOS 200D II",
-      "lens": "EF-S18-55mm f/4-5.6 IS STM",
-      "focalLength": "55mm",
-      "aperture": "f/5.6",
-      "shutterSpeed": "1/200s",
-      "iso": "",
-      "location": ""
-    }
-  },
-  {
     "id": "gal-1",
     "src": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&auto=format&fit=crop&q=80",
     "alt": "Mist-shrouded mountain peaks at dawn",
