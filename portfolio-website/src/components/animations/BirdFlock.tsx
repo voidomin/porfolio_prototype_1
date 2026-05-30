@@ -35,7 +35,7 @@ function createFlock(): Bird[] {
   }));
 }
 
-const BirdShape = ({ size, color }: { size: number; color: string }) => (
+const BirdShape = ({ size, color, isMobile }: { size: number; color: string; isMobile: boolean }) => (
   <svg
     width={24 * size}
     height={12 * size}
@@ -49,13 +49,17 @@ const BirdShape = ({ size, color }: { size: number; color: string }) => (
       strokeWidth={1.5}
       strokeLinecap="round"
       fill="none"
-      animate={{
-        d: [
-          "M0,8 Q4,0 12,6 Q20,0 24,8",
-          "M0,4 Q4,6 12,6 Q20,6 24,4",
-          "M0,8 Q4,0 12,6 Q20,0 24,8",
-        ],
-      }}
+      animate={
+        isMobile
+          ? undefined
+          : {
+              d: [
+                "M0,8 Q4,0 12,6 Q20,0 24,8",
+                "M0,4 Q4,6 12,6 Q20,6 24,4",
+                "M0,8 Q4,0 12,6 Q20,0 24,8",
+              ],
+            }
+      }
       transition={{
         duration: 0.6,
         repeat: Infinity,
@@ -68,8 +72,11 @@ const BirdShape = ({ size, color }: { size: number; color: string }) => (
 export const BirdFlock = () => {
   const [flocks, setFlocks] = useState<Flock[]>([]);
   const flockIdCounter = useRef(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    setIsMobile(globalThis.innerWidth < 768);
+    
     // Spawn a new flock every 12-20 seconds
     const spawnFlock = () => {
       flockIdCounter.current += 1;
@@ -124,6 +131,7 @@ export const BirdFlock = () => {
                 <BirdShape
                   size={bird.size}
                   color="rgba(30,30,30,0.35)"
+                  isMobile={isMobile}
                 />
               </motion.div>
             ))}

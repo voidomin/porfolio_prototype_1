@@ -46,14 +46,20 @@ function generateFireflies(count: number) {
 // Interactive rising campfire embers on input hover & focus
 const InputEmberEmitter = ({ active }: { active: boolean }) => {
   const [embers, setEmbers] = useState<{ id: number; left: number; size: number; delay: number; duration: number; distanceY: number; driftX: number }[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(globalThis.innerWidth < 768);
+  }, []);
 
   useEffect(() => {
     if (!active) {
       setEmbers([]);
       return;
     }
-    // Generate 12 lively embers
-    const list = Array.from({ length: 12 }, (_, i) => ({
+    // Generate 12 lively embers (3 on mobile for performance)
+    const count = isMobile ? 3 : 12;
+    const list = Array.from({ length: count }, (_, i) => ({
       id: i,
       left: 5 + Math.random() * 90,
       size: 1.5 + Math.random() * 2.5,
@@ -63,7 +69,7 @@ const InputEmberEmitter = ({ active }: { active: boolean }) => {
       driftX: -20 + Math.random() * 40,
     }));
     setEmbers(list);
-  }, [active]);
+  }, [active, isMobile]);
 
   if (!active) return null;
 
@@ -78,7 +84,9 @@ const InputEmberEmitter = ({ active }: { active: boolean }) => {
             bottom: "0px",
             width: ember.size,
             height: ember.size,
-            boxShadow: `0 0 ${ember.size * 3}px ${ember.size}px rgba(249,115,22,0.8)`,
+            boxShadow: isMobile
+              ? `0 0 ${ember.size * 1.5}px rgba(249,115,22,0.6)`
+              : `0 0 ${ember.size * 3}px ${ember.size}px rgba(249,115,22,0.8)`,
           }}
           initial={{ opacity: 0, y: 0, x: 0 }}
           animate={{
@@ -215,10 +223,14 @@ export const ContactSection = () => {
     status: "idle",
     message: "",
   });
-  const [fireflies] = useState(() => generateFireflies(15));
+  const [fireflies, setFireflies] = useState<{ id: number; x: number; y: number; delay: number; duration: number; size: number }[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const mobile = globalThis.innerWidth < 768;
+    setIsMobile(mobile);
+    setFireflies(generateFireflies(mobile ? 4 : 15));
     setMounted(true);
   }, []);
 
@@ -310,7 +322,9 @@ export const ContactSection = () => {
                 width: ff.size,
                 height: ff.size,
                 background: "#f0b429",
-                boxShadow: `0 0 ${ff.size * 3}px ${ff.size}px rgba(240,180,41,0.4)`,
+                boxShadow: isMobile
+                  ? `0 0 ${ff.size * 2}px rgba(240,180,41,0.3)`
+                  : `0 0 ${ff.size * 3}px ${ff.size}px rgba(240,180,41,0.4)`,
               }}
               animate={{
                 x: [0, 20 - Math.random() * 40, 0],
@@ -460,13 +474,17 @@ export const ContactSection = () => {
                     d="M50 15C50 15 35 40 35 55C35 67 43 75 50 75C57 75 65 67 65 55C65 40 50 15 50 15Z"
                     fill="#f0541e"
                     opacity="0.85"
-                    animate={{
-                      scaleY: [1, 1.15, 0.95, 1.08, 1],
-                      skewX: [0, -3, 3, -1, 0],
-                      y: [0, -2, 1, -1, 0],
-                    }}
+                    animate={
+                      isMobile
+                        ? { scaleY: [0.95, 1.05, 0.95], opacity: [0.75, 0.9, 0.75] }
+                        : {
+                            scaleY: [1, 1.15, 0.95, 1.08, 1],
+                            skewX: [0, -3, 3, -1, 0],
+                            y: [0, -2, 1, -1, 0],
+                          }
+                    }
                     transition={{
-                      duration: 2.2,
+                      duration: isMobile ? 1.5 : 2.2,
                       repeat: Infinity,
                       ease: "easeInOut",
                     }}
@@ -478,13 +496,17 @@ export const ContactSection = () => {
                     d="M50 25C50 25 38 43 38 58C38 68 45 75 50 75C55 75 62 68 62 58C62 43 50 25 50 25Z"
                     fill="#ff9800"
                     opacity="0.95"
-                    animate={{
-                      scaleY: [1, 0.92, 1.12, 0.97, 1],
-                      skewX: [0, 4, -4, 2, 0],
-                      y: [0, 1, -2, 1, 0],
-                    }}
+                    animate={
+                      isMobile
+                        ? { scaleY: [0.96, 1.04, 0.96], opacity: [0.85, 0.98, 0.85] }
+                        : {
+                            scaleY: [1, 0.92, 1.12, 0.97, 1],
+                            skewX: [0, 4, -4, 2, 0],
+                            y: [0, 1, -2, 1, 0],
+                          }
+                    }
                     transition={{
-                      duration: 1.8,
+                      duration: isMobile ? 1.2 : 1.8,
                       repeat: Infinity,
                       ease: "easeInOut",
                     }}
@@ -495,12 +517,16 @@ export const ContactSection = () => {
                   <motion.path
                     d="M50 38C50 38 42 50 42 62C42 69 46 75 50 75C54 75 58 69 58 62C58 50 50 38 50 38Z"
                     fill="#ffeb3b"
-                    animate={{
-                      scaleY: [1, 1.1, 0.9, 1.05, 1],
-                      skewX: [0, -2, 2, 0, 0],
-                    }}
+                    animate={
+                      isMobile
+                        ? { scaleY: [0.97, 1.03, 0.97] }
+                        : {
+                            scaleY: [1, 1.1, 0.9, 1.05, 1],
+                            skewX: [0, -2, 2, 0, 0],
+                          }
+                    }
                     transition={{
-                      duration: 1.3,
+                      duration: isMobile ? 1.0 : 1.3,
                       repeat: Infinity,
                       ease: "easeInOut",
                     }}

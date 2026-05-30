@@ -32,6 +32,18 @@ export const InteractiveTrail = () => {
   const mousePos = useRef({ x: 0, y: 0, lastX: 0, lastY: 0, active: false });
   const particles = useRef<Particle[]>([]);
   const lastGustTime = useRef(0);
+  const lastTouchTime = useRef(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile viewport on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(globalThis.innerWidth < 768);
+    };
+    checkMobile();
+    globalThis.addEventListener("resize", checkMobile);
+    return () => globalThis.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Update current scroll progress state for particle spawning
   useEffect(() => {
@@ -176,6 +188,12 @@ export const InteractiveTrail = () => {
     // Track touch movement (mobile)
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length === 0) return;
+      
+      // Throttle touch events to ~30fps (32ms) to prevent scrolling jank
+      const now = Date.now();
+      if (now - lastTouchTime.current < 32) return;
+      lastTouchTime.current = now;
+
       const touch = e.touches[0];
 
       mousePos.current.lastX = mousePos.current.x;
@@ -200,7 +218,8 @@ export const InteractiveTrail = () => {
         );
       }
 
-      if (speed > 3 && particles.current.length < 25) {
+      const particleCap = isMobile ? 8 : 25;
+      if (speed > 3 && particles.current.length < particleCap) {
         spawnParticleAt(touch.clientX, touch.clientY);
       }
     };
@@ -215,8 +234,8 @@ export const InteractiveTrail = () => {
       mousePos.current.lastY = touch.clientY;
       mousePos.current.active = true;
 
-      // Burst of particles from fingerprint tap
-      spawnBurstAt(touch.clientX, touch.clientY, 4);
+      // Burst of particles from fingerprint tap (reduced on mobile)
+      spawnBurstAt(touch.clientX, touch.clientY, isMobile ? 2 : 4);
     };
 
     const handleMouseLeave = () => {
@@ -232,7 +251,7 @@ export const InteractiveTrail = () => {
       lastGustTime.current = now;
 
       const { vx, vy } = (e as CustomEvent).detail;
-      const count = 7; // Reduced from 15 to prevent screen flooding
+      const count = isMobile ? 2 : 7; // Reduced on mobile
 
       for (let i = 0; i < count; i++) {
         let type: "leaf" | "pollen" | "ember" = "leaf";
@@ -265,7 +284,7 @@ export const InteractiveTrail = () => {
 
     const handleCampfireStoke = (e: Event) => {
       const { x, y } = (e as CustomEvent).detail;
-      const count = 14; // Reduced from 22 for better visual balance
+      const count = isMobile ? 4 : 14; // Reduced on mobile
 
       for (let i = 0; i < count; i++) {
         particles.current.push({
@@ -373,8 +392,12 @@ export const InteractiveTrail = () => {
           ctx.strokeStyle = p.color;
           ctx.lineWidth = p.size;
           ctx.lineCap = "round";
-          ctx.shadowColor = "rgba(255, 95, 30, 0.8)";
-          ctx.shadowBlur = p.size * 2;
+          
+          if (!isMobile) {
+            ctx.shadowColor = "rgba(255, 95, 30, 0.8)";
+            ctx.shadowBlur = p.size * 2;
+          }
+          
           ctx.stroke();
         }
 
@@ -399,12 +422,13 @@ export const InteractiveTrail = () => {
       );
       cancelAnimationFrame(animationId);
     };
-  }, [scrollProgress]);
+  }, [scrollProgress, isMobile]);
 
   return (
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-[75] block"
+      style={{ transform: "translate3d(0, 0, 0)" }}
     />
   );
 };

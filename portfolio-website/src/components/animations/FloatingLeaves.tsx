@@ -78,10 +78,12 @@ const LeafSVG = ({ size, color }: { size: number; color: string }) => (
 );
 
 export const FloatingLeaves = () => {
-  const [leaves] = useState(() => generateLeaves(12));
+  const [leaves, setLeaves] = useState<Leaf[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    const isMobile = globalThis.innerWidth < 768;
+    setLeaves(generateLeaves(isMobile ? 4 : 12));
     setMounted(true);
   }, []);
 
