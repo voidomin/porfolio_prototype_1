@@ -11,10 +11,10 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  Compass,
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { galleryImages } from "@/data/portfolio";
 import { GalleryImage } from "@/types";
 import { gsap } from "gsap";
@@ -63,7 +63,7 @@ export const PhotographySection = () => {
   // Open lightbox at specific index
   const openLightbox = (photo: GalleryImage) => {
     const idx = homepagePhotos.findIndex((p) => p.id === photo.id);
-    setPhotoIndex(idx !== -1 ? idx : 0);
+    setPhotoIndex(idx === -1 ? 0 : idx);
     setSelectedPhoto(photo);
   };
 
@@ -224,9 +224,10 @@ export const PhotographySection = () => {
             className="flex gap-8 cursor-grab active:cursor-grabbing w-max px-4"
           >
             {homepagePhotos.map((photo, index) => (
-              <div
+              <button
                 key={photo.id}
-                className="group select-none w-[280px] sm:w-[360px] md:w-[420px] shrink-0"
+                type="button"
+                className="group select-none shrink-0 text-left cursor-pointer"
                 onClick={() => {
                   if (!isDragging) {
                     openLightbox(photo);
@@ -236,12 +237,19 @@ export const PhotographySection = () => {
                 {/* Museum Matte Frame Border Style */}
                 <div className="bg-white p-4 pb-6 rounded-xl shadow-xl shadow-stone-900/5 border border-stone-100 hover:shadow-2xl hover:shadow-stone-900/10 transition-all duration-500">
                   {/* Photo Canvas Frame */}
-                  <div className="relative aspect-[3/2] rounded-lg overflow-hidden bg-stone-100">
-                    <img
+                  <div 
+                    className="relative rounded-lg overflow-hidden bg-stone-100 h-[180px] sm:h-[240px] md:h-[280px]"
+                    style={{
+                      aspectRatio: photo.width && photo.height ? `${photo.width}/${photo.height}` : "3/2"
+                    }}
+                  >
+                    <Image
                       src={photo.src}
                       alt={photo.alt}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
-                      loading="lazy"
+                      fill
+                      sizes="(max-width: 640px) 180px, (max-width: 1024px) 240px, 280px"
+                      quality={90}
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                     />
 
                     {/* Dark glass warm overlay on hover */}
@@ -259,18 +267,18 @@ export const PhotographySection = () => {
                   </div>
 
                   {/* Clean text strip below like an exhibition print */}
-                  <div className="mt-4 px-1 text-center">
-                    <h3 className="text-stone-800 font-semibold tracking-wide text-sm font-sans">
+                  <div className="mt-4 px-1 text-center max-w-full">
+                    <h3 className="text-stone-800 font-semibold tracking-wide text-sm font-sans truncate">
                       {photo.title || "Untitled"}
                     </h3>
                     {photo.exif?.camera && (
-                      <p className="text-stone-400/80 text-[10px] tracking-widest uppercase mt-1">
+                      <p className="text-stone-400/80 text-[10px] tracking-widest uppercase mt-1 truncate">
                         {photo.exif.camera}
                       </p>
                     )}
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </motion.div>
         </div>
@@ -301,9 +309,11 @@ export const PhotographySection = () => {
             aria-modal="true"
           >
             {/* Background close click */}
-            <div
-              className="absolute inset-0 cursor-default"
+            <button
+              type="button"
+              className="absolute inset-0 w-full h-full cursor-default bg-transparent border-0 focus:outline-none"
               onClick={() => setSelectedPhoto(null)}
+              aria-label="Close lightbox"
             />
 
             {/* Navigation buttons */}
@@ -341,10 +351,13 @@ export const PhotographySection = () => {
             >
               {/* Image Canvas container (Left 2/3) */}
               <div className="lg:col-span-2 relative bg-black flex items-center justify-center min-h-[300px] md:min-h-[500px] max-h-[75vh]">
-                <img
+                <Image
                   src={selectedPhoto.src}
                   alt={selectedPhoto.alt}
-                  className="w-full h-full object-contain max-h-[75vh]"
+                  fill
+                  unoptimized
+                  className="object-contain max-h-[75vh]"
+                  priority
                 />
               </div>
 

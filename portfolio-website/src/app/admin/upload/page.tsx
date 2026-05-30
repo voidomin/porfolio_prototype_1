@@ -16,6 +16,7 @@ import {
   Trash2
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 
@@ -456,9 +457,11 @@ function WorkspaceCanvas({
           Exhibition Image Preview (CMS View)
         </span>
         <div className="w-full overflow-auto max-h-[82vh] xl:max-h-[850px] flex items-center justify-center rounded-xl border border-stone-950 bg-stone-900/20 p-2">
-          <img 
+          <Image 
             src={selectedFile} 
             alt="Published preview" 
+            width={1920}
+            height={1280}
             className="w-full max-h-[78vh] xl:max-h-[800px] object-contain rounded-xl shadow-lg border border-stone-950 pointer-events-none"
           />
         </div>
@@ -487,6 +490,7 @@ function WorkspaceCanvas({
             onComplete={(c) => setCompletedCrop(c)}
             className="w-full flex justify-center"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src={`/api/admin/view?file=${encodeURIComponent(selectedFile)}`} 
               alt="Interactive crop preview" 
@@ -645,11 +649,13 @@ function ProjectsQueue({
                   : "bg-stone-950/40 border-stone-850 text-stone-400 hover:bg-stone-900/60 hover:text-stone-200"
               }`}
             >
-              <div className="w-10 h-10 rounded-lg overflow-hidden bg-stone-900 shrink-0 border border-stone-800/40">
-                <img 
+              <div className="w-10 h-10 rounded-lg overflow-hidden bg-stone-900 shrink-0 border border-stone-800/40 relative">
+                <Image 
                   src={project.image || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=100&h=100&fit=crop"} 
                   alt="" 
-                  className="w-full h-full object-cover" 
+                  fill
+                  sizes="40px"
+                  className="object-cover" 
                 />
               </div>
               <div className="overflow-hidden flex-1">
@@ -728,6 +734,16 @@ function ProjectEditor({
   subProjects,
   setSubProjects,
 }: Readonly<ProjectEditorProps>) {
+  const [imageFallbackSrc, setImageFallbackSrc] = useState(
+    image || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop"
+  );
+
+  useEffect(() => {
+    setImageFallbackSrc(
+      image || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop"
+    );
+  }, [image]);
+
   const renderSubmitContent = () => {
     if (isProcessing) {
       return (
@@ -770,13 +786,15 @@ function ProjectEditor({
           <span className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold mb-3 block text-center">
             Project Cover Image Preview
           </span>
-          <div className="w-full overflow-hidden rounded-xl border border-stone-950 bg-stone-900/20 p-2 flex justify-center">
-            <img 
-              src={image || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop"} 
+          <div className="w-full overflow-hidden rounded-xl border border-stone-950 bg-stone-900/20 p-2 flex justify-center relative h-[300px]">
+            <Image 
+              src={imageFallbackSrc} 
               alt="Project preview" 
-              className="max-h-[300px] object-contain rounded-xl shadow-lg border border-stone-950"
-              onError={(e) => {
-                e.currentTarget.src = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop";
+              fill
+              sizes="(max-width: 1024px) 100vw, 800px"
+              className="object-contain rounded-xl shadow-lg border border-stone-950"
+              onError={() => {
+                setImageFallbackSrc("https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop");
               }}
             />
           </div>
@@ -1154,11 +1172,13 @@ function PublishedQueue({
                 : "bg-stone-950/40 border-stone-850 text-stone-400 hover:bg-stone-900/60 hover:text-stone-200"
             }`}
           >
-            <div className="w-10 h-10 rounded-lg overflow-hidden bg-stone-900 shrink-0 border border-stone-800/40">
-              <img 
+            <div className="w-10 h-10 rounded-lg overflow-hidden bg-stone-900 shrink-0 border border-stone-800/40 relative">
+              <Image 
                 src={photo.src} 
                 alt="" 
-                className="w-full h-full object-cover" 
+                fill
+                sizes="40px"
+                className="object-cover" 
               />
             </div>
             <div className="overflow-hidden flex-1">

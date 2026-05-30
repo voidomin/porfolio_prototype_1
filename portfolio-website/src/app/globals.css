@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 @layer base {
   :root {
@@ -25,14 +25,19 @@
     --content-max-width: 80rem;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-fraunces), serif;
     letter-spacing: -0.01em;
   }
 
   body {
     font-family: var(--font-manrope), sans-serif;
-    color: #1e293b;
+    color: #e2e8f0;
     background-color: #0f0d2e;
     overflow-x: hidden;
   }
@@ -40,23 +45,43 @@
 
 /* Custom cursor for desktop */
 @media (pointer: fine) {
-  body { cursor: none; }
-  a, button, input, textarea, select, label, [role="button"] { cursor: none; }
-  input, textarea, select { cursor: text; }
+  body {
+    cursor: none;
+  }
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  label,
+  [role="button"] {
+    cursor: none;
+  }
+  input,
+  textarea,
+  select {
+    cursor: text;
+  }
 }
 
 /* Custom scrollbar — nature themed */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0f0d2e; }
-::-webkit-scrollbar-thumb { 
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f0d2e;
+}
+::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #f0b429, #3a8f3a, #5d40e6);
   border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover { 
+::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #f8cc4d, #5aaf5a, #8180f9);
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 /* ─── Nature Scene Layers ─── */
 .nature-scene {
@@ -115,7 +140,7 @@ html { scroll-behavior: smooth; }
 
 .bird-v::before,
 .bird-v::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 14px;
   height: 2px;
@@ -179,7 +204,9 @@ html { scroll-behavior: smooth; }
 }
 
 @keyframes textRevealUp {
-  to { transform: translateY(0); }
+  to {
+    transform: translateY(0);
+  }
 }
 
 /* ─── Nature Card Styles ─── */
@@ -208,7 +235,7 @@ html { scroll-behavior: smooth; }
 
 /* Wood texture effect (CSS gradient pattern) */
 .wood-texture {
-  background-image: 
+  background-image:
     repeating-linear-gradient(
       90deg,
       rgba(121, 85, 72, 0.03),
@@ -228,9 +255,17 @@ html { scroll-behavior: smooth; }
 /* Parchment texture */
 .parchment {
   background-color: #fef7e0;
-  background-image: 
-    radial-gradient(circle at 20% 50%, rgba(180, 140, 80, 0.08), transparent 50%),
-    radial-gradient(circle at 80% 50%, rgba(180, 140, 80, 0.06), transparent 50%),
+  background-image:
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(180, 140, 80, 0.08),
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 50%,
+      rgba(180, 140, 80, 0.06),
+      transparent 50%
+    ),
     url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b08850' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
@@ -247,8 +282,12 @@ html { scroll-behavior: smooth; }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* ─── Text Selection ─── */
@@ -260,12 +299,16 @@ html { scroll-behavior: smooth; }
 /* Focus styles */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(125, 181, 35, 0.5), 0 0 0 4px rgba(125, 181, 35, 0.2);
+  box-shadow:
+    0 0 0 2px rgba(125, 181, 35, 0.5),
+    0 0 0 4px rgba(125, 181, 35, 0.2);
 }
 
 /* ─── Reduced Motion ─── */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -282,22 +325,32 @@ html { scroll-behavior: smooth; }
     text-shadow: none !important;
   }
 }
-
-/* ─── Pinterest Masonry Gallery Grid ─── */
-.my-masonry-grid {
-  display: flex;
-  margin-left: -4px; /* Gutter width offset */
-  width: auto;
+/* ─── Premium Mosaic Gallery Grid ─── */
+.mosaic-grid {
+  column-count: 1;
+  column-gap: 2px;
+  width: 100%;
 }
 
-.my-masonry-grid_column {
-  padding-left: 4px; /* Gutter width */
-  background-clip: padding-box;
+@media (min-width: 640px) {
+  .mosaic-grid {
+    column-count: 2;
+    column-gap: 3px;
+  }
 }
 
-/* Style your individual items */
-.my-masonry-grid_column > div {
-  margin-bottom: 4px;
+@media (min-width: 1024px) {
+  .mosaic-grid {
+    column-count: 3;
+    column-gap: 4px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .mosaic-grid {
+    column-count: 4;
+    column-gap: 4px;
+  }
 }
 
 /* ─── River Flowing Currents ─── */
@@ -312,18 +365,30 @@ html { scroll-behavior: smooth; }
 }
 
 @keyframes riverFlow1 {
-  0% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: 200; }
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 200;
+  }
 }
 
 @keyframes riverFlow2 {
-  0% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: -200; }
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -200;
+  }
 }
 
 @keyframes riverFlow3 {
-  0% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: 350; }
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 350;
+  }
 }
 
 /* ─── Stepping Stones Floating ─── */
@@ -332,13 +397,44 @@ html { scroll-behavior: smooth; }
 }
 
 @keyframes stoneFloat {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-6px) rotate(0.5deg); }
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(0.5deg);
+  }
 }
 
 /* Delay modifiers for staggered float look */
-.float-delay-1 { animation-delay: 1.5s; }
-.float-delay-2 { animation-delay: 3s; }
-.float-delay-3 { animation-delay: 4.5s; }
+.float-delay-1 {
+  animation-delay: 1.5s;
+}
+.float-delay-2 {
+  animation-delay: 3s;
+}
+.float-delay-3 {
+  animation-delay: 4.5s;
+}
 
+/* Shimmer animation for premium gallery images */
+.pulse-shimmer {
+  background: linear-gradient(
+    90deg,
+    #1c1917 25%,
+    #292524 50%,
+    #1c1917 75%
+  );
+  background-size: 200% 100%;
+  animation: loadingShimmer 1.5s infinite linear;
+}
+
+@keyframes loadingShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
 
