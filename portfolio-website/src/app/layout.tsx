@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Manrope, Fraunces, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
-import { DesktopMotionChrome } from "@/components/layout/DesktopMotionChrome";
+import { ScrollProgress } from "@/components/animations/ScrollProgress";
+import { StorybookCursor } from "@/components/layout/StorybookCursor";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -23,23 +24,8 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
-const siteUrl = (() => {
-  const configuredUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL;
-
-  if (!configuredUrl) {
-    return new URL("http://localhost:3000");
-  }
-
-  return new URL(
-    configuredUrl.startsWith("http")
-      ? configuredUrl
-      : `https://${configuredUrl}`,
-  );
-})();
-
 export const metadata: Metadata = {
-  metadataBase: siteUrl,
+  metadataBase: new URL("https://akashportfolio.dev"), // Set your production domain here
   title: "Akash — Full-Stack & Data Science Engineer",
   description:
     "Portfolio of Akash featuring full-stack engineering, data science work, selected projects, and research contributions. A storytelling journey through nature.",
@@ -84,8 +70,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased">
+        <StorybookCursor />
         <SmoothScroll>
-          <DesktopMotionChrome />
+          <ScrollProgress />
           <div className="relative min-h-screen">{children}</div>
         </SmoothScroll>
       </body>
