@@ -57,15 +57,17 @@ export const HeroSection = () => {
           className="inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full bg-forest-950/5 backdrop-blur-md border border-forest-950/15 text-sm"
         >
           <MapPin className="h-4 w-4 text-forest-800" />
-          <span className="text-forest-900 font-medium">{personalProfile.location}</span>
+          <span className="text-forest-900 font-medium">
+            {personalProfile.location}
+          </span>
         </motion.div>
 
         {/* Name — cinematic letter-by-letter reveal */}
         <div className="overflow-hidden mb-4">
-          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight flex justify-center flex-wrap">
+          <h1 className="text-[clamp(3rem,12vw,7rem)] sm:text-[clamp(4rem,10vw,8rem)] md:text-8xl lg:text-9xl font-bold tracking-tight flex justify-center flex-wrap">
             {nameLetters.map((letter, i) => (
               <motion.span
-                key={i}
+                key={`${letter}-${i}`}
                 custom={i}
                 variants={letterVariants}
                 initial="hidden"
@@ -148,7 +150,7 @@ export const HeroSection = () => {
               >
                 {label}
               </span>
-            )
+            ),
           )}
         </motion.div>
       </div>

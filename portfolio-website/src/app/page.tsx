@@ -10,28 +10,14 @@ import { Footer } from "@/components/layout/Footer";
 import { FloatingActionButton } from "@/components/ui/FloatingActionButton";
 import { MountainAscentHUD } from "@/components/ui/MountainAscentHUD";
 import { ChapterTitleIntro } from "@/components/ui/ChapterTitleIntro";
-import { NatureScene } from "@/components/animations/NatureScene";
-import { BirdFlock } from "@/components/animations/BirdFlock";
-import { FloatingLeaves } from "@/components/animations/FloatingLeaves";
-import { InteractiveTrail } from "@/components/animations/InteractiveTrail";
-import { SoundscapeManager } from "@/components/audio/SoundscapeManager";
+import { AmbientEffects } from "@/components/layout/AmbientEffects";
 import { SectionDivider } from "@/components/animations/SectionDivider";
 
 export default function Home() {
   return (
     <main className="relative overflow-x-hidden">
-      {/* Fixed nature background — sky, mountains, sun, stars */}
-      <NatureScene />
-
-      {/* Ambient nature overlays */}
-      <BirdFlock />
-      <FloatingLeaves />
-
-      {/* Interactive trailing micro-particles */}
-      <InteractiveTrail />
-
-      {/* Ambient soundscape manager (procedural audio) */}
-      <SoundscapeManager />
+      {/* Fixed nature background and ambient effects, reduced on phones */}
+      <AmbientEffects />
 
       {/* Navigation */}
       <Navbar />
