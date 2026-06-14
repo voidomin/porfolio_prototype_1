@@ -4,10 +4,9 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Centralized block for admin panel and admin APIs in production
-  if (process.env.NODE_ENV === "production") {
+  // Block admin routes unless ENABLE_ADMIN=true is explicitly set in the environment
+  if (!process.env.ENABLE_ADMIN) {
     if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
-      // Return 404 response to make the path look completely non-existent
       return new NextResponse(null, { status: 404 });
     }
   }

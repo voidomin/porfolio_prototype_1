@@ -16,22 +16,23 @@ import { FloatingLeaves } from "@/components/animations/FloatingLeaves";
 import { InteractiveTrail } from "@/components/animations/InteractiveTrail";
 import { SoundscapeManager } from "@/components/audio/SoundscapeManager";
 import { SectionDivider } from "@/components/animations/SectionDivider";
+import { SectionErrorBoundary } from "@/components/ui/SectionErrorBoundary";
 
 export default function Home() {
   return (
-    <main className="relative overflow-x-hidden">
+    <main id="main-content" className="relative overflow-x-hidden">
       {/* Fixed nature background — sky, mountains, sun, stars */}
-      <NatureScene />
+      <SectionErrorBoundary name="nature-scene"><NatureScene /></SectionErrorBoundary>
 
       {/* Ambient nature overlays */}
-      <BirdFlock />
-      <FloatingLeaves />
+      <SectionErrorBoundary name="bird-flock"><BirdFlock /></SectionErrorBoundary>
+      <SectionErrorBoundary name="floating-leaves"><FloatingLeaves /></SectionErrorBoundary>
 
       {/* Interactive trailing micro-particles */}
-      <InteractiveTrail />
+      <SectionErrorBoundary name="interactive-trail"><InteractiveTrail /></SectionErrorBoundary>
 
       {/* Ambient soundscape manager (procedural audio) */}
-      <SoundscapeManager />
+      <SectionErrorBoundary name="soundscape"><SoundscapeManager /></SectionErrorBoundary>
 
       {/* Navigation */}
       <Navbar />
@@ -39,61 +40,43 @@ export default function Home() {
       {/* ─── Storytelling Chapters ─── */}
 
       {/* Chapter 1: Dawn */}
-      <HeroSection />
+      <SectionErrorBoundary name="hero"><HeroSection /></SectionErrorBoundary>
 
       {/* Terrain: mountain ridge → forest */}
-      <SectionDivider
-        variant="mountain-ridge"
-        fillColor="rgba(13, 32, 13, 0.35)"
-      />
+      <SectionDivider variant="mountain-ridge" fillColor="rgba(13, 32, 13, 0.35)" />
 
       {/* Chapter 2: The Forest Path */}
-      <AboutSection />
+      <SectionErrorBoundary name="about"><AboutSection /></SectionErrorBoundary>
 
       {/* Terrain: forest treeline → meadow */}
-      <SectionDivider
-        variant="forest-treeline"
-        fillColor="rgba(34, 73, 34, 0.2)"
-      />
+      <SectionDivider variant="forest-treeline" fillColor="rgba(34, 73, 34, 0.2)" />
 
       {/* Chapter 3: The Meadow */}
-      <SkillsSection />
+      <SectionErrorBoundary name="skills"><SkillsSection /></SectionErrorBoundary>
 
       {/* Terrain: rolling hills → river */}
-      <SectionDivider
-        variant="rolling-hills"
-        fillColor="rgba(211, 237, 158, 0.2)"
-      />
+      <SectionDivider variant="rolling-hills" fillColor="rgba(211, 237, 158, 0.2)" />
 
       {/* Chapter 4: Stepping Stones */}
-      <ProjectsSection />
+      <SectionErrorBoundary name="projects"><ProjectsSection /></SectionErrorBoundary>
 
       {/* Terrain: river bank → clearing */}
-      <SectionDivider
-        variant="river-bank"
-        fillColor="rgba(191, 227, 254, 0.2)"
-      />
+      <SectionDivider variant="river-bank" fillColor="rgba(191, 227, 254, 0.2)" />
 
       {/* Chapter 5: The Clearing */}
-      <PublicationsSection />
+      <SectionErrorBoundary name="publications"><PublicationsSection /></SectionErrorBoundary>
 
       {/* Terrain: rolling hills → golden hour */}
-      <SectionDivider
-        variant="rolling-hills"
-        fillColor="rgba(252, 232, 230, 0.2)"
-      />
+      <SectionDivider variant="rolling-hills" fillColor="rgba(252, 232, 230, 0.2)" />
 
       {/* Chapter 6: Golden Hour */}
-      <PhotographySection />
+      <SectionErrorBoundary name="photography"><PhotographySection /></SectionErrorBoundary>
 
       {/* Terrain: dusk horizon → campfire */}
-      <SectionDivider
-        variant="dusk-horizon"
-        fillColor="rgba(252, 232, 230, 0.2)"
-      />
+      <SectionDivider variant="dusk-horizon" fillColor="rgba(252, 232, 230, 0.2)" />
 
       {/* Chapter 7: Campfire at Dusk */}
-      <ContactSection />
+      <SectionErrorBoundary name="contact"><ContactSection /></SectionErrorBoundary>
 
       {/* Terrain: night hills → footer */}
       <SectionDivider variant="night-hills" fillColor="rgba(26, 10, 9, 0.5)" />
@@ -102,10 +85,10 @@ export default function Home() {
       <Footer />
 
       {/* Mountain Ascent Climbing Map tracker */}
-      <MountainAscentHUD />
+      <SectionErrorBoundary name="mountain-hud"><MountainAscentHUD /></SectionErrorBoundary>
 
       {/* Cinematic Chapter Title Intros */}
-      <ChapterTitleIntro />
+      <SectionErrorBoundary name="chapter-intro"><ChapterTitleIntro /></SectionErrorBoundary>
 
       {/* Compass FAB */}
       <FloatingActionButton />

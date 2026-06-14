@@ -17,9 +17,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { galleryImages } from "@/data/portfolio";
 import { GalleryImage } from "@/types";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
 /* ──────────────────────────────────────────────────────────
    PhotographySection – "Chapter 6: Golden Hour"
    A highly elegant, premium photography portfolio.
@@ -115,47 +112,6 @@ export const PhotographySection = () => {
     };
   }, [homepagePhotos]);
 
-  // GSAP scroll trigger entry animations
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const titleEl = document.querySelector("#photography .section-title-wrap");
-    if (titleEl) {
-      gsap.fromTo(
-        titleEl,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: "#photography",
-            start: "top 80%",
-          },
-        }
-      );
-    }
-
-    if (carouselContainerRef.current) {
-      gsap.fromTo(
-        carouselContainerRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.2,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: "#photography",
-            start: "top 70%",
-          },
-        }
-      );
-    }
-  }, []);
-
-
   return (
     <section
       id="photography"
@@ -173,7 +129,13 @@ export const PhotographySection = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
         {/* Section header */}
-        <div className="text-center mb-16 section-title-wrap">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
           <p className="text-dawn-700/50 text-sm tracking-[0.3em] uppercase mb-4">
             Chapter Six
           </p>
@@ -181,10 +143,10 @@ export const PhotographySection = () => {
             Golden <span className="text-dawn-600">Hour</span>
           </h2>
           <p className="text-stone-600/60 max-w-lg mx-auto text-sm leading-relaxed">
-            Moments captured in transit. Stored with camera exposure profiles (EXIF) 
+            Moments captured in transit. Stored with camera exposure profiles (EXIF)
             to preserve the exact light and setting of each memory.
           </p>
-        </div>
+        </motion.div>
 
         {/* Categories tag navigation */}
         <div className="flex justify-center mb-12">
@@ -209,8 +171,14 @@ export const PhotographySection = () => {
         </div>
 
         {/* Art Gallery Photography Carousel */}
-        <div 
-          ref={carouselContainerRef} 
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+        >
+        <div
+          ref={carouselContainerRef}
           className="relative w-full overflow-hidden py-4"
         >
           <motion.div
@@ -282,6 +250,7 @@ export const PhotographySection = () => {
             ))}
           </motion.div>
         </div>
+        </motion.div>
 
         {/* View More Button for full gallery page */}
         {filteredPhotos.length > 6 && (

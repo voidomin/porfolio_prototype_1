@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useScroll } from "framer-motion";
 
 interface UseIntersectionObserverProps {
   threshold?: number;
@@ -49,48 +50,30 @@ export const useIntersectionObserver = ({
 
 
 export const useScrollDirection = () => {
+  const { scrollY } = useScroll();
   const [scrollDirection, setScrollDirection] = useState<"up" | "down">("down");
-  const [scrollY, setScrollY] = useState(0);
+  const [scrollYValue, setScrollYValue] = useState(0);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+    return scrollY.on("change", (current) => {
+      if (current > lastScrollY.current) setScrollDirection("down");
+      else if (current < lastScrollY.current) setScrollDirection("up");
+      setScrollYValue(current);
+      lastScrollY.current = current;
+    });
+  }, [scrollY]);
 
-      if (currentScrollY > lastScrollY.current) {
-        setScrollDirection("down");
-      } else if (currentScrollY < lastScrollY.current) {
-        setScrollDirection("up");
-      }
-
-      setScrollY(currentScrollY);
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  return { scrollDirection, scrollY };
+  return { scrollDirection, scrollY: scrollYValue };
 };
 
 export const useScrollProgress = () => {
+  const { scrollYProgress } = useScroll();
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrolled = window.scrollY;
-      const maxScroll =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const percentage = (scrolled / maxScroll) * 100;
-      setProgress(Math.min(100, Math.max(0, percentage)));
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // Initial calculation
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    return scrollYProgress.on("change", (v) => setProgress(v * 100));
+  }, [scrollYProgress]);
 
   return progress;
 };

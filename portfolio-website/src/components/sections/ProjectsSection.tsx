@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import {
   motion,
   AnimatePresence,
@@ -188,15 +189,22 @@ const ProjectCard = ({
 
               {/* Frame Viewport */}
               <div className="relative h-44 overflow-hidden bg-stone-900">
-                <motion.img
+                <motion.div
                   key={displayImage}
-                  src={displayImage}
-                  alt={displayTitle}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1, scale: isHovered ? 1.05 : 1 }}
                   transition={{ duration: 0.4 }}
-                  className="w-full h-full object-cover"
-                />
+                  className="relative w-full h-full"
+                >
+                  <Image
+                    src={displayImage}
+                    alt={displayTitle}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, 380px"
+                    quality={85}
+                  />
+                </motion.div>
 
                 {/* Hover actions panel */}
                 <motion.div

@@ -25,7 +25,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://akashportfolio.dev"), // Set your production domain here
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://akashportfolio.dev"),
   title: "Akash — Full-Stack & Data Science Engineer",
   description:
     "Portfolio of Akash featuring full-stack engineering, data science work, selected projects, and research contributions. A storytelling journey through nature.",
@@ -70,6 +70,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-[9999] focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-900 focus:rounded-lg focus:shadow-lg focus:font-semibold focus:text-sm"
+        >
+          Skip to main content
+        </a>
         <StorybookCursor />
         <SmoothScroll>
           <ScrollProgress />

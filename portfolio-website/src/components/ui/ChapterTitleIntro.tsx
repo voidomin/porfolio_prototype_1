@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
 
 const chapters = [
   { id: "home", title: "Chapter I", name: "Dawn Summit", subtitle: "Misty mountain peak at sunrise", icon: "🌅" },
@@ -18,11 +18,11 @@ export const ChapterTitleIntro = () => {
   const [show, setShow] = useState(false);
   const lastActiveId = useRef<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { scrollY } = useScroll();
 
   useEffect(() => {
-    const handleScrollSpy = () => {
-      // Find the element currently centered in the viewport
-      const viewportCenter = globalThis.scrollY + globalThis.innerHeight / 2;
+    const runScrollSpy = (currentScrollY: number) => {
+      const viewportCenter = currentScrollY + globalThis.innerHeight / 2;
 
       for (let i = chapters.length - 1; i >= 0; i--) {
         const item = chapters[i];
@@ -31,19 +31,13 @@ export const ChapterTitleIntro = () => {
           const top = el.offsetTop;
           const height = el.offsetHeight;
 
-          // If the element crosses the middle of the screen
           if (viewportCenter >= top && viewportCenter <= top + height) {
             if (lastActiveId.current !== item.id) {
               lastActiveId.current = item.id;
               setActiveChapter(item);
               setShow(true);
 
-              // Clear any existing auto-dismiss timer
-              if (timerRef.current) {
-                clearTimeout(timerRef.current);
-              }
-
-              // Set a fresh auto-dismiss timer after 2.8s
+              if (timerRef.current) clearTimeout(timerRef.current);
               timerRef.current = setTimeout(() => {
                 setShow(false);
                 timerRef.current = null;
@@ -55,16 +49,14 @@ export const ChapterTitleIntro = () => {
       }
     };
 
-    globalThis.addEventListener("scroll", handleScrollSpy, { passive: true });
-    handleScrollSpy(); // Run on initial render
+    runScrollSpy(scrollY.get());
+    const unsubscribe = scrollY.on("change", runScrollSpy);
 
     return () => {
-      globalThis.removeEventListener("scroll", handleScrollSpy);
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
+      unsubscribe();
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, []);
+  }, [scrollY]);
 
   return (
     <div className="fixed bottom-6 left-6 z-[80] pointer-events-none select-none max-w-[340px] hidden md:block">
