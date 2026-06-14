@@ -286,16 +286,27 @@ export const ContactSection = () => {
     setFormState({ status: "loading", message: "" });
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error ?? "Failed to send message.");
+      }
+
       setFormState({
         status: "success",
         message: "Thanks for reaching out. I will get back to you soon.",
       });
       setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch {
+    } catch (err) {
       setFormState({
         status: "error",
-        message: "Something went wrong. Please try again later.",
+        message: err instanceof Error ? err.message : "Something went wrong. Please try again later.",
       });
     }
   };
