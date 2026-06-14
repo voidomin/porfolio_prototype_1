@@ -339,108 +339,114 @@ function useHorizontalScroll(
 
   const animatedProgress = useRef(0);
   const targetProgress = useRef(0);
-  const rafId = useRef(0);
-  const lastReportedProgress = useRef(0);
+  // Mirror of scrollRange for use inside RAF without stale closure
+  const scrollRangeRef = useRef(0);
+
+  useEffect(() => {
+    scrollRangeRef.current = scrollRange;
+  }, [scrollRange]);
 
   // Recalculate pixel-based translation boundaries on mount/resize/filter
   useEffect(() => {
-    const handleRecalculate = () => {
+    const recalculate = () => {
       if (isDesktop && trackRef.current) {
-        const visibleWidth = window.innerWidth;
-        const range = trackRef.current.scrollWidth - visibleWidth;
-        const safeRange = Math.max(0, range);
-        setScrollRange(safeRange);
-        setContainerHeight(window.innerHeight + safeRange);
+        const range = Math.max(0, trackRef.current.scrollWidth - window.innerWidth);
+        setScrollRange(range);
+        scrollRangeRef.current = range;
+        setContainerHeight(window.innerHeight + range);
       }
     };
-
-    const timer = setTimeout(handleRecalculate, 150);
-    globalThis.addEventListener("resize", handleRecalculate);
+    const timer = setTimeout(recalculate, 100);
+    globalThis.addEventListener("resize", recalculate);
     return () => {
       clearTimeout(timer);
-      globalThis.removeEventListener("resize", handleRecalculate);
+      globalThis.removeEventListener("resize", recalculate);
     };
   }, [filteredProjects, isDesktop, trackRef]);
 
-  // Smooth scroll animation & pin-phase positioning
+  // Scroll listener — only updates target progress and pin position.
+  // Deliberately does NOT start/stop the RAF so the animation loop
+  // is never interrupted mid-flight by incoming scroll events.
   useEffect(() => {
     if (!isDesktop) {
-      setScrollProgress(0);
       animatedProgress.current = 0;
       targetProgress.current = 0;
       return;
     }
 
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-
-    const animate = () => {
-      animatedProgress.current = lerp(animatedProgress.current, targetProgress.current, 0.1);
-
-      if (Math.abs(animatedProgress.current - targetProgress.current) < 0.0005) {
-        animatedProgress.current = targetProgress.current;
-      }
-
-      const p = animatedProgress.current;
-
-      if (trackRef.current) {
-        trackRef.current.style.transform = `translateX(${-scrollRange * p}px)`;
-      }
-      if (bgRef.current) {
-        bgRef.current.style.transform = `translateX(${-scrollRange * 0.32 * p}px)`;
-      }
-
-      if (Math.abs(p - lastReportedProgress.current) > 0.02 || p === 0 || p === 1) {
-        lastReportedProgress.current = p;
-        setScrollProgress(p);
-      }
-
-      if (Math.abs(animatedProgress.current - targetProgress.current) > 0.0005) {
-        rafId.current = requestAnimationFrame(animate);
-      }
-    };
-
-    const applyPinPosition = (
-      el: HTMLElement,
-      phase: "before" | "active" | "after",
-    ) => {
-      if (phase === "active") {
-        el.style.position = "fixed";
-        el.style.top = "0px";
-      } else if (phase === "after") {
-        el.style.position = "absolute";
-        el.style.top = `${scrollRange}px`;
-      } else {
-        el.style.position = "absolute";
-        el.style.top = "0px";
-      }
-    };
-
     const updateScrollState = () => {
       if (!containerRef.current || !stickyRef.current) return;
 
       const rect = containerRef.current.getBoundingClientRect();
-      const scrollable = Math.max(1, rect.height - window.innerHeight);
-      targetProgress.current = Math.min(1, Math.max(0, -rect.top / scrollable));
+      const range = scrollRangeRef.current;
+      targetProgress.current = Math.min(1, Math.max(0, -rect.top / Math.max(1, range)));
 
-      let phase: "before" | "active" | "after" = "active";
-      if (rect.top >= 0) phase = "before";
-      else if (rect.bottom <= window.innerHeight) phase = "after";
-
-      applyPinPosition(stickyRef.current, phase);
-      cancelAnimationFrame(rafId.current);
-      rafId.current = requestAnimationFrame(animate);
+      if (rect.top >= 0) {
+        stickyRef.current.style.position = "absolute";
+        stickyRef.current.style.top = "0px";
+      } else if (rect.bottom <= window.innerHeight) {
+        stickyRef.current.style.position = "absolute";
+        stickyRef.current.style.top = `${range}px`;
+      } else {
+        stickyRef.current.style.position = "fixed";
+        stickyRef.current.style.top = "0px";
+      }
     };
 
     updateScrollState();
     globalThis.addEventListener("scroll", updateScrollState, { passive: true });
     globalThis.addEventListener("resize", updateScrollState);
-
     return () => {
-      cancelAnimationFrame(rafId.current);
       globalThis.removeEventListener("scroll", updateScrollState);
       globalThis.removeEventListener("resize", updateScrollState);
     };
-  }, [isDesktop, containerHeight, scrollRange, containerRef, trackRef, stickyRef, bgRef]);
+  }, [isDesktop, containerHeight, containerRef, stickyRef]);
+
+  // Continuous RAF animation loop — runs independently from the scroll listener.
+  // Promotes track to its own GPU compositor layer so translateX never triggers
+  // a repaint. React state is updated every 3 frames (~20 fps) to keep the
+  // progress bar smooth without re-rendering on every animation frame.
+  useEffect(() => {
+    if (!isDesktop) {
+      setScrollProgress(0);
+      return;
+    }
+
+    if (trackRef.current) trackRef.current.style.willChange = "transform";
+    if (bgRef.current) bgRef.current.style.willChange = "transform";
+
+    let rafId: number;
+    let frame = 0;
+
+    const loop = () => {
+      const diff = targetProgress.current - animatedProgress.current;
+      animatedProgress.current = Math.abs(diff) > 0.0003
+        ? animatedProgress.current + diff * 0.13
+        : targetProgress.current;
+
+      const p = animatedProgress.current;
+      const range = scrollRangeRef.current;
+
+      if (trackRef.current) trackRef.current.style.transform = `translateX(${-range * p}px)`;
+      if (bgRef.current) bgRef.current.style.transform = `translateX(${-range * 0.32 * p}px)`;
+
+      frame++;
+      if (frame % 3 === 0) {
+        setScrollProgress(p);
+        frame = 0;
+      }
+
+      rafId = requestAnimationFrame(loop);
+    };
+
+    rafId = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      if (trackRef.current) trackRef.current.style.willChange = "auto";
+      if (bgRef.current) bgRef.current.style.willChange = "auto";
+    };
+  }, [isDesktop, trackRef, bgRef]);
 
   return { scrollRange, containerHeight, scrollProgress };
 }
