@@ -412,8 +412,11 @@ function useHorizontalScroll(
       return;
     }
 
-    if (trackRef.current) trackRef.current.style.willChange = "transform";
-    if (bgRef.current) bgRef.current.style.willChange = "transform";
+    const track = trackRef.current;
+    const bg = bgRef.current;
+
+    if (track) track.style.willChange = "transform";
+    if (bg) bg.style.willChange = "transform";
 
     let rafId: number;
     let frame = 0;
@@ -427,8 +430,8 @@ function useHorizontalScroll(
       const p = animatedProgress.current;
       const range = scrollRangeRef.current;
 
-      if (trackRef.current) trackRef.current.style.transform = `translateX(${-range * p}px)`;
-      if (bgRef.current) bgRef.current.style.transform = `translateX(${-range * 0.32 * p}px)`;
+      if (track) track.style.transform = `translateX(${-range * p}px)`;
+      if (bg) bg.style.transform = `translateX(${-range * 0.32 * p}px)`;
 
       frame++;
       if (frame % 3 === 0) {
@@ -443,8 +446,8 @@ function useHorizontalScroll(
 
     return () => {
       cancelAnimationFrame(rafId);
-      if (trackRef.current) trackRef.current.style.willChange = "auto";
-      if (bgRef.current) bgRef.current.style.willChange = "auto";
+      if (track) track.style.willChange = "auto";
+      if (bg) bg.style.willChange = "auto";
     };
   }, [isDesktop, trackRef, bgRef]);
 
