@@ -170,6 +170,8 @@ interface FormTextareaProps {
   rows?: number;
 }
 
+const MAX_MESSAGE_CHARS = 1000;
+
 const FormTextarea = ({
   label,
   id,
@@ -182,13 +184,23 @@ const FormTextarea = ({
 }: FormTextareaProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const remaining = MAX_MESSAGE_CHARS - value.length;
+  const isNearLimit = remaining <= 100;
 
   return (
     <div className="relative group">
-      <label htmlFor={id} className="block text-sm font-medium text-white/75 mb-2 select-none">
-        {label} {required && "*"}
-      </label>
-      <div 
+      <div className="flex justify-between items-center mb-2">
+        <label htmlFor={id} className="block text-sm font-medium text-white/75 select-none">
+          {label} {required && "*"}
+        </label>
+        <span className={cn(
+          "text-xs font-mono tabular-nums transition-colors duration-300",
+          isNearLimit ? (remaining <= 0 ? "text-red-400" : "text-dawn-400") : "text-white/30"
+        )}>
+          {value.length}/{MAX_MESSAGE_CHARS}
+        </span>
+      </div>
+      <div
         className="relative rounded-xl overflow-hidden"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -201,6 +213,7 @@ const FormTextarea = ({
           onChange={onChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          maxLength={MAX_MESSAGE_CHARS}
           className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/25 focus:border-dawn-400/50 focus:bg-white/10 focus:outline-none resize-none transition-all relative z-10"
           placeholder={placeholder}
           required={required}

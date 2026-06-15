@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Compass, ArrowUp, Mail, Github, Linkedin } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,16 @@ interface FABAction {
 
 export const FloatingActionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const handler = () => {
+      setVisible(window.scrollY > window.innerHeight * 0.3);
+    };
+    window.addEventListener("scroll", handler, { passive: true });
+    handler();
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -75,8 +85,16 @@ export const FloatingActionButton = () => {
     },
   ];
 
+  if (!visible) return null;
+
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <motion.div
+      className="fixed bottom-6 right-6 z-50"
+      initial={{ opacity: 0, scale: 0.7, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.7, y: 20 }}
+      transition={{ type: "spring", stiffness: 400, damping: 28 }}
+    >
       <motion.div
         animate={isOpen ? "open" : "closed"}
         className="flex flex-col-reverse items-end gap-3"
@@ -162,6 +180,6 @@ export const FloatingActionButton = () => {
           />
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };

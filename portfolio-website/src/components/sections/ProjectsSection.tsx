@@ -7,6 +7,7 @@ import {
   AnimatePresence,
   useTransform,
   useMotionValue,
+  useMotionTemplate,
   useSpring,
 } from "framer-motion";
 import { ExternalLink, Github, Feather } from "lucide-react";
@@ -60,6 +61,11 @@ const ProjectCard = ({
     damping: 25,
     stiffness: 180,
   });
+
+  // Directional shadow shifts opposite to tilt to reinforce depth
+  const shadowX = useTransform(rotateY, [-12, 12], [10, -10]);
+  const shadowY = useTransform(rotateX, [-12, 12], [-10, 10]);
+  const boxShadow = useMotionTemplate`${shadowX}px ${shadowY}px 32px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.08)`;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
@@ -119,10 +125,11 @@ const ProjectCard = ({
             rotateX,
             rotateY,
             transformStyle: "preserve-3d",
+            boxShadow,
           }}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="group relative rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl border border-stone-200/40 bg-gradient-to-b from-[#efede6] to-[#ddd9cc] transition-shadow duration-500"
+          className="group relative rounded-3xl overflow-hidden border border-stone-200/40 bg-gradient-to-b from-[#efede6] to-[#ddd9cc]"
         >
           {/* Specular sheen reflection overlay */}
           <div
@@ -711,6 +718,9 @@ export const ProjectsSection = () => {
       }}
     >
       <div className="absolute inset-0 pointer-events-none z-0">
+        {/* Blend from meadow-green above into river-blue below */}
+        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[rgba(232,245,204,0.35)] to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[rgba(219,239,254,0.3)] to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgba(147,210,253,0.15),transparent_60%)]" />
       </div>
 

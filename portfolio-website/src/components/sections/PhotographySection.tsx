@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Camera,
@@ -17,6 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { galleryImages } from "@/data/portfolio";
 import { GalleryImage } from "@/types";
+import { cn } from "@/lib/utils";
 /* ──────────────────────────────────────────────────────────
    PhotographySection – "Chapter 6: Golden Hour"
    A highly elegant, premium photography portfolio.
@@ -24,6 +25,71 @@ import { GalleryImage } from "@/types";
    and a comprehensive EXIF camera metadata lightbox.
    No 3D tilt or card-clones - completely unique look and feel.
    ────────────────────────────────────────────────────────── */
+
+const GalleryPhotoCard = memo(function GalleryPhotoCard({
+  photo,
+  onOpen,
+  isDragging,
+}: {
+  photo: GalleryImage;
+  onOpen: (p: GalleryImage) => void;
+  isDragging: boolean;
+}) {
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <button
+      type="button"
+      className="group select-none shrink-0 text-left cursor-pointer"
+      onClick={() => { if (!isDragging) onOpen(photo); }}
+    >
+      <div className="bg-white p-4 pb-6 rounded-xl shadow-xl shadow-stone-900/5 border border-stone-100 hover:shadow-2xl hover:shadow-stone-900/10 transition-all duration-500">
+        <div
+          className="relative rounded-lg overflow-hidden bg-stone-100 h-[180px] sm:h-[240px] md:h-[280px]"
+          style={{ aspectRatio: photo.width && photo.height ? `${photo.width}/${photo.height}` : "3/2" }}
+        >
+          {/* Shimmer skeleton while image loads */}
+          {!loaded && (
+            <div className="absolute inset-0 pulse-shimmer rounded-lg z-10" />
+          )}
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            fill
+            sizes="(max-width: 640px) 180px, (max-width: 1024px) 240px, 280px"
+            quality={90}
+            className={cn(
+              "object-cover transition-all duration-700 ease-out group-hover:scale-105 pointer-events-none",
+              loaded ? "opacity-100" : "opacity-0"
+            )}
+            onLoad={() => setLoaded(true)}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-between p-4 z-20">
+            {photo.exif?.location && (
+              <span className="text-white text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 drop-shadow-sm">
+                <MapPin className="w-3.5 h-3.5 text-dawn-400" />
+                {photo.exif.location}
+              </span>
+            )}
+            <span className="p-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-stone-900 transition-all duration-300 shadow">
+              <Maximize2 className="w-3.5 h-3.5" />
+            </span>
+          </div>
+        </div>
+        <div className="mt-4 px-1 text-center max-w-full">
+          <h3 className="text-stone-800 font-semibold tracking-wide text-sm font-sans truncate">
+            {photo.title || "Untitled"}
+          </h3>
+          {photo.exif?.camera && (
+            <p className="text-stone-400/80 text-[10px] tracking-widest uppercase mt-1 truncate">
+              {photo.exif.camera}
+            </p>
+          )}
+        </div>
+      </div>
+    </button>
+  );
+});
 
 export const PhotographySection = () => {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -191,62 +257,13 @@ export const PhotographySection = () => {
             onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
             className="flex gap-8 cursor-grab active:cursor-grabbing w-max px-4"
           >
-            {homepagePhotos.map((photo, index) => (
-              <button
+            {homepagePhotos.map((photo) => (
+              <GalleryPhotoCard
                 key={photo.id}
-                type="button"
-                className="group select-none shrink-0 text-left cursor-pointer"
-                onClick={() => {
-                  if (!isDragging) {
-                    openLightbox(photo);
-                  }
-                }}
-              >
-                {/* Museum Matte Frame Border Style */}
-                <div className="bg-white p-4 pb-6 rounded-xl shadow-xl shadow-stone-900/5 border border-stone-100 hover:shadow-2xl hover:shadow-stone-900/10 transition-all duration-500">
-                  {/* Photo Canvas Frame */}
-                  <div 
-                    className="relative rounded-lg overflow-hidden bg-stone-100 h-[180px] sm:h-[240px] md:h-[280px]"
-                    style={{
-                      aspectRatio: photo.width && photo.height ? `${photo.width}/${photo.height}` : "3/2"
-                    }}
-                  >
-                    <Image
-                      src={photo.src}
-                      alt={photo.alt}
-                      fill
-                      sizes="(max-width: 640px) 180px, (max-width: 1024px) 240px, 280px"
-                      quality={90}
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
-                    />
-
-                    {/* Dark glass warm overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-between p-4">
-                      {photo.exif?.location && (
-                        <span className="text-white text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 drop-shadow-sm">
-                          <MapPin className="w-3.5 h-3.5 text-dawn-400" />
-                          {photo.exif.location}
-                        </span>
-                      )}
-                      <span className="p-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-stone-900 transition-all duration-300 shadow">
-                        <Maximize2 className="w-3.5 h-3.5" />
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Clean text strip below like an exhibition print */}
-                  <div className="mt-4 px-1 text-center max-w-full">
-                    <h3 className="text-stone-800 font-semibold tracking-wide text-sm font-sans truncate">
-                      {photo.title || "Untitled"}
-                    </h3>
-                    {photo.exif?.camera && (
-                      <p className="text-stone-400/80 text-[10px] tracking-widest uppercase mt-1 truncate">
-                        {photo.exif.camera}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </button>
+                photo={photo}
+                onOpen={openLightbox}
+                isDragging={isDragging}
+              />
             ))}
           </motion.div>
         </div>

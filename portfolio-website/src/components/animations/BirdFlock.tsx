@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 /* ──────────────────────────────────────────────────────────
    BirdFlock – animated SVG birds that fly across the
@@ -70,6 +70,7 @@ const BirdShape = ({ size, color, isMobile }: { size: number; color: string; isM
 );
 
 export const BirdFlock = () => {
+  const prefersReducedMotion = useReducedMotion();
   const [flocks, setFlocks] = useState<Flock[]>([]);
   const flockIdCounter = useRef(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -99,6 +100,8 @@ export const BirdFlock = () => {
       clearInterval(interval);
     };
   }, []);
+
+  if (prefersReducedMotion) return null;
 
   return (
     <div

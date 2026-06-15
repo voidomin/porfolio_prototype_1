@@ -81,19 +81,24 @@ export const HeroSection = () => {
           </h1>
         </div>
 
-        {/* Headline */}
-        <motion.h2
-          custom={1.2}
-          variants={fadeUpVariants}
-          initial="hidden"
-          animate="visible"
-          className="text-xl sm:text-2xl md:text-3xl font-medium text-forest-900 mb-6"
-          style={{
-            textShadow: "0 1px 10px rgba(255,255,255,0.4)",
-          }}
+        {/* Headline — word-by-word stagger */}
+        <h2
+          className="text-xl sm:text-2xl md:text-3xl font-medium text-forest-900 mb-6 flex flex-wrap justify-center gap-x-[0.3em]"
+          style={{ textShadow: "0 1px 10px rgba(255,255,255,0.4)" }}
         >
-          {personalProfile.headline}
-        </motion.h2>
+          {personalProfile.headline.split(" ").map((word, i) => (
+            <motion.span
+              key={i}
+              custom={1.0 + i * 0.1}
+              variants={fadeUpVariants}
+              initial="hidden"
+              animate="visible"
+              className="inline-block"
+            >
+              {word}
+            </motion.span>
+          ))}
+        </h2>
 
         {/* Intro */}
         <motion.p

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { navigationItems, personalProfile } from "@/data/portfolio";
@@ -60,10 +60,11 @@ interface NavLinkProps {
   href: string;
   label: string;
   hasScrolled: boolean;
+  isActive: boolean;
   onClick: (href: string) => void;
 }
 
-const NavLink = ({ href, label, hasScrolled, onClick }: NavLinkProps) => {
+const NavLink = ({ href, label, hasScrolled, isActive, onClick }: NavLinkProps) => {
   return (
     <motion.a
       href={href}
@@ -74,11 +75,21 @@ const NavLink = ({ href, label, hasScrolled, onClick }: NavLinkProps) => {
       className={cn(
         "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
         hasScrolled
-          ? "text-white/70 hover:text-white hover:bg-white/10"
-          : "text-forest-950/80 hover:text-forest-950 hover:bg-forest-950/10"
+          ? isActive ? "text-white bg-white/10" : "text-white/70 hover:text-white hover:bg-white/10"
+          : isActive ? "text-forest-950 bg-forest-950/10" : "text-forest-950/80 hover:text-forest-950 hover:bg-forest-950/10"
       )}
     >
       {label}
+      {isActive && (
+        <motion.span
+          layoutId="nav-active-dot"
+          className={cn(
+            "absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full",
+            hasScrolled ? "bg-forest-400" : "bg-forest-700"
+          )}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        />
+      )}
     </motion.a>
   );
 };
@@ -207,7 +218,28 @@ const getSoundButtonStyles = (hasScrolled: boolean, soundEnabled: boolean): Butt
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [activeSection, setActiveSection] = useState("#home");
   const { scrollDirection, scrollY } = useScrollDirection();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(`#${entry.target.id}`);
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+    );
+
+    navigationItems.forEach((item) => {
+      const el = document.querySelector(item.href);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const shouldHideNav = scrollDirection === "down" && scrollY > 100;
   const hasScrolled = scrollY > 50;
@@ -287,6 +319,7 @@ export const Navbar = () => {
                     href={item.href}
                     label={item.label}
                     hasScrolled={hasScrolled}
+                    isActive={activeSection === item.href}
                     onClick={handleLinkClick}
                   />
                 </motion.div>

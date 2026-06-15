@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 /* ──────────────────────────────────────────────────────────
    FloatingLeaves – CSS-driven leaf particles that drift
@@ -78,6 +78,7 @@ const LeafSVG = ({ size, color }: { size: number; color: string }) => (
 );
 
 export const FloatingLeaves = () => {
+  const prefersReducedMotion = useReducedMotion();
   const [leaves, setLeaves] = useState<Leaf[]>([]);
   const [mounted, setMounted] = useState(false);
 
@@ -87,7 +88,7 @@ export const FloatingLeaves = () => {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  if (prefersReducedMotion || !mounted) return null;
 
   return (
     <div
