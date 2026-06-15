@@ -332,19 +332,27 @@ function useHorizontalScroll(
   trackRef: React.RefObject<HTMLDivElement | null>,
   stickyRef: React.RefObject<HTMLDivElement | null>,
   bgRef: React.RefObject<HTMLDivElement | null>,
+  progressBarRef: React.RefObject<HTMLDivElement | null>,
+  progressTextRef: React.RefObject<HTMLSpanElement | null>,
 ) {
   const [scrollRange, setScrollRange] = useState(0);
   const [containerHeight, setContainerHeight] = useState<number | null>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  // currentIndex drives arrow button visibility — updated at ~5fps so it
+  // never triggers re-renders on every animation frame.
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const animatedProgress = useRef(0);
   const targetProgress = useRef(0);
-  // Mirror of scrollRange for use inside RAF without stale closure
   const scrollRangeRef = useRef(0);
+  const filteredCountRef = useRef(filteredProjects.length);
 
   useEffect(() => {
     scrollRangeRef.current = scrollRange;
   }, [scrollRange]);
+
+  useEffect(() => {
+    filteredCountRef.current = filteredProjects.length;
+  }, [filteredProjects]);
 
   // Recalculate pixel-based translation boundaries on mount/resize/filter
   useEffect(() => {
@@ -364,9 +372,7 @@ function useHorizontalScroll(
     };
   }, [filteredProjects, isDesktop, trackRef]);
 
-  // Scroll listener — only updates target progress and pin position.
-  // Deliberately does NOT start/stop the RAF so the animation loop
-  // is never interrupted mid-flight by incoming scroll events.
+  // Scroll listener — only writes to refs, zero React state changes.
   useEffect(() => {
     if (!isDesktop) {
       animatedProgress.current = 0;
@@ -402,15 +408,12 @@ function useHorizontalScroll(
     };
   }, [isDesktop, containerHeight, containerRef, stickyRef]);
 
-  // Continuous RAF animation loop — runs independently from the scroll listener.
-  // Promotes track to its own GPU compositor layer so translateX never triggers
-  // a repaint. React state is updated every 3 frames (~20 fps) to keep the
-  // progress bar smooth without re-rendering on every animation frame.
+  // Continuous RAF loop. All progress UI is updated via direct DOM refs so
+  // zero React re-renders happen during animation. currentIndex (arrow buttons)
+  // updates via React state but only every 12 frames (~5fps) — far below the
+  // threshold where card re-renders would be noticeable.
   useEffect(() => {
-    if (!isDesktop) {
-      setScrollProgress(0);
-      return;
-    }
+    if (!isDesktop) return;
 
     const track = trackRef.current;
     const bg = bgRef.current;
@@ -423,20 +426,30 @@ function useHorizontalScroll(
 
     const loop = () => {
       const diff = targetProgress.current - animatedProgress.current;
-      animatedProgress.current = Math.abs(diff) > 0.0003
-        ? animatedProgress.current + diff * 0.13
+      animatedProgress.current = Math.abs(diff) > 0.0002
+        ? animatedProgress.current + diff * 0.2
         : targetProgress.current;
 
       const p = animatedProgress.current;
       const range = scrollRangeRef.current;
 
-      if (track) track.style.transform = `translateX(${-range * p}px)`;
-      if (bg) bg.style.transform = `translateX(${-range * 0.32 * p}px)`;
+      // GPU-composited transform — no layout, no paint
+      if (track) track.style.transform = `translate3d(${-range * p}px, 0, 0)`;
+      if (bg)    bg.style.transform    = `translate3d(${-range * 0.32 * p}px, 0, 0)`;
 
+      // Direct DOM updates — zero React re-renders
+      if (progressBarRef.current)
+        progressBarRef.current.style.width = `${p * 100}%`;
+      if (progressTextRef.current)
+        progressTextRef.current.textContent = `${Math.round(p * 100)}% Crossed`;
+
+      // React state update at ~5fps only — drives arrow button visibility
       frame++;
-      if (frame % 3 === 0) {
-        setScrollProgress(p);
+      if (frame >= 12) {
         frame = 0;
+        const count = filteredCountRef.current;
+        const idx = Math.max(0, Math.min(count - 1, Math.round(p * (count - 1 || 1))));
+        setCurrentIndex(idx);
       }
 
       rafId = requestAnimationFrame(loop);
@@ -447,11 +460,11 @@ function useHorizontalScroll(
     return () => {
       cancelAnimationFrame(rafId);
       if (track) track.style.willChange = "auto";
-      if (bg) bg.style.willChange = "auto";
+      if (bg)    bg.style.willChange    = "auto";
     };
-  }, [isDesktop, trackRef, bgRef]);
+  }, [isDesktop, trackRef, bgRef, progressBarRef, progressTextRef]);
 
-  return { scrollRange, containerHeight, scrollProgress };
+  return { scrollRange, containerHeight, currentIndex };
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -463,21 +476,22 @@ interface DesktopLayoutProps {
   readonly stickyRef: React.Ref<HTMLDivElement>;
   readonly bgRef: React.Ref<HTMLDivElement>;
   readonly trackRef: React.Ref<HTMLDivElement>;
+  readonly progressBarRef: React.Ref<HTMLDivElement>;
+  readonly progressTextRef: React.Ref<HTMLSpanElement>;
   readonly activeCategory: ProjectCategory | "all";
   readonly filteredProjects: Project[];
-  readonly scrollProgress: number;
+  readonly currentIndex: number;
   readonly canScrollLeft: boolean;
   readonly canScrollRight: boolean;
   readonly handleCategoryChange: (cat: ProjectCategory | "all") => void;
   readonly scrollToProject: (index: number) => void;
-  readonly currentIndex: number;
 }
 
 function DesktopLayout({
-  stickyRef, bgRef, trackRef,
-  activeCategory, filteredProjects, scrollProgress,
+  stickyRef, bgRef, trackRef, progressBarRef, progressTextRef,
+  activeCategory, filteredProjects, currentIndex,
   canScrollLeft, canScrollRight,
-  handleCategoryChange, scrollToProject, currentIndex,
+  handleCategoryChange, scrollToProject,
 }: DesktopLayoutProps) {
   return (
     <div
@@ -571,10 +585,9 @@ function DesktopLayout({
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-12 md:px-24 mt-6 flex flex-col gap-4 select-none shrink-0">
         <div className="w-full h-1 bg-stone-200/50 rounded-full relative">
-          <div className="absolute top-0 bottom-0 left-0 bg-forest-600 transition-all duration-350 ease-out rounded-full" style={{ width: `${scrollProgress * 100}%` }} />
+          <div ref={progressBarRef} className="absolute top-0 bottom-0 left-0 bg-forest-600 rounded-full" style={{ width: "0%" }} />
           {filteredProjects.map((proj, idx) => {
-            const fraction = idx / (filteredProjects.length - 1 || 1);
-            const isActive = scrollProgress >= fraction - 0.05;
+            const isActive = idx <= currentIndex;
             return (
               <button
                 key={proj.id}
@@ -583,7 +596,7 @@ function DesktopLayout({
                   "absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-2 transition-all duration-500 cursor-pointer shadow-sm hover:scale-125",
                   isActive ? "bg-forest-600 border-forest-600 scale-110" : "bg-white border-stone-300 hover:border-forest-400"
                 )}
-                style={{ left: `${fraction * 100}%`, transform: `translate(-50%, -50%)` }}
+                style={{ left: `${(idx / (filteredProjects.length - 1 || 1)) * 100}%`, transform: `translate(-50%, -50%)` }}
                 aria-label={`Go to project ${idx + 1}`}
               />
             );
@@ -596,7 +609,7 @@ function DesktopLayout({
           </div>
           <div className="flex gap-6 font-mono font-medium">
             <span>{filteredProjects.length} Stones</span>
-            <span>{Math.round(scrollProgress * 100)}% Crossed</span>
+            <span ref={progressTextRef}>0% Crossed</span>
           </div>
         </div>
       </div>
@@ -670,14 +683,13 @@ export const ProjectsSection = () => {
   const stickyRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
 
-  const { scrollRange, containerHeight, scrollProgress } = useHorizontalScroll(
-    isDesktop, filteredProjects, containerRef, trackRef, stickyRef, bgRef,
-  );
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const progressTextRef = useRef<HTMLSpanElement>(null);
 
-  const currentIndex = Math.max(0, Math.min(
-    filteredProjects.length - 1,
-    Math.round(scrollProgress * (filteredProjects.length - 1 || 1)),
-  ));
+  const { scrollRange, containerHeight, currentIndex } = useHorizontalScroll(
+    isDesktop, filteredProjects, containerRef, trackRef, stickyRef, bgRef,
+    progressBarRef, progressTextRef,
+  );
 
   const scrollToProject = (index: number) => {
     if (!containerRef.current) return;
@@ -705,13 +717,13 @@ export const ProjectsSection = () => {
       {isDesktop ? (
         <DesktopLayout
           stickyRef={stickyRef} bgRef={bgRef} trackRef={trackRef}
+          progressBarRef={progressBarRef} progressTextRef={progressTextRef}
           activeCategory={activeCategory} filteredProjects={filteredProjects}
-          scrollProgress={scrollProgress}
+          currentIndex={currentIndex}
           canScrollLeft={currentIndex > 0}
           canScrollRight={currentIndex < filteredProjects.length - 1}
           handleCategoryChange={handleCategoryChange}
           scrollToProject={scrollToProject}
-          currentIndex={currentIndex}
         />
       ) : (
         <MobileLayout activeCategory={activeCategory} filteredProjects={filteredProjects} handleCategoryChange={handleCategoryChange} />
