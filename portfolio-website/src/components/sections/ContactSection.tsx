@@ -148,7 +148,7 @@ const FormInput = ({
           onChange={onChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/25 focus:border-dawn-400/50 focus:bg-white/10 focus:outline-none transition-all relative z-10"
+          className="w-full px-4 py-3 bg-white/8 border border-white/15 rounded-xl text-white placeholder:text-white/40 focus:border-dawn-400/50 focus:bg-white/12 focus:outline-none transition-all relative z-10"
           placeholder={placeholder}
           required={required}
         />
@@ -298,11 +298,12 @@ export const ContactSection = () => {
         throw new Error(data.error ?? "Failed to send message.");
       }
 
+      setFormData({ name: "", email: "", subject: "", message: "" });
       setFormState({
         status: "success",
         message: "Thanks for reaching out. I will get back to you soon.",
       });
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setTimeout(() => setFormState({ status: "idle", message: "" }), 3000);
     } catch (err) {
       setFormState({
         status: "error",

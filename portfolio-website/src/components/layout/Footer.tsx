@@ -118,11 +118,12 @@ export const Footer = () => {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-night-300 hover:bg-night-500/30 hover:text-white hover:border-night-400/30 transition-all duration-300"
+                  aria-label={link.platform}
+                  className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-night-300 hover:bg-night-500/30 hover:text-white hover:border-night-400/30 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-night-400"
                   whileHover={{ scale: 1.15, y: -3 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <IconComponent className="w-4 h-4" />
+                  <IconComponent className="w-5 h-5" />
                 </motion.a>
               );
             })}
