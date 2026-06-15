@@ -83,7 +83,7 @@ export const HeroSection = () => {
 
         {/* Headline — word-by-word stagger */}
         <h2
-          className="text-xl sm:text-2xl md:text-3xl font-medium text-forest-900 mb-6 flex flex-wrap justify-center gap-x-[0.3em]"
+          className="text-xl sm:text-2xl md:text-3xl font-medium text-forest-900 mb-6"
           style={{ textShadow: "0 1px 10px rgba(255,255,255,0.4)" }}
         >
           {personalProfile.headline.split(" ").map((word, i) => (
@@ -93,7 +93,7 @@ export const HeroSection = () => {
               variants={fadeUpVariants}
               initial="hidden"
               animate="visible"
-              className="inline-block"
+              className="inline-block mr-[0.3em] last:mr-0"
             >
               {word}
             </motion.span>

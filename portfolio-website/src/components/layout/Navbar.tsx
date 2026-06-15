@@ -219,7 +219,7 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [activeSection, setActiveSection] = useState("#home");
-  const { scrollDirection, scrollY } = useScrollDirection();
+  const { scrollY } = useScrollDirection();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -241,7 +241,6 @@ export const Navbar = () => {
     return () => observer.disconnect();
   }, []);
 
-  const shouldHideNav = scrollDirection === "down" && scrollY > 100;
   const hasScrolled = scrollY > 50;
 
   const {
@@ -272,11 +271,6 @@ export const Navbar = () => {
   return (
     <>
       <motion.nav
-        animate={{
-          y: shouldHideNav ? -100 : 0,
-          opacity: shouldHideNav ? 0.8 : 1,
-        }}
-        transition={{ duration: 0.3 }}
         className={cn(
           "fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-500",
           hasScrolled
