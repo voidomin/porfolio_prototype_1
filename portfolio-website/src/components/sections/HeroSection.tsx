@@ -145,7 +145,7 @@ export const HeroSection = () => {
           animate="visible"
           className="flex flex-wrap gap-3 justify-center mt-10"
         >
-          {["Dawn trails", "Mountain calm", "Soft motion", "Data + craft"].map(
+          {(personalProfile.tags ?? ["Data + Craft", "Full-Stack", "Mountain calm", "Dawn trails"]).map(
             (label) => (
               <span
                 key={label}

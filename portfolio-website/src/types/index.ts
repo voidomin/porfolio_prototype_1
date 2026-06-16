@@ -97,6 +97,8 @@ export interface PersonalProfile {
   intro: string;
   about: string;
   aboutExtended: string;
+  avatar?: string;
+  tags?: string[];
 }
 
 export interface ExperienceItem {

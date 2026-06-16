@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Briefcase, Compass, Tent, Flame, TreePine } from "lucide-react";
 import {
@@ -75,10 +76,20 @@ export const AboutSection = () => {
             {/* Monogram with organic frame */}
             <div className="relative mb-6">
               <div className="w-40 h-40 rounded-full bg-gradient-to-br from-forest-400/30 to-forest-700/40 p-1 shadow-2xl shadow-forest-900/50">
-                <div className="w-full h-full rounded-full bg-forest-900/80 backdrop-blur-sm flex items-center justify-center border border-forest-500/20">
-                  <span className="text-5xl font-bold text-forest-200 tracking-tight">
-                    A
-                  </span>
+                <div className="w-full h-full rounded-full bg-forest-900/80 backdrop-blur-sm flex items-center justify-center border border-forest-500/20 overflow-hidden">
+                  {personalProfile.avatar ? (
+                    <Image
+                      src={personalProfile.avatar}
+                      alt={personalProfile.name}
+                      width={160}
+                      height={160}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-5xl font-bold text-forest-200 tracking-tight">
+                      {personalProfile.name.charAt(0)}
+                    </span>
+                  )}
                 </div>
               </div>
               {/* Organic leaf accent */}
