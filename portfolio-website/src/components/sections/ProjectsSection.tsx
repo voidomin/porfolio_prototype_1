@@ -611,7 +611,7 @@ function DesktopLayout({
         </div>
         <div className="flex justify-between items-center text-xs text-stone-450 mt-1">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-stone-500">Scroll down to step across the river</span>
+            <span className="font-semibold text-stone-500">Scroll down to step across the river.</span>
             <span className="animate-bounce">→</span>
           </div>
           <div className="flex gap-6 font-mono font-medium">
