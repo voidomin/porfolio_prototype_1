@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useScroll } from "framer-motion";
+import { useScrollContext } from "@/contexts/ScrollContext";
 
 interface UseIntersectionObserverProps {
   threshold?: number;
@@ -50,29 +50,38 @@ export const useIntersectionObserver = ({
 
 
 export const useScrollDirection = () => {
-  const { scrollY } = useScroll();
-  const [scrollDirection, setScrollDirection] = useState<"up" | "down">("down");
+  const { scrollY } = useScrollContext();
+  // Only re-render when crossing the threshold Navbar actually cares about
   const [scrollYValue, setScrollYValue] = useState(0);
-  const lastScrollY = useRef(0);
+  const prevHasScrolled = useRef(false);
 
   useEffect(() => {
     return scrollY.on("change", (current) => {
-      if (current > lastScrollY.current) setScrollDirection("down");
-      else if (current < lastScrollY.current) setScrollDirection("up");
-      setScrollYValue(current);
-      lastScrollY.current = current;
+      const hasScrolled = current > 50;
+      if (hasScrolled !== prevHasScrolled.current) {
+        prevHasScrolled.current = hasScrolled;
+        setScrollYValue(current);
+      }
     });
   }, [scrollY]);
 
-  return { scrollDirection, scrollY: scrollYValue };
+  return { scrollY: scrollYValue };
 };
 
 export const useScrollProgress = () => {
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = useScrollContext();
   const [progress, setProgress] = useState(0);
+  const prevProgress = useRef(0);
 
   useEffect(() => {
-    return scrollYProgress.on("change", (v) => setProgress(v * 100));
+    return scrollYProgress.on("change", (v) => {
+      const next = v * 100;
+      // Throttle to 0.5% increments — still smooth for the HUD, avoids 60fps re-renders
+      if (Math.abs(next - prevProgress.current) >= 0.5) {
+        prevProgress.current = next;
+        setProgress(next);
+      }
+    });
   }, [scrollYProgress]);
 
   return progress;

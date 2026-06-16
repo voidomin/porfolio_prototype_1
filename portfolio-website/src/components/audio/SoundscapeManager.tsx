@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { useScroll } from "framer-motion";
+import { useEffect, useRef, useCallback } from "react";
+import { useScrollContext } from "@/contexts/ScrollContext";
 
 /* ──────────────────────────────────────────────────────────
    SoundscapeManager – Procedural Nature Audio Synthesizer.
@@ -14,8 +14,7 @@ import { useScroll } from "framer-motion";
    ────────────────────────────────────────────────────────── */
 
 export const SoundscapeManager = () => {
-  const { scrollYProgress } = useScroll();
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const { scrollYProgress } = useScrollContext();
   const isPlayingRef = useRef(false);
 
   // Audio Context and Node References
@@ -33,48 +32,30 @@ export const SoundscapeManager = () => {
   // Active timers for insect/fire scheduling loops
   const schedulerTimersRef = useRef<number[]>([]);
 
-  // Track scroll changes for dynamic crossfades
+  // Adjust volume levels dynamically based on scroll — direct listener, no state re-renders
   useEffect(() => {
-    return scrollYProgress.on("change", (v) => setScrollProgress(v));
+    return scrollYProgress.on("change", (v) => {
+      if (!isPlayingRef.current) return;
+
+      const now = audioCtxRef.current?.currentTime || 0;
+
+      let targetWind = 0.25;
+      if (v > 0.4) targetWind = 0.15;
+      if (v > 0.75) targetWind = 0.05;
+
+      let targetCrickets = 0.0;
+      if (v >= 0.35) targetCrickets = Math.min(0.20, (v - 0.35) * 0.5);
+      if (v >= 0.7) targetCrickets = 0.22;
+
+      let targetFire = 0.0;
+      if (v >= 0.7) targetFire = Math.min(0.35, (v - 0.7) * 1.5);
+      if (v > 0.95) targetFire = 0.1;
+
+      windGainRef.current?.gain.linearRampToValueAtTime(targetWind, now + 0.5);
+      cricketGainRef.current?.gain.linearRampToValueAtTime(targetCrickets, now + 0.5);
+      fireGainRef.current?.gain.linearRampToValueAtTime(targetFire, now + 0.5);
+    });
   }, [scrollYProgress]);
-
-  // Adjust volume levels dynamically based on scroll chapters
-  useEffect(() => {
-    if (!isPlayingRef.current) return;
-
-    // Fade durations and target calculations
-    const now = audioCtxRef.current?.currentTime || 0;
-    
-    // 1. Wind (Lush Dawn & Forest: peak at top 0.0 - 0.5, soft in meadow, fades at night)
-    let targetWind = 0.25;
-    if (scrollProgress > 0.4) targetWind = 0.15;
-    if (scrollProgress > 0.75) targetWind = 0.05; // Quiet summit breeze at night
-    
-    // 2. Crickets (Meadow to Campfire: starts at 0.35, peaks around 0.6 - 1.0)
-    let targetCrickets = 0.0;
-    if (scrollProgress >= 0.35) {
-      // Linear ramp up
-      targetCrickets = Math.min(0.20, (scrollProgress - 0.35) * 0.5);
-    }
-    if (scrollProgress >= 0.7) {
-      targetCrickets = 0.22; // Night insect chorus
-    }
-
-    // 3. Campfire Crackles (Peaks in Chapter 7 campfire contact section: 0.75 - 0.95)
-    let targetFire = 0.0;
-    if (scrollProgress >= 0.7) {
-      // Rapid volume build as we descend into campfire dusk circle
-      targetFire = Math.min(0.35, (scrollProgress - 0.7) * 1.5);
-    }
-    if (scrollProgress > 0.95) {
-      targetFire = 0.1; // Softer embers during late night footer
-    }
-
-    // Smooth linear crossfade ramps to avoid sudden volume clicks
-    windGainRef.current?.gain.linearRampToValueAtTime(targetWind, now + 0.5);
-    cricketGainRef.current?.gain.linearRampToValueAtTime(targetCrickets, now + 0.5);
-    fireGainRef.current?.gain.linearRampToValueAtTime(targetFire, now + 0.5);
-  }, [scrollProgress]);
 
   // Direct cleanup of sound synthesis nodes and timers
   const cleanupSoundscape = useCallback(() => {

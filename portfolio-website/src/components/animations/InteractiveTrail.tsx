@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useScroll } from "framer-motion";
+import { useScrollContext } from "@/contexts/ScrollContext";
 
 /* ──────────────────────────────────────────────────────────
    InteractiveTrail – A low-overhead full-screen canvas trail.
@@ -27,30 +27,32 @@ interface Particle {
 
 export const InteractiveTrail = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { scrollYProgress } = useScroll();
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const { scrollYProgress } = useScrollContext();
+  // Use a ref — not state — so scroll changes never restart the RAF loop
+  const scrollProgressRef = useRef(0);
   const mousePos = useRef({ x: 0, y: 0, lastX: 0, lastY: 0, active: false });
   const particles = useRef<Particle[]>([]);
   const lastGustTime = useRef(0);
   const lastTouchTime = useRef(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(true); // default true = SSR safe
 
-  // Detect mobile viewport on mount and resize
+  // Detect mobile on mount
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(globalThis.innerWidth < 768);
-    };
-    checkMobile();
-    globalThis.addEventListener("resize", checkMobile);
-    return () => globalThis.removeEventListener("resize", checkMobile);
+    const check = () => setIsMobile(globalThis.innerWidth < 768);
+    check();
+    globalThis.addEventListener("resize", check);
+    return () => globalThis.removeEventListener("resize", check);
   }, []);
 
-  // Update current scroll progress state for particle spawning
+  // Keep the ref current without triggering re-renders
   useEffect(() => {
-    return scrollYProgress.on("change", (v) => setScrollProgress(v));
+    return scrollYProgress.on("change", (v) => { scrollProgressRef.current = v; });
   }, [scrollYProgress]);
 
   useEffect(() => {
+    // Canvas trail is desktop-only; mobile scroll is already jank-prone
+    if (isMobile) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -59,7 +61,8 @@ export const InteractiveTrail = () => {
 
     // Setup high-DPI canvas resolution
     const resizeCanvas = () => {
-      const dpr = globalThis.devicePixelRatio || 1;
+      // Cap DPR at 1.5 — full native DPR on 4K (DPR=2) wastes ~130MB for imperceptible canvas quality gain
+      const dpr = Math.min(globalThis.devicePixelRatio || 1, 1.5);
       canvas.width = globalThis.innerWidth * dpr;
       canvas.height = globalThis.innerHeight * dpr;
       canvas.style.width = `${globalThis.innerWidth}px`;
@@ -75,10 +78,10 @@ export const InteractiveTrail = () => {
       let type: "leaf" | "pollen" | "ember" = "leaf";
       let color = "rgba(120, 180, 80, 0.7)"; // Leaf green
 
-      if (scrollProgress >= 0.35 && scrollProgress < 0.7) {
+      if (scrollProgressRef.current >= 0.35 && scrollProgressRef.current < 0.7) {
         type = "pollen";
         color = "rgba(250, 195, 50, 0.85)"; // Pollen gold/amber shimmer
-      } else if (scrollProgress >= 0.7) {
+      } else if (scrollProgressRef.current >= 0.7) {
         type = "ember";
         color = "rgba(255, 95, 30, 0.95)"; // Fast, hot campfire orange
       }
@@ -120,10 +123,10 @@ export const InteractiveTrail = () => {
         let type: "leaf" | "pollen" | "ember" = "leaf";
         let color = "rgba(120, 180, 80, 0.7)";
 
-        if (scrollProgress >= 0.35 && scrollProgress < 0.7) {
+        if (scrollProgressRef.current >= 0.35 && scrollProgressRef.current < 0.7) {
           type = "pollen";
           color = "rgba(250, 195, 50, 0.85)";
-        } else if (scrollProgress >= 0.7) {
+        } else if (scrollProgressRef.current >= 0.7) {
           type = "ember";
           color = "rgba(255, 95, 30, 0.95)";
         }
@@ -257,10 +260,10 @@ export const InteractiveTrail = () => {
         let type: "leaf" | "pollen" | "ember" = "leaf";
         let color = "rgba(120, 180, 80, 0.7)"; // Leaf green
 
-        if (scrollProgress >= 0.35 && scrollProgress < 0.7) {
+        if (scrollProgressRef.current >= 0.35 && scrollProgressRef.current < 0.7) {
           type = "pollen";
           color = "rgba(250, 195, 50, 0.85)";
-        } else if (scrollProgress >= 0.7) {
+        } else if (scrollProgressRef.current >= 0.7) {
           type = "ember";
           color = "rgba(255, 95, 30, 0.95)";
         }
@@ -315,6 +318,11 @@ export const InteractiveTrail = () => {
     let time = 0;
 
     const drawParticles = () => {
+      animationId = requestAnimationFrame(drawParticles);
+
+      // Nothing to draw — skip all canvas work to avoid 60fps clearRect overhead
+      if (particles.current.length === 0) return;
+
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       time += 1;
 
@@ -364,20 +372,14 @@ export const InteractiveTrail = () => {
           ctx.globalAlpha = shimmer;
           ctx.rotate(p.rotation);
 
-          // Draw 4-point light spark glint
+          // 4-point star with solid fill (avoids per-frame createRadialGradient cost)
           ctx.beginPath();
           ctx.moveTo(0, -p.size);
           ctx.quadraticCurveTo(0, 0, p.size, 0);
           ctx.quadraticCurveTo(0, 0, 0, p.size);
           ctx.quadraticCurveTo(0, 0, -p.size, 0);
           ctx.quadraticCurveTo(0, 0, 0, -p.size);
-
-          // Outer dapple radial glow
-          const radial = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size * 1.5);
-          radial.addColorStop(0, "#ffffff");
-          radial.addColorStop(0.3, p.color);
-          radial.addColorStop(1, "rgba(250, 195, 50, 0)");
-          ctx.fillStyle = radial;
+          ctx.fillStyle = p.color;
           ctx.fill();
         } else if (p.type === "ember") {
           // Campfire embers are hot velocity-blurred lines, flickering as they burn
@@ -403,8 +405,6 @@ export const InteractiveTrail = () => {
 
         ctx.restore();
       }
-
-      animationId = requestAnimationFrame(drawParticles);
     };
 
     drawParticles();
@@ -422,7 +422,7 @@ export const InteractiveTrail = () => {
       );
       cancelAnimationFrame(animationId);
     };
-  }, [scrollProgress, isMobile]);
+  }, [isMobile]);
 
   return (
     <canvas

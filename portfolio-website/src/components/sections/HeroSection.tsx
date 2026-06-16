@@ -41,7 +41,7 @@ export const HeroSection = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-0"
     >
       {/* Dawn glow overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-dawn-200/20 via-transparent to-transparent pointer-events-none z-[1]" />

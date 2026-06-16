@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Camera,
@@ -35,17 +35,19 @@ export const PhotographySection = () => {
   const carouselTrackRef = useRef<HTMLDivElement>(null);
   const [dragConstraintsLeft, setDragConstraintsLeft] = useState(0);
 
-  // Filter photos based on active category
-  const filteredPhotos = galleryImages.filter((photo) => {
-    if (activeCategory === "all") return true;
-    return photo.category.toLowerCase() === activeCategory.toLowerCase();
-  });
+  // Memoized — only recomputes when the active category filter changes
+  const filteredPhotos = useMemo(
+    () => galleryImages.filter((photo) => {
+      if (activeCategory === "all") return true;
+      return photo.category.toLowerCase() === activeCategory.toLowerCase();
+    }),
+    [activeCategory]
+  );
 
-  // Slice for home page exhibition (featured first, max 6)
-  const featuredFilteredPhotos = filteredPhotos.filter((p) => p.featured);
-  const homepagePhotos = featuredFilteredPhotos.length > 0 
-    ? featuredFilteredPhotos.slice(0, 6) 
-    : filteredPhotos.slice(0, 6);
+  const homepagePhotos = useMemo(() => {
+    const featured = filteredPhotos.filter((p) => p.featured);
+    return featured.length > 0 ? featured.slice(0, 6) : filteredPhotos.slice(0, 6);
+  }, [filteredPhotos]);
 
   // Supported categories matching the upload form
   const categories = [

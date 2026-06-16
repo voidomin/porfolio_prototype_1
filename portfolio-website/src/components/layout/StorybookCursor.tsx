@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
   useSpring,
-  useScroll,
   useTransform,
   useReducedMotion,
 } from "framer-motion";
+import { useScrollContext } from "@/contexts/ScrollContext";
 
 /* ──────────────────────────────────────────────────────────
    StorybookCursor – Premium Concentric Lagrangian Cursor
@@ -29,6 +29,11 @@ export const StorybookCursor = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(true);
 
+  // Refs to track previous values — prevents setState on every pointermove
+  const prevHovering = useRef(false);
+  const prevTextInput = useRef(false);
+  const prevVisible = useRef(false);
+
   // Raw coordinate motion values
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
@@ -41,7 +46,7 @@ export const StorybookCursor = () => {
   const ringSpringX = useSpring(x, { stiffness: 120, damping: 20, mass: 0.45 });
   const ringSpringY = useSpring(y, { stiffness: 120, damping: 20, mass: 0.45 });
 
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = useScrollContext();
 
   // Dynamic color system mapping to storytelling chapters:
   // Dawn gold ➡️ Forest path green ➡️ Meadow yellow-green ➡️ Dusk rose ➡️ Night silver
@@ -75,23 +80,36 @@ export const StorybookCursor = () => {
     const handleMove = (event: PointerEvent) => {
       x.set(event.clientX);
       y.set(event.clientY);
-      setIsVisible(true);
+
+      // Only call setState when value changes — prevents re-renders on every mousemove
+      if (!prevVisible.current) {
+        prevVisible.current = true;
+        setIsVisible(true);
+      }
 
       const target = event.target as Element | null;
       if (!target) return;
 
-      setIsHovering(Boolean(target.closest(interactiveSelector)));
+      const hovering = Boolean(target.closest(interactiveSelector));
+      if (hovering !== prevHovering.current) {
+        prevHovering.current = hovering;
+        setIsHovering(hovering);
+      }
 
-      // Check if mouse is hovering over typing fields where native carets are preferred
       const isText = Boolean(
         target.closest(
           'input[type="text"], input[type="email"], input[type="password"], textarea, [contenteditable="true"]',
         ),
       );
-      setIsTextInput(isText);
+      if (isText !== prevTextInput.current) {
+        prevTextInput.current = isText;
+        setIsTextInput(isText);
+      }
     };
 
     const handleLeave = () => {
+      prevVisible.current = false;
+      prevHovering.current = false;
       setIsVisible(false);
       setIsHovering(false);
       setIsClicked(false);

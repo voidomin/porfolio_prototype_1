@@ -76,8 +76,10 @@ export const BirdFlock = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setIsMobile(globalThis.innerWidth < 768);
-    
+    const mobile = globalThis.innerWidth < 768;
+    setIsMobile(mobile);
+    if (mobile) return;
+
     // Spawn a new flock every 12-20 seconds
     const spawnFlock = () => {
       flockIdCounter.current += 1;
@@ -101,7 +103,7 @@ export const BirdFlock = () => {
     };
   }, []);
 
-  if (prefersReducedMotion) return null;
+  if (prefersReducedMotion || isMobile) return null;
 
   return (
     <div

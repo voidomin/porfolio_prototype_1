@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useSpring, useTransform } from "framer-motion";
+import { useScrollContext } from "@/contexts/ScrollContext";
 
 /* ──────────────────────────────────────────────────────────
    ScrollProgress – a "sun path" indicator at the very top
@@ -10,7 +11,7 @@ import { motion, useScroll, useSpring, useTransform } from "framer-motion";
    ────────────────────────────────────────────────────────── */
 
 export const ScrollProgress: React.FC = () => {
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = useScrollContext();
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,

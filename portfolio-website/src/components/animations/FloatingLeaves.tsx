@@ -81,14 +81,16 @@ export const FloatingLeaves = () => {
   const prefersReducedMotion = useReducedMotion();
   const [leaves, setLeaves] = useState<Leaf[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const isMobile = globalThis.innerWidth < 768;
-    setLeaves(generateLeaves(isMobile ? 4 : 12));
+    const mobile = globalThis.innerWidth < 768;
+    setIsMobile(mobile);
     setMounted(true);
+    if (!mobile) setLeaves(generateLeaves(12));
   }, []);
 
-  if (prefersReducedMotion || !mounted) return null;
+  if (prefersReducedMotion || isMobile || !mounted) return null;
 
   return (
     <div

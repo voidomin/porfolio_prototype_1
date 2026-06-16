@@ -4,6 +4,7 @@ import "./globals.css";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { StorybookCursor } from "@/components/layout/StorybookCursor";
+import { ScrollProvider } from "@/contexts/ScrollContext";
 import { Analytics } from "@vercel/analytics/react";
 
 const manrope = Manrope({
@@ -77,11 +78,13 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <StorybookCursor />
-        <SmoothScroll>
-          <ScrollProgress />
-          <div className="relative min-h-screen">{children}</div>
-        </SmoothScroll>
+        <ScrollProvider>
+          <StorybookCursor />
+          <SmoothScroll>
+            <ScrollProgress />
+            <div className="relative min-h-screen">{children}</div>
+          </SmoothScroll>
+        </ScrollProvider>
         <Analytics />
       </body>
     </html>
