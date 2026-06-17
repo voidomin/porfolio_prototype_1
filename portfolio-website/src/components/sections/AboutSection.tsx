@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { Briefcase, Compass, Tent, Flame, TreePine } from "lucide-react";
 import {
   aboutStats,
@@ -18,6 +19,8 @@ import {
 const trailIcons = [Tent, Compass, Flame];
 
 export const AboutSection = () => {
+  const [avatarError, setAvatarError] = useState(false);
+
   return (
     <section
       id="about"
@@ -77,13 +80,14 @@ export const AboutSection = () => {
             <div className="relative mb-6">
               <div className="w-40 h-40 rounded-full bg-gradient-to-br from-forest-400/30 to-forest-700/40 p-1 shadow-2xl shadow-forest-900/50">
                 <div className="w-full h-full rounded-full bg-forest-900/80 backdrop-blur-sm flex items-center justify-center border border-forest-500/20 overflow-hidden">
-                  {personalProfile.avatar ? (
+                  {personalProfile.avatar && !avatarError ? (
                     <Image
                       src={personalProfile.avatar}
                       alt={personalProfile.name}
                       width={160}
                       height={160}
                       className="w-full h-full rounded-full object-cover"
+                      onError={() => setAvatarError(true)}
                     />
                   ) : (
                     <span className="text-5xl font-bold text-forest-200 tracking-tight">
