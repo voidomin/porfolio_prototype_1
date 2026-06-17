@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const filename = searchParams.get("file");
-    
+
     if (!filename) {
       return NextResponse.json({ error: "Filename is required" }, { status: 400 });
     }
@@ -29,12 +29,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Read EXIF metadata using exifr
-    const exifData = await exifr.parse(filePath, {
-      tiff: true,
-      xmp: true,
-      gps: true,
-      exif: true,
-    }).catch(() => null);
+    const exifData = await exifr
+      .parse(filePath, {
+        tiff: true,
+        xmp: true,
+        gps: true,
+        exif: true,
+      })
+      .catch(() => null);
 
     const stats = fs.statSync(filePath);
 
@@ -45,7 +47,7 @@ export async function GET(request: NextRequest) {
     const aperture = exifData?.FNumber ? `f/${exifData.FNumber}` : "";
     const shutterSpeed = formatShutterSpeed(exifData?.ExposureTime);
     const iso = exifData?.ISOSpeedRatings ? String(exifData.ISOSpeedRatings) : "";
-    
+
     // Format Date: DateTimeOriginal, or fallback to file creation date
     let captureDate = "";
     if (exifData?.DateTimeOriginal) {
@@ -60,9 +62,10 @@ export async function GET(request: NextRequest) {
 
     // Try to get GPS coordinates if present
     const location = ""; // Default empty, user can input manually
-    const gps = exifData?.latitude && exifData?.longitude 
-      ? { lat: exifData.latitude, lng: exifData.longitude }
-      : null;
+    const gps =
+      exifData?.latitude && exifData?.longitude
+        ? { lat: exifData.latitude, lng: exifData.longitude }
+        : null;
 
     return NextResponse.json({
       exif: {
@@ -76,7 +79,7 @@ export async function GET(request: NextRequest) {
       },
       createdAt: captureDate,
       gps,
-      filename
+      filename,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

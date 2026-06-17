@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  useReducedMotion,
-} from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
 import { useScrollContext } from "@/contexts/ScrollContext";
 
 /* ──────────────────────────────────────────────────────────
@@ -98,8 +92,8 @@ export const StorybookCursor = () => {
 
       const isText = Boolean(
         target.closest(
-          'input[type="text"], input[type="email"], input[type="password"], textarea, [contenteditable="true"]',
-        ),
+          'input[type="text"], input[type="email"], input[type="password"], textarea, [contenteditable="true"]'
+        )
       );
       if (isText !== prevTextInput.current) {
         prevTextInput.current = isText;
@@ -154,9 +148,7 @@ export const StorybookCursor = () => {
           animate={{
             width: isClicked ? 14 : isHovering ? 56 : 30,
             height: isClicked ? 14 : isHovering ? 56 : 30,
-            backgroundColor: isHovering
-              ? "rgba(255, 255, 255, 0.04)"
-              : "rgba(255, 255, 255, 0)",
+            backgroundColor: isHovering ? "rgba(255, 255, 255, 0.04)" : "rgba(255, 255, 255, 0)",
           }}
           transition={{ type: "spring", stiffness: 350, damping: 25 }}
         />

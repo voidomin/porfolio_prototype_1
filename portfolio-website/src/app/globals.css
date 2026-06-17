@@ -256,27 +256,14 @@ html {
 .parchment {
   background-color: #fef7e0;
   background-image:
-    radial-gradient(
-      circle at 20% 50%,
-      rgba(180, 140, 80, 0.08),
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 80% 50%,
-      rgba(180, 140, 80, 0.06),
-      transparent 50%
-    ),
+    radial-gradient(circle at 20% 50%, rgba(180, 140, 80, 0.08), transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(180, 140, 80, 0.06), transparent 50%),
     url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b08850' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 /* ─── Water/River Effect ─── */
 .water-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(147, 210, 253, 0.15),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(147, 210, 253, 0.15), transparent);
   background-size: 200% 100%;
   animation: shimmer 3s infinite;
 }
@@ -419,12 +406,7 @@ html {
 
 /* Shimmer animation for premium gallery images */
 .pulse-shimmer {
-  background: linear-gradient(
-    90deg,
-    #1c1917 25%,
-    #292524 50%,
-    #1c1917 75%
-  );
+  background: linear-gradient(90deg, #1c1917 25%, #292524 50%, #1c1917 75%);
   background-size: 200% 100%;
   animation: loadingShimmer 1.5s infinite linear;
 }
@@ -437,4 +419,3 @@ html {
     background-position: -200% 0;
   }
 }
-

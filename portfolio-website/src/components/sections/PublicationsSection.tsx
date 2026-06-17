@@ -36,16 +36,12 @@ export const PublicationsSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <p className="text-dawn-600/50 text-sm tracking-[0.3em] uppercase mb-4">
-            Chapter Five
-          </p>
+          <p className="text-dawn-600/50 text-sm tracking-[0.3em] uppercase mb-4">Chapter Five</p>
           <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
-            The{" "}
-            <span className="text-dawn-600">Clearing</span>
+            The <span className="text-dawn-600">Clearing</span>
           </h2>
           <p className="text-stone-600/60 max-w-xl mx-auto">
-            A single research chapter, told like a story found in an afternoon
-            clearing.
+            A single research chapter, told like a story found in an afternoon clearing.
           </p>
         </motion.div>
 
@@ -91,23 +87,15 @@ export const PublicationsSection = () => {
                 </div>
 
                 <aside className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-dawn-200/40">
-                  <p className="text-xs uppercase tracking-[0.2em] text-stone-500 mb-4">
-                    Details
-                  </p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-stone-500 mb-4">Details</p>
                   <div className="space-y-4 text-sm">
                     <div>
-                      <span className="block text-stone-400 text-xs mb-1">
-                        Venue
-                      </span>
-                      <span className="font-medium text-stone-700">
-                        {publication.venue}
-                      </span>
+                      <span className="block text-stone-400 text-xs mb-1">Venue</span>
+                      <span className="font-medium text-stone-700">{publication.venue}</span>
                     </div>
                     {publication.citation && (
                       <div>
-                        <span className="block text-stone-400 text-xs mb-1">
-                          Citation
-                        </span>
+                        <span className="block text-stone-400 text-xs mb-1">Citation</span>
                         <span className="font-medium text-stone-600 text-xs">
                           {publication.citation}
                         </span>

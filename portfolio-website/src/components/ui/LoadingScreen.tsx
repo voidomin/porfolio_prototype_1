@@ -24,7 +24,8 @@ export const LoadingScreen = () => {
           exit={{ opacity: 0, transition: { duration: 0.9, ease: "easeInOut" } }}
           className="fixed inset-0 z-[999] flex flex-col items-center justify-center overflow-hidden select-none"
           style={{
-            background: "linear-gradient(180deg, #fef7e0 0%, #fdedb7 25%, #fbdf85 55%, #f0b429 80%, #224922 100%)",
+            background:
+              "linear-gradient(180deg, #fef7e0 0%, #fdedb7 25%, #fbdf85 55%, #f0b429 80%, #224922 100%)",
           }}
         >
           {/* Mountain silhouettes */}
@@ -58,8 +59,10 @@ export const LoadingScreen = () => {
             <div
               className="w-16 h-16 rounded-full"
               style={{
-                background: "radial-gradient(circle, #fffde7 0%, #f0b429 55%, rgba(240,180,41,0) 100%)",
-                boxShadow: "0 0 60px 20px rgba(240,180,41,0.5), 0 0 120px 40px rgba(240,180,41,0.2)",
+                background:
+                  "radial-gradient(circle, #fffde7 0%, #f0b429 55%, rgba(240,180,41,0) 100%)",
+                boxShadow:
+                  "0 0 60px 20px rgba(240,180,41,0.5), 0 0 120px 40px rgba(240,180,41,0.2)",
               }}
             />
           </motion.div>
@@ -71,7 +74,8 @@ export const LoadingScreen = () => {
             transition={{ delay: 0.55, duration: 0.9, ease: "easeOut" }}
             className="text-center z-10"
           >
-            <h1 className="text-6xl sm:text-7xl font-bold text-forest-950 tracking-tight leading-none mb-3"
+            <h1
+              className="text-6xl sm:text-7xl font-bold text-forest-950 tracking-tight leading-none mb-3"
               style={{ textShadow: "0 2px 20px rgba(255,255,255,0.4)" }}
             >
               Akash

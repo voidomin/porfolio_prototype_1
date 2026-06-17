@@ -49,9 +49,7 @@ const OptimizedImage = ({
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <div
-      className={`relative w-full h-full overflow-hidden ${isLoaded ? "" : "pulse-shimmer"}`}
-    >
+    <div className={`relative w-full h-full overflow-hidden ${isLoaded ? "" : "pulse-shimmer"}`}>
       <Image
         src={src}
         alt={alt}
@@ -91,11 +89,7 @@ const getCategoryBorderClass = (category?: string) => {
   }
 };
 
-const MosaicGrid = ({
-  filteredPhotos,
-  openLightbox,
-  galleryTheme,
-}: MosaicGridProps) => {
+const MosaicGrid = ({ filteredPhotos, openLightbox, galleryTheme }: MosaicGridProps) => {
   return (
     <div className="mosaic-grid w-full px-[2px] sm:px-[3px] md:px-[4px]">
       {filteredPhotos.map((photo) => {
@@ -206,9 +200,7 @@ export default function PhotographyGalleryPage() {
   // Autoplay / Slideshow States
   const [isAutoplay, setIsAutoplay] = useState(false);
   const [autoplayPacing, setAutoplayPacing] = useState<number>(5);
-  const [dominantColor, setDominantColor] = useState<string>(
-    "rgba(240, 180, 41, 0.15)",
-  );
+  const [dominantColor, setDominantColor] = useState<string>("rgba(240, 180, 41, 0.15)");
 
   // Loupe States
   const [showLoupe, setShowLoupe] = useState(false);
@@ -220,9 +212,7 @@ export default function PhotographyGalleryPage() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Theme, clipboard and touch states
-  const [galleryTheme, setGalleryTheme] = useState<"minimal" | "matte">(
-    "minimal",
-  );
+  const [galleryTheme, setGalleryTheme] = useState<"minimal" | "matte">("minimal");
   const [copiedSettings, setCopiedSettings] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
@@ -283,17 +273,16 @@ export default function PhotographyGalleryPage() {
 
   // Dynamic filter lists from database
   const cameraOptions = Array.from(
-    new Set(galleryImages.map((img) => img.exif?.camera).filter(Boolean)),
+    new Set(galleryImages.map((img) => img.exif?.camera).filter(Boolean))
   );
   const locationOptions = Array.from(
-    new Set(galleryImages.map((img) => img.exif?.location).filter(Boolean)),
+    new Set(galleryImages.map((img) => img.exif?.location).filter(Boolean))
   );
 
   // Filter photos based on parameters
   const filteredPhotos = galleryImages.filter((photo) => {
     const matchesCategory =
-      activeCategory === "all" ||
-      photo.category.toLowerCase() === activeCategory.toLowerCase();
+      activeCategory === "all" || photo.category.toLowerCase() === activeCategory.toLowerCase();
     const query = searchQuery.toLowerCase().trim();
     const matchesSearch =
       !query ||
@@ -302,10 +291,8 @@ export default function PhotographyGalleryPage() {
       photo.exif?.camera?.toLowerCase().includes(query) ||
       photo.exif?.lens?.toLowerCase().includes(query) ||
       photo.exif?.location?.toLowerCase().includes(query);
-    const matchesCamera =
-      filterCamera === "all" || photo.exif?.camera === filterCamera;
-    const matchesLocation =
-      filterLocation === "all" || photo.exif?.location === filterLocation;
+    const matchesCamera = filterCamera === "all" || photo.exif?.camera === filterCamera;
+    const matchesLocation = filterLocation === "all" || photo.exif?.location === filterLocation;
     return matchesCategory && matchesSearch && matchesCamera && matchesLocation;
   });
 
@@ -335,8 +322,7 @@ export default function PhotographyGalleryPage() {
 
   const prevPhoto = useCallback(() => {
     if (filteredPhotos.length === 0) return;
-    const prevIdx =
-      (photoIndex - 1 + filteredPhotos.length) % filteredPhotos.length;
+    const prevIdx = (photoIndex - 1 + filteredPhotos.length) % filteredPhotos.length;
     setPhotoIndex(prevIdx);
     setSelectedPhoto(filteredPhotos[prevIdx]);
   }, [photoIndex, filteredPhotos]);
@@ -421,9 +407,7 @@ export default function PhotographyGalleryPage() {
         }
       } catch {
         // Canvas extraction failed (e.g. CORS); fallback color already set
-        console.debug(
-          "Dominant color extraction skipped — using category fallback.",
-        );
+        console.debug("Dominant color extraction skipped — using category fallback.");
       }
     };
   }, [selectedPhoto]);
@@ -491,8 +475,7 @@ export default function PhotographyGalleryPage() {
     if (!el) return;
     const scrollAmount = el.clientWidth * 0.75;
     el.scrollTo({
-      left:
-        el.scrollLeft + (direction === "left" ? -scrollAmount : scrollAmount),
+      left: el.scrollLeft + (direction === "left" ? -scrollAmount : scrollAmount),
       behavior: "smooth",
     });
   };
@@ -529,12 +512,7 @@ export default function PhotographyGalleryPage() {
     const xOffset = (width - renderedWidth) / 2;
     const yOffset = (height - renderedHeight) / 2;
 
-    if (
-      x < xOffset ||
-      x > xOffset + renderedWidth ||
-      y < yOffset ||
-      y > yOffset + renderedHeight
-    ) {
+    if (x < xOffset || x > xOffset + renderedWidth || y < yOffset || y > yOffset + renderedHeight) {
       setShowLoupe(false);
       return;
     }
@@ -556,12 +534,10 @@ export default function PhotographyGalleryPage() {
             className="w-12 h-12 text-stone-800 mb-4 animate-spin"
             style={{ animationDuration: "6s" }}
           />
-          <h3 className="text-base font-bold text-stone-400">
-            Exhibition Empty
-          </h3>
+          <h3 className="text-base font-bold text-stone-400">Exhibition Empty</h3>
           <p className="text-xs text-stone-600 max-w-sm mt-2">
-            No photographs match your query or have been imported under this
-            category. Select another filter or import new photos.
+            No photographs match your query or have been imported under this category. Select
+            another filter or import new photos.
           </p>
         </div>
       );
@@ -605,9 +581,7 @@ export default function PhotographyGalleryPage() {
                   className="inline-flex flex-col h-full snap-start px-2 cursor-pointer relative group/item overflow-hidden bg-stone-950 border border-stone-900/60 hover:border-dawn-500/40 transition-all duration-500 animate-fadeIn shrink-0 text-left"
                   style={{
                     aspectRatio:
-                      photo.width && photo.height
-                        ? `${photo.width}/${photo.height}`
-                        : "3/2",
+                      photo.width && photo.height ? `${photo.width}/${photo.height}` : "3/2",
                   }}
                 >
                   {/* Top film edge with repeating sprocket holes */}
@@ -667,8 +641,7 @@ export default function PhotographyGalleryPage() {
                         <div className="flex justify-between items-center text-[9px] text-stone-500 font-mono pt-1">
                           <span>
                             {photo.exif?.aperture && `${photo.exif.aperture} `}
-                            {photo.exif?.shutterSpeed &&
-                              `${photo.exif.shutterSpeed} `}
+                            {photo.exif?.shutterSpeed && `${photo.exif.shutterSpeed} `}
                             {photo.exif?.iso && `ISO ${photo.exif.iso}`}
                           </span>
                           <span>{photo.createdAt}</span>
@@ -752,10 +725,7 @@ export default function PhotographyGalleryPage() {
         </button>
       )}
 
-      <div
-        ref={containerRef}
-        className="relative z-10 w-full mx-auto flex flex-col min-h-full"
-      >
+      <div ref={containerRef} className="relative z-10 w-full mx-auto flex flex-col min-h-full">
         {/* Control Dimming Wrapper */}
         <div
           className={`transition-opacity duration-750 ${isCinemaMode ? "opacity-5 pointer-events-none" : "opacity-100"}`}
@@ -779,8 +749,8 @@ export default function PhotographyGalleryPage() {
               </div>
             </div>
             <p className="text-xs text-stone-500 max-w-xs leading-relaxed">
-              A comprehensive visual record of settings, light, and optics. Move
-              your cursor over cards to view details.
+              A comprehensive visual record of settings, light, and optics. Move your cursor over
+              cards to view details.
             </p>
           </header>
 
@@ -1201,9 +1171,7 @@ export default function PhotographyGalleryPage() {
                             <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">
                               ISO Speed
                             </span>
-                            <span className="text-white font-bold">
-                              {selectedPhoto.exif.iso}
-                            </span>
+                            <span className="text-white font-bold">{selectedPhoto.exif.iso}</span>
                           </div>
                         )}
                       </div>

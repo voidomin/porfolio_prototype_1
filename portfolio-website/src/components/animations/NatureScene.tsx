@@ -12,16 +12,24 @@ import { useScrollContext } from "@/contexts/ScrollContext";
    ────────────────────────────────────────────────────────── */
 
 const SKY_GRADIENTS: Record<string, string> = {
-  home:         "linear-gradient(180deg, #fef7e0 0%, #fdedb7 30%, #fbdf85 60%, #f0b429 100%)",
-  about:        "linear-gradient(180deg, #e0f0ff 0%, #93d2fd 30%, #60b8fa 60%, #3b99f5 100%)",
-  skills:       "linear-gradient(180deg, #c8e6c9 0%, #81c784 30%, #66bb6a 60%, #43a047 100%)",
-  projects:     "linear-gradient(180deg, #bbdefb 0%, #90caf9 30%, #64b5f6 60%, #42a5f5 100%)",
+  home: "linear-gradient(180deg, #fef7e0 0%, #fdedb7 30%, #fbdf85 60%, #f0b429 100%)",
+  about: "linear-gradient(180deg, #e0f0ff 0%, #93d2fd 30%, #60b8fa 60%, #3b99f5 100%)",
+  skills: "linear-gradient(180deg, #c8e6c9 0%, #81c784 30%, #66bb6a 60%, #43a047 100%)",
+  projects: "linear-gradient(180deg, #bbdefb 0%, #90caf9 30%, #64b5f6 60%, #42a5f5 100%)",
   publications: "linear-gradient(180deg, #fce8e6 0%, #f5b3af 40%, #e05d57 70%, #762b2a 100%)",
-  photography:  "linear-gradient(180deg, #fcdfa8 0%, #fbad60 40%, #e05d57 70%, #762b2a 100%)",
-  contact:      "linear-gradient(180deg, #1a1145 0%, #0f0d2e 40%, #0a0820 100%)",
+  photography: "linear-gradient(180deg, #fcdfa8 0%, #fbad60 40%, #e05d57 70%, #762b2a 100%)",
+  contact: "linear-gradient(180deg, #1a1145 0%, #0f0d2e 40%, #0a0820 100%)",
 };
 
-const SECTION_IDS = ["home", "about", "skills", "projects", "publications", "photography", "contact"];
+const SECTION_IDS = [
+  "home",
+  "about",
+  "skills",
+  "projects",
+  "publications",
+  "photography",
+  "contact",
+];
 
 const STARS_COUNT = 60;
 
@@ -140,7 +148,8 @@ export const NatureScene = () => {
         style={{
           width: 40,
           height: 40,
-          background: "radial-gradient(circle at 35% 35%, #e0e5ff 0%, #c7cfff 50%, rgba(199,207,255,0.3) 100%)",
+          background:
+            "radial-gradient(circle at 35% 35%, #e0e5ff 0%, #c7cfff 50%, rgba(199,207,255,0.3) 100%)",
           boxShadow: "0 0 40px 10px rgba(199,207,255,0.2)",
           right: moonRight,
           top: moonTop,
@@ -170,43 +179,75 @@ export const NatureScene = () => {
       <motion.div style={{ opacity: cloudOpacity }}>
         <div
           className="cloud animate-drift-cloud"
-          style={{ width: 200, height: 60, top: "12%", background: "radial-gradient(ellipse, rgba(255,255,255,0.7), transparent)" }}
+          style={{
+            width: 200,
+            height: 60,
+            top: "12%",
+            background: "radial-gradient(ellipse, rgba(255,255,255,0.7), transparent)",
+          }}
         />
         <div
           className="cloud animate-drift-cloud-slow"
-          style={{ width: 280, height: 70, top: "22%", animationDelay: "-15s", background: "radial-gradient(ellipse, rgba(255,255,255,0.5), transparent)" }}
+          style={{
+            width: 280,
+            height: 70,
+            top: "22%",
+            animationDelay: "-15s",
+            background: "radial-gradient(ellipse, rgba(255,255,255,0.5), transparent)",
+          }}
         />
         <div
           className="cloud animate-drift-cloud"
-          style={{ width: 160, height: 50, top: "8%", animationDelay: "-30s", background: "radial-gradient(ellipse, rgba(255,255,255,0.6), transparent)" }}
+          style={{
+            width: 160,
+            height: 50,
+            top: "8%",
+            animationDelay: "-30s",
+            background: "radial-gradient(ellipse, rgba(255,255,255,0.6), transparent)",
+          }}
         />
       </motion.div>
 
       {/* ─── Mountain Layer 3 (back, lightest) ─── */}
       <motion.div className="mountain-layer" style={{ y: mountainBackY, height: "45%", zIndex: 1 }}>
         <svg viewBox="0 0 1440 400" preserveAspectRatio="none" className="w-full h-full">
-          <path d="M0,400 L0,280 Q120,160 240,220 Q360,100 480,180 Q600,60 720,140 Q840,40 960,120 Q1080,60 1200,160 Q1320,100 1440,200 L1440,400 Z" fill="rgba(30,70,30,0.3)" />
+          <path
+            d="M0,400 L0,280 Q120,160 240,220 Q360,100 480,180 Q600,60 720,140 Q840,40 960,120 Q1080,60 1200,160 Q1320,100 1440,200 L1440,400 Z"
+            fill="rgba(30,70,30,0.3)"
+          />
         </svg>
       </motion.div>
 
       {/* ─── Mountain Layer 2 (mid) ─── */}
       <motion.div className="mountain-layer" style={{ y: mountainMidY, height: "38%", zIndex: 2 }}>
         <svg viewBox="0 0 1440 400" preserveAspectRatio="none" className="w-full h-full">
-          <path d="M0,400 L0,300 Q100,180 200,240 Q320,120 440,200 Q560,80 680,160 Q800,60 920,140 Q1040,100 1160,180 Q1280,120 1440,220 L1440,400 Z" fill="rgba(20,50,20,0.45)" />
+          <path
+            d="M0,400 L0,300 Q100,180 200,240 Q320,120 440,200 Q560,80 680,160 Q800,60 920,140 Q1040,100 1160,180 Q1280,120 1440,220 L1440,400 Z"
+            fill="rgba(20,50,20,0.45)"
+          />
         </svg>
       </motion.div>
 
       {/* ─── Mountain Layer 1 (front, darkest) ─── */}
-      <motion.div className="mountain-layer" style={{ y: mountainFrontY, height: "30%", zIndex: 3 }}>
+      <motion.div
+        className="mountain-layer"
+        style={{ y: mountainFrontY, height: "30%", zIndex: 3 }}
+      >
         <svg viewBox="0 0 1440 400" preserveAspectRatio="none" className="w-full h-full">
-          <path d="M0,400 L0,320 Q80,240 200,280 Q320,200 440,260 Q560,180 680,220 Q800,140 920,200 Q1040,160 1160,220 Q1280,180 1440,260 L1440,400 Z" fill="rgba(15,35,15,0.6)" />
+          <path
+            d="M0,400 L0,320 Q80,240 200,280 Q320,200 440,260 Q560,180 680,220 Q800,140 920,200 Q1040,160 1160,220 Q1280,180 1440,260 L1440,400 Z"
+            fill="rgba(15,35,15,0.6)"
+          />
         </svg>
       </motion.div>
 
       {/* ─── Ground mist ─── */}
       <motion.div
         className="absolute bottom-0 left-0 right-0 h-32"
-        style={{ background: "linear-gradient(180deg, transparent, rgba(255,255,255,0.08))", opacity: mistOpacity }}
+        style={{
+          background: "linear-gradient(180deg, transparent, rgba(255,255,255,0.08))",
+          opacity: mistOpacity,
+        }}
       />
     </div>
   );

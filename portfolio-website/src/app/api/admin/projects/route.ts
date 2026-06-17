@@ -159,7 +159,8 @@ export async function PUT(request: NextRequest) {
       ...existingProject,
       title: title || existingProject.title,
       description: description || existingProject.description,
-      longDescription: typeof longDescription === "string" ? longDescription : existingProject.longDescription,
+      longDescription:
+        typeof longDescription === "string" ? longDescription : existingProject.longDescription,
       image: image || existingProject.image,
       technologies: Array.isArray(technologies) ? technologies : existingProject.technologies,
       category: category || existingProject.category,

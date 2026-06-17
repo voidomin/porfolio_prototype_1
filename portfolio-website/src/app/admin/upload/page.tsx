@@ -1,19 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Camera, 
-  MapPin, 
-  Sliders, 
-  Compass, 
-  ArrowLeft, 
-  Loader2, 
-  CheckCircle2, 
-  Image as ImageIcon, 
-  AlertCircle, 
+import {
+  Camera,
+  MapPin,
+  Sliders,
+  Compass,
+  ArrowLeft,
+  Loader2,
+  CheckCircle2,
+  Image as ImageIcon,
+  AlertCircle,
   FileText,
   Plus,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -65,9 +65,9 @@ function PendingQueue({
         <span className="text-[11px] text-stone-600 mt-2">
           Drop files in `/images-to-process/` and they will show up here.
         </span>
-        <button 
+        <button
           type="button"
-          onClick={fetchPendingFiles} 
+          onClick={fetchPendingFiles}
           className="mt-4 px-3 py-1.5 rounded-lg bg-stone-800 border border-stone-700 text-xs text-stone-300 hover:bg-stone-750 transition cursor-pointer"
         >
           Refresh Scan
@@ -85,12 +85,14 @@ function PendingQueue({
             type="button"
             onClick={() => handleSelectFile(file)}
             className={`w-full text-left p-3.5 rounded-xl border flex items-center gap-3 transition ${
-              isSelected 
-                ? "bg-dawn-950/20 border-dawn-700 text-white shadow-lg" 
+              isSelected
+                ? "bg-dawn-950/20 border-dawn-700 text-white shadow-lg"
                 : "bg-stone-950/40 border-stone-850 text-stone-400 hover:bg-stone-900/60 hover:text-stone-200"
             }`}
           >
-            <ImageIcon className={`w-5 h-5 shrink-0 ${isSelected ? "text-dawn-400" : "text-stone-600"}`} />
+            <ImageIcon
+              className={`w-5 h-5 shrink-0 ${isSelected ? "text-dawn-400" : "text-stone-600"}`}
+            />
             <div className="overflow-hidden">
               <p className="text-xs font-semibold truncate">{file}</p>
               <p className="text-[10px] text-stone-600 font-mono mt-0.5">Ready for processing</p>
@@ -108,7 +110,8 @@ function EmptyWorkspaceState() {
       <Sliders className="w-12 h-12 text-stone-700 mb-4 animate-pulse" />
       <h3 className="text-base font-bold text-stone-400">No Image Selected</h3>
       <p className="text-xs text-stone-600 max-w-sm mt-2">
-        Select a pending image from the sidebar to automatically extract its camera EXIF settings and prepare it for import.
+        Select a pending image from the sidebar to automatically extract its camera EXIF settings
+        and prepare it for import.
       </p>
     </div>
   );
@@ -191,7 +194,7 @@ function AdjustmentsSection({
           />
         </div>
       </div>
-      
+
       <div className="mt-5 pt-4 border-t border-stone-800 flex justify-between items-center">
         <span className="text-[10px] text-stone-500 font-mono">ROTATION</span>
         <div className="flex gap-2">
@@ -220,10 +223,7 @@ interface ExifMetadataSectionProps {
   readonly onChange: (updatedExif: ExifData) => void;
 }
 
-function ExifMetadataSection({
-  exif,
-  onChange,
-}: Readonly<ExifMetadataSectionProps>) {
+function ExifMetadataSection({ exif, onChange }: Readonly<ExifMetadataSectionProps>) {
   return (
     <div>
       <h3 className="text-xs uppercase tracking-wider text-dawn-500 font-bold mb-4 flex items-center gap-1.5">
@@ -233,7 +233,10 @@ function ExifMetadataSection({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
-          <label htmlFor="exif-camera" className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono">
+          <label
+            htmlFor="exif-camera"
+            className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono"
+          >
             Camera Body
           </label>
           <input
@@ -246,7 +249,10 @@ function ExifMetadataSection({
           />
         </div>
         <div>
-          <label htmlFor="exif-lens" className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono">
+          <label
+            htmlFor="exif-lens"
+            className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono"
+          >
             Optics / Lens
           </label>
           <input
@@ -259,7 +265,10 @@ function ExifMetadataSection({
           />
         </div>
         <div>
-          <label htmlFor="exif-focalLength" className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono">
+          <label
+            htmlFor="exif-focalLength"
+            className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono"
+          >
             Focal Length
           </label>
           <input
@@ -272,7 +281,10 @@ function ExifMetadataSection({
           />
         </div>
         <div>
-          <label htmlFor="exif-aperture" className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono">
+          <label
+            htmlFor="exif-aperture"
+            className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono"
+          >
             Aperture
           </label>
           <input
@@ -285,7 +297,10 @@ function ExifMetadataSection({
           />
         </div>
         <div>
-          <label htmlFor="exif-shutterSpeed" className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono">
+          <label
+            htmlFor="exif-shutterSpeed"
+            className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono"
+          >
             Shutter Speed
           </label>
           <input
@@ -298,7 +313,10 @@ function ExifMetadataSection({
           />
         </div>
         <div>
-          <label htmlFor="exif-iso" className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono">
+          <label
+            htmlFor="exif-iso"
+            className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono"
+          >
             ISO Speed
           </label>
           <input
@@ -313,7 +331,10 @@ function ExifMetadataSection({
       </div>
 
       <div className="mt-4">
-        <label htmlFor="exif-location" className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono flex items-center gap-1">
+        <label
+          htmlFor="exif-location"
+          className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono flex items-center gap-1"
+        >
           <MapPin className="w-3.5 h-3.5 text-stone-600" />
           Geographical Location
         </label>
@@ -354,23 +375,28 @@ const DASHBOARD_TITLES: Record<string, string> = {
   experiences: "Work Experience Lab",
 };
 
-function StudioHeader({ selectedFile, isSidebarOpen, setIsSidebarOpen, adminTab }: Readonly<StudioHeaderProps>) {
+function StudioHeader({
+  selectedFile,
+  isSidebarOpen,
+  setIsSidebarOpen,
+  adminTab,
+}: Readonly<StudioHeaderProps>) {
   const isPhotos = adminTab === "photos";
   const dashboardTitle = DASHBOARD_TITLES[adminTab] || "Studio";
   return (
     <header className="flex justify-between items-center border-b border-stone-800 pb-6 mb-10">
       <div className="flex items-center gap-4">
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="p-2.5 rounded-xl bg-stone-900 border border-stone-850 hover:bg-stone-800 transition text-stone-400 hover:text-white"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <span className="text-[10px] text-dawn-500 uppercase tracking-widest font-bold">Studio Dashboard</span>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white">
-            {dashboardTitle}
-          </h1>
+          <span className="text-[10px] text-dawn-500 uppercase tracking-widest font-bold">
+            Studio Dashboard
+          </span>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white">{dashboardTitle}</h1>
         </div>
       </div>
       <div className="flex items-center gap-3">
@@ -399,18 +425,22 @@ interface StatusBannerProps {
 function StatusBanner({ statusMessage }: Readonly<StatusBannerProps>) {
   if (!statusMessage) return null;
   return (
-    <div className={`p-4 rounded-xl mb-8 flex items-start gap-3 border ${
-      statusMessage.type === "success" 
-        ? "bg-emerald-950/30 border-emerald-800 text-emerald-300" 
-        : "bg-rose-950/30 border-rose-800 text-rose-300"
-    }`}>
+    <div
+      className={`p-4 rounded-xl mb-8 flex items-start gap-3 border ${
+        statusMessage.type === "success"
+          ? "bg-emerald-950/30 border-emerald-800 text-emerald-300"
+          : "bg-rose-950/30 border-rose-800 text-rose-300"
+      }`}
+    >
       {statusMessage.type === "success" ? (
         <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
       ) : (
         <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
       )}
       <div>
-        <p className="text-sm font-semibold">{statusMessage.type === "success" ? "Success" : "Error Occurred"}</p>
+        <p className="text-sm font-semibold">
+          {statusMessage.type === "success" ? "Success" : "Error Occurred"}
+        </p>
         <p className="text-xs mt-1 text-stone-300/80">{statusMessage.text}</p>
       </div>
     </div>
@@ -457,19 +487,22 @@ function WorkspaceCanvas({
           Exhibition Image Preview (CMS View)
         </span>
         <div className="w-full overflow-auto max-h-[82vh] xl:max-h-[850px] flex items-center justify-center rounded-xl border border-stone-950 bg-stone-900/20 p-2">
-          <Image 
-            src={selectedFile} 
-            alt="Published preview" 
+          <Image
+            src={selectedFile}
+            alt="Published preview"
             width={1920}
             height={1280}
             className="w-full max-h-[78vh] xl:max-h-[800px] object-contain rounded-xl shadow-lg border border-stone-950 pointer-events-none"
           />
         </div>
         <div className="bg-stone-950/60 p-4 rounded-xl border border-stone-850 text-center w-full mt-6">
-          <p className="text-[10px] text-dawn-500 font-bold uppercase tracking-wider">EDITING PUBLISHED PHOTO</p>
+          <p className="text-[10px] text-dawn-500 font-bold uppercase tracking-wider">
+            EDITING PUBLISHED PHOTO
+          </p>
           <p className="text-[10px] text-stone-500 mt-1.5 leading-relaxed">
-            Visual processing (cropping, rotation, and color lab sliders) is finalized. 
-            To modify the visuals of this image, please delete it from the gallery and re-import the original file from the Queue.
+            Visual processing (cropping, rotation, and color lab sliders) is finalized. To modify
+            the visuals of this image, please delete it from the gallery and re-import the original
+            file from the Queue.
           </p>
         </div>
       </div>
@@ -491,12 +524,12 @@ function WorkspaceCanvas({
             className="w-full flex justify-center"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img 
-              src={`/api/admin/view?file=${encodeURIComponent(selectedFile)}`} 
-              alt="Interactive crop preview" 
+            <img
+              src={`/api/admin/view?file=${encodeURIComponent(selectedFile)}`}
+              alt="Interactive crop preview"
               onLoad={onImageLoad}
               className="w-full max-h-[78vh] xl:max-h-[800px] object-contain rounded-xl pointer-events-auto transition-all"
-              style={{ 
+              style={{
                 filter: `brightness(${brightness}) contrast(${contrast}) saturate(${saturation})`,
                 transform: `rotate(${rotation}deg)`,
               }}
@@ -538,7 +571,10 @@ function WatermarkSection({
           <FileText className="w-4 h-4" />
           Signature Watermarking
         </h3>
-        <label htmlFor="watermarkEnabled" className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-stone-300 select-none">
+        <label
+          htmlFor="watermarkEnabled"
+          className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-stone-300 select-none"
+        >
           <input
             id="watermarkEnabled"
             type="checkbox"
@@ -549,11 +585,14 @@ function WatermarkSection({
           <span>Enable</span>
         </label>
       </div>
-      
+
       {enabled && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
           <div>
-            <label htmlFor="watermarkText" className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono">
+            <label
+              htmlFor="watermarkText"
+              className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono"
+            >
               Watermark Text
             </label>
             <input
@@ -566,7 +605,10 @@ function WatermarkSection({
             />
           </div>
           <div>
-            <label htmlFor="watermarkPosition" className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono">
+            <label
+              htmlFor="watermarkPosition"
+              className="block text-[10px] text-stone-500 font-bold mb-1.5 uppercase font-mono"
+            >
               Position / Gravity
             </label>
             <select
@@ -644,23 +686,28 @@ function ProjectsQueue({
               type="button"
               onClick={() => onSelect(project)}
               className={`w-full text-left p-3 rounded-xl border flex items-center gap-3 transition ${
-                isSelected 
-                  ? "bg-dawn-950/20 border-dawn-700 text-white shadow-lg" 
+                isSelected
+                  ? "bg-dawn-950/20 border-dawn-700 text-white shadow-lg"
                   : "bg-stone-950/40 border-stone-850 text-stone-400 hover:bg-stone-900/60 hover:text-stone-200"
               }`}
             >
               <div className="w-10 h-10 rounded-lg overflow-hidden bg-stone-900 shrink-0 border border-stone-800/40 relative">
-                <Image 
-                  src={project.image || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=100&h=100&fit=crop"} 
-                  alt="" 
+                <Image
+                  src={
+                    project.image ||
+                    "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=100&h=100&fit=crop"
+                  }
+                  alt=""
                   fill
                   sizes="40px"
-                  className="object-cover" 
+                  className="object-cover"
                 />
               </div>
               <div className="overflow-hidden flex-1">
                 <p className="text-xs font-semibold truncate">{project.title || "Untitled"}</p>
-                <p className="text-[9px] text-stone-600 font-mono mt-0.5 truncate uppercase tracking-wider">{project.category} app</p>
+                <p className="text-[9px] text-stone-600 font-mono mt-0.5 truncate uppercase tracking-wider">
+                  {project.category} app
+                </p>
               </div>
             </button>
           );
@@ -787,14 +834,16 @@ function ProjectEditor({
             Project Cover Image Preview
           </span>
           <div className="w-full overflow-hidden rounded-xl border border-stone-950 bg-stone-900/20 p-2 flex justify-center relative h-[300px]">
-            <Image 
-              src={imageFallbackSrc} 
-              alt="Project preview" 
+            <Image
+              src={imageFallbackSrc}
+              alt="Project preview"
               fill
               sizes="(max-width: 1024px) 100vw, 800px"
               className="object-contain rounded-xl shadow-lg border border-stone-950"
               onError={() => {
-                setImageFallbackSrc("https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop");
+                setImageFallbackSrc(
+                  "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop"
+                );
               }}
             />
           </div>
@@ -821,7 +870,10 @@ function ProjectEditor({
           ) : (
             <div className="space-y-4">
               {subProjects.map((sub, index) => (
-                <div key={sub.id} className="bg-stone-950/60 p-4 rounded-xl border border-stone-850 relative space-y-3">
+                <div
+                  key={sub.id}
+                  className="bg-stone-950/60 p-4 rounded-xl border border-stone-850 relative space-y-3"
+                >
                   <button
                     type="button"
                     onClick={() => handleRemoveSubProject(index)}
@@ -833,7 +885,10 @@ function ProjectEditor({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor={`sub-title-${sub.id}`} className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono">
+                      <label
+                        htmlFor={`sub-title-${sub.id}`}
+                        className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono"
+                      >
                         Sub-Project Title
                       </label>
                       <input
@@ -847,7 +902,10 @@ function ProjectEditor({
                       />
                     </div>
                     <div>
-                      <label htmlFor={`sub-image-${sub.id}`} className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono">
+                      <label
+                        htmlFor={`sub-image-${sub.id}`}
+                        className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono"
+                      >
                         Image URL
                       </label>
                       <input
@@ -863,7 +921,10 @@ function ProjectEditor({
                   </div>
 
                   <div>
-                    <label htmlFor={`sub-desc-${sub.id}`} className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono">
+                    <label
+                      htmlFor={`sub-desc-${sub.id}`}
+                      className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono"
+                    >
                       Description
                     </label>
                     <input
@@ -871,7 +932,9 @@ function ProjectEditor({
                       type="text"
                       required
                       value={sub.description}
-                      onChange={(e) => handleUpdateSubProject(index, { description: e.target.value })}
+                      onChange={(e) =>
+                        handleUpdateSubProject(index, { description: e.target.value })
+                      }
                       className="w-full bg-stone-950 border border-stone-850 rounded-lg px-3.5 py-1.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
                       placeholder="Short description"
                     />
@@ -879,7 +942,10 @@ function ProjectEditor({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor={`sub-demo-${sub.id}`} className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono">
+                      <label
+                        htmlFor={`sub-demo-${sub.id}`}
+                        className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono"
+                      >
                         Demo URL
                       </label>
                       <input
@@ -892,7 +958,10 @@ function ProjectEditor({
                       />
                     </div>
                     <div>
-                      <label htmlFor={`sub-tech-${sub.id}`} className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono">
+                      <label
+                        htmlFor={`sub-tech-${sub.id}`}
+                        className="block text-[9px] text-stone-500 font-bold uppercase tracking-wider mb-1 font-mono"
+                      >
                         Technologies (comma-separated)
                       </label>
                       <input
@@ -900,9 +969,14 @@ function ProjectEditor({
                         type="text"
                         required
                         value={sub.technologies.join(", ")}
-                        onChange={(e) => handleUpdateSubProject(index, { 
-                          technologies: e.target.value.split(",").map(t => t.trim()).filter(Boolean) 
-                        })}
+                        onChange={(e) =>
+                          handleUpdateSubProject(index, {
+                            technologies: e.target.value
+                              .split(",")
+                              .map((t) => t.trim())
+                              .filter(Boolean),
+                          })
+                        }
                         className="w-full bg-stone-950 border border-stone-850 rounded-lg px-3.5 py-1.5 text-xs text-white focus:outline-none focus:border-dawn-500 transition"
                         placeholder="React, Firebase, Vite"
                       />
@@ -923,7 +997,10 @@ function ProjectEditor({
         </h2>
 
         <div>
-          <label htmlFor="proj-title" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="proj-title"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Project Title
           </label>
           <input
@@ -938,7 +1015,10 @@ function ProjectEditor({
         </div>
 
         <div>
-          <label htmlFor="proj-desc" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="proj-desc"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Short Description
           </label>
           <textarea
@@ -953,7 +1033,10 @@ function ProjectEditor({
         </div>
 
         <div>
-          <label htmlFor="proj-longdesc" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="proj-longdesc"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Long Description / Story (Optional)
           </label>
           <textarea
@@ -968,7 +1051,10 @@ function ProjectEditor({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="proj-cat" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            <label
+              htmlFor="proj-cat"
+              className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+            >
               Category
             </label>
             <select
@@ -982,7 +1068,10 @@ function ProjectEditor({
             </select>
           </div>
           <div>
-            <label htmlFor="proj-date" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            <label
+              htmlFor="proj-date"
+              className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+            >
               Creation Date
             </label>
             <input
@@ -997,7 +1086,10 @@ function ProjectEditor({
         </div>
 
         <div>
-          <label htmlFor="proj-image" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="proj-image"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Cover Image Path / URL
           </label>
           <input
@@ -1012,7 +1104,10 @@ function ProjectEditor({
         </div>
 
         <div>
-          <label htmlFor="proj-tech" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="proj-tech"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Technologies (comma-separated list)
           </label>
           <input
@@ -1028,7 +1123,10 @@ function ProjectEditor({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="proj-demo" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            <label
+              htmlFor="proj-demo"
+              className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+            >
               Demo URL
             </label>
             <input
@@ -1041,7 +1139,10 @@ function ProjectEditor({
             />
           </div>
           <div>
-            <label htmlFor="proj-github" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+            <label
+              htmlFor="proj-github"
+              className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+            >
               GitHub URL
             </label>
             <input
@@ -1056,7 +1157,10 @@ function ProjectEditor({
         </div>
 
         <div className="flex items-center gap-3 bg-stone-950/40 p-4 rounded-xl border border-stone-850">
-          <label htmlFor="proj-featured" className="flex items-center gap-3 cursor-pointer text-xs font-semibold text-stone-300">
+          <label
+            htmlFor="proj-featured"
+            className="flex items-center gap-3 cursor-pointer text-xs font-semibold text-stone-300"
+          >
             <input
               id="proj-featured"
               type="checkbox"
@@ -1147,9 +1251,9 @@ function PublishedQueue({
         <p className="text-[11px] text-stone-600 mt-2">
           Import photos from the queue tab to view them here.
         </p>
-        <button 
+        <button
           type="button"
-          onClick={onRefresh} 
+          onClick={onRefresh}
           className="mt-4 px-3 py-1.5 rounded-lg bg-stone-800 border border-stone-700 text-xs text-stone-300 hover:bg-stone-750 transition cursor-pointer"
         >
           Refresh List
@@ -1167,23 +1271,19 @@ function PublishedQueue({
             type="button"
             onClick={() => onSelect(photo)}
             className={`w-full text-left p-2.5 rounded-xl border flex items-center gap-3 transition ${
-              isSelected 
-                ? "bg-dawn-950/20 border-dawn-700 text-white shadow-lg" 
+              isSelected
+                ? "bg-dawn-950/20 border-dawn-700 text-white shadow-lg"
                 : "bg-stone-950/40 border-stone-850 text-stone-400 hover:bg-stone-900/60 hover:text-stone-200"
             }`}
           >
             <div className="w-10 h-10 rounded-lg overflow-hidden bg-stone-900 shrink-0 border border-stone-800/40 relative">
-              <Image 
-                src={photo.src} 
-                alt="" 
-                fill
-                sizes="40px"
-                className="object-cover" 
-              />
+              <Image src={photo.src} alt="" fill sizes="40px" className="object-cover" />
             </div>
             <div className="overflow-hidden flex-1">
               <p className="text-xs font-semibold truncate">{photo.title || "Untitled"}</p>
-              <p className="text-[9px] text-stone-600 font-mono mt-0.5 truncate uppercase tracking-wider">{photo.category}</p>
+              <p className="text-[9px] text-stone-600 font-mono mt-0.5 truncate uppercase tracking-wider">
+                {photo.category}
+              </p>
             </div>
           </button>
         );
@@ -1353,7 +1453,10 @@ function useAdminDashboardState() {
   const [isLoadingFiles, setIsLoadingFiles] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isExtractingExif, setIsExtractingExif] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const [activeTab, setActiveTab] = useState<"pending" | "published">("pending");
   const [publishedPhotos, setPublishedPhotos] = useState<any[]>([]);
@@ -1495,7 +1598,9 @@ function useAdminDashboardState() {
     setProjTitle("");
     setProjDescription("");
     setProjLongDescription("");
-    setProjImage("https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop");
+    setProjImage(
+      "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop"
+    );
     setProjCategory("web");
     setProjFeatured(false);
     setProjDemoUrl("");
@@ -1604,7 +1709,10 @@ function useAdminDashboardState() {
       demoUrl: projDemoUrl,
       githubUrl: projGithubUrl,
       createdAt: projCreatedAt,
-      technologies: projTechnologies.split(",").map((t) => t.trim()).filter(Boolean),
+      technologies: projTechnologies
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
       subProjects: projSubProjects,
     };
 
@@ -1720,16 +1828,16 @@ function useAdminDashboardState() {
 
     const baseName = filename
       .toLowerCase()
-      .replace(/\.[^/.]+$/, "") 
-      .replace(/[^a-z0-9]+/g, "-") 
-      .replace(/(^-|-$)/g, ""); 
-    
+      .replace(/\.[^/.]+$/, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
     setPhotoId(`gal-${baseName}`);
     setTitle(
       filename
         .replace(/\.[^/.]+$/, "")
         .replace(/[-_]+/g, " ")
-        .replace(/\b\w/g, c => c.toUpperCase())
+        .replace(/\b\w/g, (c) => c.toUpperCase())
     );
     setAlt(`Photograph titled ${filename.replace(/\.[^/.]+$/, "").replace(/[-_]+/g, " ")}`);
     setDescription("");
@@ -1840,13 +1948,13 @@ function useAdminDashboardState() {
         type: "success",
         text: `Successfully processed and imported "${title}" to your gallery!`,
       });
-      
+
       const finishedFile = selectedFile;
       setSelectedFile(null);
-      
-      const remainingQueue = pendingFiles.filter(f => f !== finishedFile);
+
+      const remainingQueue = pendingFiles.filter((f) => f !== finishedFile);
       await fetchPendingFiles();
-      
+
       if (remainingQueue.length > 0) {
         handleSelectFile(remainingQueue[0]);
       }
@@ -2102,7 +2210,10 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
       {/* Database Identity */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="photoId" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="photoId"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Unique ID (for URL and filename)
           </label>
           <input
@@ -2117,7 +2228,10 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
           />
         </div>
         <div>
-          <label htmlFor="title" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="title"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Exhibition Title
           </label>
           <input
@@ -2135,7 +2249,10 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
       {/* Image Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="category" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="category"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Gallery Category
           </label>
           <select
@@ -2152,7 +2269,10 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
           </select>
         </div>
         <div>
-          <label htmlFor="createdAt" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="createdAt"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Capture Date
           </label>
           <input
@@ -2169,7 +2289,10 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
       {/* Alt Text & Story */}
       <div className="grid grid-cols-1 gap-4">
         <div>
-          <label htmlFor="alt" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="alt"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Accessibility Alt Text (For screen readers)
           </label>
           <input
@@ -2183,7 +2306,10 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
           />
         </div>
         <div>
-          <label htmlFor="description" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="description"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Backstory / Description (Optional)
           </label>
           <textarea
@@ -2200,10 +2326,7 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
       <hr className="border-stone-800" />
 
       {/* EXIF Metadata Block */}
-      <ExifMetadataSection
-        exif={exif}
-        onChange={setExif}
-      />
+      <ExifMetadataSection exif={exif} onChange={setExif} />
 
       <hr className="border-stone-800" />
 
@@ -2219,7 +2342,10 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
 
       {/* Options */}
       <div className="flex items-center gap-6 bg-stone-950/40 p-4 rounded-xl border border-stone-850">
-        <label htmlFor="featured" className="flex items-center gap-3 cursor-pointer text-xs font-semibold text-stone-300">
+        <label
+          htmlFor="featured"
+          className="flex items-center gap-3 cursor-pointer text-xs font-semibold text-stone-300"
+        >
           <input
             id="featured"
             type="checkbox"
@@ -2298,9 +2424,14 @@ function PhotoExhibitionWorkspace({ state }: PhotoExhibitionWorkspaceProps) {
   if (!selectedFile) return null;
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
+    <form
+      onSubmit={handleSubmit}
+      className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full"
+    >
       {/* Column 2: Sticky Image Workspace & Adjustments */}
-      <div className={`${isSidebarOpen ? "lg:col-span-8" : "lg:col-span-9"} lg:sticky lg:top-6 space-y-6`}>
+      <div
+        className={`${isSidebarOpen ? "lg:col-span-8" : "lg:col-span-9"} lg:sticky lg:top-6 space-y-6`}
+      >
         <div className="bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6">
           <WorkspaceCanvas
             editingPhotoId={editingPhotoId}
@@ -2322,7 +2453,9 @@ function PhotoExhibitionWorkspace({ state }: PhotoExhibitionWorkspaceProps) {
       </div>
 
       {/* Column 3: Metadata & Exif Form */}
-      <div className={`${isSidebarOpen ? "lg:col-span-4" : "lg:col-span-3"} bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6 md:p-8 space-y-6`}>
+      <div
+        className={`${isSidebarOpen ? "lg:col-span-4" : "lg:col-span-3"} bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6 md:p-8 space-y-6`}
+      >
         <div className="flex justify-between items-center border-b border-stone-800 pb-4 mb-4">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Sliders className="w-5 h-5 text-dawn-500" />
@@ -2370,7 +2503,9 @@ function ExhibitionSidebar({ state }: ExhibitionSidebarProps) {
   } = state;
 
   return (
-    <div className={`${(isSidebarOpen || !selectedFile) ? "lg:col-span-3" : "hidden"} bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6`}>
+    <div
+      className={`${isSidebarOpen || !selectedFile ? "lg:col-span-3" : "hidden"} bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6`}
+    >
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold text-white flex items-center gap-2">
           <Compass className="w-5 h-5 text-dawn-500" />
@@ -2417,7 +2552,11 @@ function ExhibitionSidebar({ state }: ExhibitionSidebarProps) {
       {activeTab === "pending" ? (
         <>
           <p className="text-xs text-stone-500 mb-6 leading-relaxed">
-            Place raw camera photos in the local project directory under <code className="bg-stone-950 px-1.5 py-0.5 rounded text-dawn-400 font-mono">/images-to-process/</code> to import them.
+            Place raw camera photos in the local project directory under{" "}
+            <code className="bg-stone-950 px-1.5 py-0.5 rounded text-dawn-400 font-mono">
+              /images-to-process/
+            </code>{" "}
+            to import them.
           </p>
           <PendingQueue
             isLoadingFiles={isLoadingFiles}
@@ -2430,7 +2569,8 @@ function ExhibitionSidebar({ state }: ExhibitionSidebarProps) {
       ) : (
         <>
           <p className="text-xs text-stone-500 mb-6 leading-relaxed">
-            Manage your imported portfolio photos. Click any photo below to update its exhibition metadata or remove it.
+            Manage your imported portfolio photos. Click any photo below to update its exhibition
+            metadata or remove it.
           </p>
           <PublishedQueue
             photos={publishedPhotos}
@@ -2457,12 +2597,10 @@ function PhotoExhibitionLab({ state }: Readonly<PhotoExhibitionLabProps>) {
       <ExhibitionSidebar state={state} />
 
       {/* Form and Workspace Area */}
-      <div className={`${(isSidebarOpen || !selectedFile) ? "lg:col-span-9" : "lg:col-span-12"} transition-all duration-350`}>
-        {selectedFile ? (
-          <PhotoExhibitionWorkspace state={state} />
-        ) : (
-          <EmptyWorkspaceState />
-        )}
+      <div
+        className={`${isSidebarOpen || !selectedFile ? "lg:col-span-9" : "lg:col-span-12"} transition-all duration-350`}
+      >
+        {selectedFile ? <PhotoExhibitionWorkspace state={state} /> : <EmptyWorkspaceState />}
       </div>
     </div>
   );
@@ -2573,7 +2711,8 @@ function ProjectsPortfolioLab({ state }: Readonly<ProjectsPortfolioLabProps>) {
             <Sliders className="w-12 h-12 text-stone-700 mb-4 animate-pulse" />
             <h3 className="text-base font-bold text-stone-400">No Project Selected</h3>
             <p className="text-xs text-stone-600 max-w-sm mt-2">
-              Select a project from the sidebar to edit its config, technology stack, and sub-projects list, or create a brand new project.
+              Select a project from the sidebar to edit its config, technology stack, and
+              sub-projects list, or create a brand new project.
             </p>
           </div>
         )}
@@ -2659,7 +2798,8 @@ function ExperiencesTimelineLab({ state }: Readonly<ExperiencesTimelineLabProps>
             <Sliders className="w-12 h-12 text-stone-700 mb-4 animate-pulse" />
             <h3 className="text-base font-bold text-stone-400">No Experience Selected</h3>
             <p className="text-xs text-stone-600 max-w-sm mt-2">
-              Select an experience from the timeline to edit its title, organization, dates, and summary, or create a brand new timeline event.
+              Select an experience from the timeline to edit its title, organization, dates, and
+              summary, or create a brand new timeline event.
             </p>
           </div>
         )}
@@ -2701,14 +2841,16 @@ function ExperiencesQueue({
               type="button"
               onClick={() => onSelect(exp)}
               className={`w-full text-left p-3 rounded-xl border flex items-center gap-3 transition ${
-                isSelected 
-                  ? "bg-dawn-950/20 border-dawn-700 text-white shadow-lg" 
+                isSelected
+                  ? "bg-dawn-950/20 border-dawn-700 text-white shadow-lg"
                   : "bg-stone-950/40 border-stone-850 text-stone-400 hover:bg-stone-900/60 hover:text-stone-200"
               }`}
             >
               <div className="overflow-hidden flex-1">
                 <p className="text-xs font-semibold truncate">{exp.title || "Untitled"}</p>
-                <p className="text-[9px] text-stone-600 font-mono mt-0.5 truncate uppercase tracking-wider">{exp.organization}</p>
+                <p className="text-[9px] text-stone-600 font-mono mt-0.5 truncate uppercase tracking-wider">
+                  {exp.organization}
+                </p>
                 <p className="text-[8px] text-dawn-600/80 font-mono mt-0.5">{exp.period}</p>
               </div>
             </button>
@@ -2775,7 +2917,10 @@ function ExperienceEditor({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label htmlFor="exp-period" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="exp-period"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Timeline Period (Dates)
           </label>
           <input
@@ -2790,7 +2935,10 @@ function ExperienceEditor({
         </div>
 
         <div>
-          <label htmlFor="exp-org" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+          <label
+            htmlFor="exp-org"
+            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+          >
             Organization / Company
           </label>
           <input
@@ -2806,7 +2954,10 @@ function ExperienceEditor({
       </div>
 
       <div>
-        <label htmlFor="exp-title" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+        <label
+          htmlFor="exp-title"
+          className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+        >
           Job Title / Role
         </label>
         <input
@@ -2821,7 +2972,10 @@ function ExperienceEditor({
       </div>
 
       <div>
-        <label htmlFor="exp-summary" className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2">
+        <label
+          htmlFor="exp-summary"
+          className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
+        >
           Role Summary / Description
         </label>
         <textarea
@@ -2905,7 +3059,7 @@ export default function AdminUploadPage() {
 
       <div className="relative z-10 max-w-[1600px] xl:max-w-[1850px] w-full mx-auto flex flex-col min-h-full">
         {/* Navigation & Header */}
-        <StudioHeader 
+        <StudioHeader
           selectedFile={state.selectedFile}
           isSidebarOpen={state.isSidebarOpen}
           setIsSidebarOpen={state.setIsSidebarOpen}

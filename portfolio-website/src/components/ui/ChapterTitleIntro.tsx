@@ -5,19 +5,65 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useScrollContext } from "@/contexts/ScrollContext";
 
 const chapters = [
-  { id: "home",         title: "Chapter I",   name: "Dawn Summit",      subtitle: "Misty mountain peak at sunrise",       icon: "🌅" },
-  { id: "about",        title: "Chapter II",  name: "Pine Forest",      subtitle: "Silent, towering green canopies",      icon: "🌲" },
-  { id: "skills",       title: "Chapter III", name: "The Meadow",       subtitle: "Sunlit wind-swept fields of grass",    icon: "🌿" },
-  { id: "projects",     title: "Chapter IV",  name: "Stepping Stones",  subtitle: "Pristine mountain rivers and ripples", icon: "🪨" },
-  { id: "publications", title: "Chapter V",   name: "The Clearing",     subtitle: "Deep editorial mountain hollows",      icon: "📖" },
-  { id: "photography",  title: "Chapter VI",  name: "Golden Hour",      subtitle: "Warm ambers and visual memories",      icon: "📷" },
-  { id: "contact",      title: "Chapter VII", name: "Campfire at Dusk", subtitle: "Gathering under rising ambers",        icon: "🔥" },
+  {
+    id: "home",
+    title: "Chapter I",
+    name: "Dawn Summit",
+    subtitle: "Misty mountain peak at sunrise",
+    icon: "🌅",
+  },
+  {
+    id: "about",
+    title: "Chapter II",
+    name: "Pine Forest",
+    subtitle: "Silent, towering green canopies",
+    icon: "🌲",
+  },
+  {
+    id: "skills",
+    title: "Chapter III",
+    name: "The Meadow",
+    subtitle: "Sunlit wind-swept fields of grass",
+    icon: "🌿",
+  },
+  {
+    id: "projects",
+    title: "Chapter IV",
+    name: "Stepping Stones",
+    subtitle: "Pristine mountain rivers and ripples",
+    icon: "🪨",
+  },
+  {
+    id: "publications",
+    title: "Chapter V",
+    name: "The Clearing",
+    subtitle: "Deep editorial mountain hollows",
+    icon: "📖",
+  },
+  {
+    id: "photography",
+    title: "Chapter VI",
+    name: "Golden Hour",
+    subtitle: "Warm ambers and visual memories",
+    icon: "📷",
+  },
+  {
+    id: "contact",
+    title: "Chapter VII",
+    name: "Campfire at Dusk",
+    subtitle: "Gathering under rising ambers",
+    icon: "🔥",
+  },
 ];
 
-interface SectionBound { id: string; top: number; bottom: number }
+interface SectionBound {
+  id: string;
+  top: number;
+  bottom: number;
+}
 
 export const ChapterTitleIntro = () => {
-  const [activeChapter, setActiveChapter] = useState<typeof chapters[0] | null>(null);
+  const [activeChapter, setActiveChapter] = useState<(typeof chapters)[0] | null>(null);
   const [show, setShow] = useState(false);
   const lastActiveId = useRef<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -100,9 +146,7 @@ export const ChapterTitleIntro = () => {
               <h4 className="text-lg font-serif font-semibold text-white/90 leading-tight">
                 {activeChapter.name} {activeChapter.icon}
               </h4>
-              <p className="text-xs text-white/40 font-light italic">
-                {activeChapter.subtitle}
-              </p>
+              <p className="text-xs text-white/40 font-light italic">{activeChapter.subtitle}</p>
             </div>
 
             {/* Progress bar */}

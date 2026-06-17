@@ -2,15 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-  Mail,
-  MapPin,
-  Send,
-  CheckCircle,
-  AlertCircle,
-  Github,
-  Linkedin,
-} from "lucide-react";
+import { Mail, MapPin, Send, CheckCircle, AlertCircle, Github, Linkedin } from "lucide-react";
 import { socialLinks, contactInfo } from "@/data/portfolio";
 import { ContactFormData } from "@/types";
 import { cn } from "@/lib/utils";
@@ -45,7 +37,17 @@ function generateFireflies(count: number) {
 
 // Interactive rising campfire embers on input hover & focus
 const InputEmberEmitter = ({ active }: { active: boolean }) => {
-  const [embers, setEmbers] = useState<{ id: number; left: number; size: number; delay: number; duration: number; distanceY: number; driftX: number }[]>([]);
+  const [embers, setEmbers] = useState<
+    {
+      id: number;
+      left: number;
+      size: number;
+      delay: number;
+      duration: number;
+      distanceY: number;
+      driftX: number;
+    }[]
+  >([]);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -135,7 +137,7 @@ const FormInput = ({
       <label htmlFor={id} className="block text-sm font-medium text-white/75 mb-2 select-none">
         {label} {required && "*"}
       </label>
-      <div 
+      <div
         className="relative rounded-xl overflow-hidden"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -193,10 +195,12 @@ const FormTextarea = ({
         <label htmlFor={id} className="block text-sm font-medium text-white/75 select-none">
           {label} {required && "*"}
         </label>
-        <span className={cn(
-          "text-xs font-mono tabular-nums transition-colors duration-300",
-          isNearLimit ? (remaining <= 0 ? "text-red-400" : "text-dawn-400") : "text-white/30"
-        )}>
+        <span
+          className={cn(
+            "text-xs font-mono tabular-nums transition-colors duration-300",
+            isNearLimit ? (remaining <= 0 ? "text-red-400" : "text-dawn-400") : "text-white/30"
+          )}
+        >
           {value.length}/{MAX_MESSAGE_CHARS}
         </span>
       </div>
@@ -236,7 +240,9 @@ export const ContactSection = () => {
     status: "idle",
     message: "",
   });
-  const [fireflies, setFireflies] = useState<{ id: number; x: number; y: number; delay: number; duration: number; size: number }[]>([]);
+  const [fireflies, setFireflies] = useState<
+    { id: number; x: number; y: number; delay: number; duration: number; size: number }[]
+  >([]);
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -269,9 +275,7 @@ export const ContactSection = () => {
     globalThis.dispatchEvent(new CustomEvent("nature-campfire-crackle"));
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -320,7 +324,8 @@ export const ContactSection = () => {
     } catch (err) {
       setFormState({
         status: "error",
-        message: err instanceof Error ? err.message : "Something went wrong. Please try again later.",
+        message:
+          err instanceof Error ? err.message : "Something went wrong. Please try again later.",
       });
     }
   };
@@ -376,12 +381,9 @@ export const ContactSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <p className="text-dusk-300/50 text-sm tracking-[0.3em] uppercase mb-4">
-            Chapter Seven
-          </p>
+          <p className="text-dusk-300/50 text-sm tracking-[0.3em] uppercase mb-4">Chapter Seven</p>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Campfire at{" "}
-            <span className="text-dawn-300">Dusk</span>
+            Campfire at <span className="text-dawn-300">Dusk</span>
           </h2>
           <p className="text-dusk-200/50 max-w-xl mx-auto">
             Open to roles, collaborations, and thoughtful product work.
@@ -398,9 +400,7 @@ export const ContactSection = () => {
             className="space-y-6"
           >
             <div className="glass-nature rounded-3xl p-8">
-              <h3 className="text-xl font-bold text-white mb-6">
-                Contact Information
-              </h3>
+              <h3 className="text-xl font-bold text-white mb-6">Contact Information</h3>
 
               <div className="space-y-5">
                 <motion.div
@@ -431,12 +431,8 @@ export const ContactSection = () => {
                     <MapPin className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white text-sm">
-                      Location
-                    </h4>
-                    <p className="text-dusk-200/60 text-sm">
-                      {contactInfo.location}
-                    </p>
+                    <h4 className="font-semibold text-white text-sm">Location</h4>
+                    <p className="text-dusk-200/60 text-sm">{contactInfo.location}</p>
                   </div>
                 </motion.div>
               </div>
@@ -446,8 +442,7 @@ export const ContactSection = () => {
               <h3 className="text-xl font-bold text-white mb-6">Profiles</h3>
               <div className="flex gap-3">
                 {socialLinks.map((social, index) => {
-                  const IconComponent =
-                    socialIcons[social.icon as keyof typeof socialIcons];
+                  const IconComponent = socialIcons[social.icon as keyof typeof socialIcons];
                   if (!IconComponent) return null;
 
                   return (
@@ -473,11 +468,10 @@ export const ContactSection = () => {
 
             {/* Interactive Campfire */}
             <div className="glass-nature rounded-3xl p-8 flex flex-col items-center text-center relative overflow-hidden group select-none">
-              <h3 className="text-xl font-bold text-white mb-3">
-                Interactive Campfire 🔥
-              </h3>
+              <h3 className="text-xl font-bold text-white mb-3">Interactive Campfire 🔥</h3>
               <p className="text-xs text-white/50 mb-6 max-w-xs leading-relaxed">
-                Stoke the digital campfire! Click the logs below to spark high-energy rising embers and hear synthesized wood snaps.
+                Stoke the digital campfire! Click the logs below to spark high-energy rising embers
+                and hear synthesized wood snaps.
               </p>
 
               {/* Animated Campfire Vector */}
@@ -490,9 +484,21 @@ export const ContactSection = () => {
                 title="Click logs to stoke the fire!"
               >
                 {/* Licking Flame Animations (using SVG paths and subtle scaling loops) */}
-                <svg className="w-20 h-20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  className="w-20 h-20"
+                  viewBox="0 0 100 100"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   {/* Outer glow */}
-                  <circle cx="50" cy="50" r="30" fill="url(#fireGlow)" opacity="0.3" className="animate-pulse" />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="30"
+                    fill="url(#fireGlow)"
+                    opacity="0.3"
+                    className="animate-pulse"
+                  />
 
                   {/* Flame Back */}
                   <motion.path
@@ -560,9 +566,25 @@ export const ContactSection = () => {
 
                   {/* Cross-positioned Campfire Logs */}
                   {/* Log Left */}
-                  <line x1="25" y1="78" x2="75" y2="68" stroke="#4a2711" strokeWidth="8" strokeLinecap="round" />
+                  <line
+                    x1="25"
+                    y1="78"
+                    x2="75"
+                    y2="68"
+                    stroke="#4a2711"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                  />
                   {/* Log Right */}
-                  <line x1="75" y1="78" x2="25" y2="68" stroke="#3d1f0c" strokeWidth="8" strokeLinecap="round" />
+                  <line
+                    x1="75"
+                    y1="78"
+                    x2="25"
+                    y2="68"
+                    stroke="#3d1f0c"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                  />
                   {/* Glowing Log Core embers */}
                   <circle cx="50" cy="73" r="4" fill="#f0541e" className="animate-ping" />
 
@@ -586,9 +608,7 @@ export const ContactSection = () => {
             transition={{ duration: 0.7 }}
             className="glass-nature rounded-3xl p-8"
           >
-            <h3 className="text-xl font-bold text-white mb-6">
-              Send a Message
-            </h3>
+            <h3 className="text-xl font-bold text-white mb-6">Send a Message</h3>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

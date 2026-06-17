@@ -4,11 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Briefcase, Compass, Tent, Flame, TreePine } from "lucide-react";
-import {
-  aboutStats,
-  experienceTimeline,
-  personalProfile,
-} from "@/data/portfolio";
+import { aboutStats, experienceTimeline, personalProfile } from "@/data/portfolio";
 
 /* ──────────────────────────────────────────────────────────
    AboutSection – "Chapter 2: The Forest Path"
@@ -54,12 +50,9 @@ export const AboutSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-20"
         >
-          <p className="text-forest-300/60 text-sm tracking-[0.3em] uppercase mb-4">
-            Chapter Two
-          </p>
+          <p className="text-forest-300/60 text-sm tracking-[0.3em] uppercase mb-4">Chapter Two</p>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            The Forest{" "}
-            <span className="text-forest-300">Path</span>
+            The Forest <span className="text-forest-300">Path</span>
           </h2>
           <p className="text-forest-200/60 max-w-xl mx-auto">
             A quiet story of roots, engineering, and product craft.
@@ -102,15 +95,9 @@ export const AboutSection = () => {
               </div>
             </div>
 
-            <h3 className="text-2xl font-bold text-white mb-1">
-              {personalProfile.name}
-            </h3>
-            <p className="text-forest-300 font-medium text-sm mb-2">
-              {personalProfile.headline}
-            </p>
-            <p className="text-forest-200/50 text-sm">
-              {personalProfile.location}
-            </p>
+            <h3 className="text-2xl font-bold text-white mb-1">{personalProfile.name}</h3>
+            <p className="text-forest-300 font-medium text-sm mb-2">{personalProfile.headline}</p>
+            <p className="text-forest-200/50 text-sm">{personalProfile.location}</p>
           </motion.div>
 
           {/* Bio content */}
@@ -125,9 +112,7 @@ export const AboutSection = () => {
               <p className="text-forest-100/80 leading-relaxed text-lg mb-4">
                 {personalProfile.about}
               </p>
-              <p className="text-forest-100/60 leading-relaxed">
-                {personalProfile.aboutExtended}
-              </p>
+              <p className="text-forest-100/60 leading-relaxed">{personalProfile.aboutExtended}</p>
             </div>
           </motion.div>
         </div>
@@ -164,9 +149,7 @@ export const AboutSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h3 className="text-2xl font-bold text-center mb-16 text-white">
-            Professional Journey
-          </h3>
+          <h3 className="text-2xl font-bold text-center mb-16 text-white">Professional Journey</h3>
 
           <div className="relative max-w-3xl mx-auto">
             {/* Trail line */}
@@ -183,9 +166,7 @@ export const AboutSection = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: index * 0.15 }}
                     className={`relative flex items-start ${
-                      index % 2 === 0
-                        ? "md:flex-row"
-                        : "md:flex-row-reverse"
+                      index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
                     }`}
                   >
                     {/* Trail node */}
@@ -204,15 +185,11 @@ export const AboutSection = () => {
                           <Briefcase className="h-3.5 w-3.5" />
                           {item.period}
                         </div>
-                        <h4 className="text-lg font-semibold text-white mb-1">
-                          {item.title}
-                        </h4>
+                        <h4 className="text-lg font-semibold text-white mb-1">{item.title}</h4>
                         <div className="text-forest-400 font-medium text-sm mb-3">
                           {item.organization}
                         </div>
-                        <p className="text-forest-200/60 text-sm leading-relaxed">
-                          {item.summary}
-                        </p>
+                        <p className="text-forest-200/60 text-sm leading-relaxed">{item.summary}</p>
                       </div>
                     </div>
                   </motion.div>

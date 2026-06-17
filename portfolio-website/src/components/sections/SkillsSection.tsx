@@ -29,12 +29,8 @@ const SkillBar = ({ skill, index }: { skill: Skill; index: number }) => (
     className="space-y-2"
   >
     <div className="flex justify-between items-center">
-      <span className="text-sm font-medium text-meadow-900">
-        {skill.name}
-      </span>
-      <span className="text-xs text-meadow-700/60 font-mono">
-        {skill.level}%
-      </span>
+      <span className="text-sm font-medium text-meadow-900">{skill.name}</span>
+      <span className="text-xs text-meadow-700/60 font-mono">{skill.level}%</span>
     </div>
     <div className="h-2.5 bg-meadow-900/10 rounded-full overflow-hidden">
       <motion.div
@@ -80,7 +76,7 @@ const SkillCategoryCard = ({
       setTimeout(() => {
         const tilt = vx > 0 ? 5.5 : -5.5;
         setGustRotate(tilt);
-        
+
         // Sway bounce sequence
         setTimeout(() => setGustRotate(vx > 0 ? -2.5 : 2.5), 200);
         setTimeout(() => setGustRotate(vx > 0 ? 1 : -1), 400);
@@ -104,9 +100,7 @@ const SkillCategoryCard = ({
     >
       <div className="flex items-center gap-3 mb-6 select-none">
         <span className="text-2xl">{meta.emoji}</span>
-        <h3 className="text-lg font-semibold text-meadow-900">
-          {meta.name}
-        </h3>
+        <h3 className="text-lg font-semibold text-meadow-900">{meta.name}</h3>
       </div>
       <div className="space-y-4">
         {categorySkills.map((skill, skillIndex) => (
@@ -134,7 +128,7 @@ const StatCard = ({
       setTimeout(() => {
         const tilt = vx > 0 ? 4 : -4;
         setGustRotate(tilt);
-        
+
         setTimeout(() => setGustRotate(vx > 0 ? -1.8 : 1.8), 200);
         setTimeout(() => setGustRotate(0), 400);
       }, delayMs);
@@ -203,27 +197,24 @@ export const SkillsSection = () => {
             Chapter Three
           </p>
           <h2 className="text-4xl md:text-5xl font-bold text-meadow-900 mb-4">
-            The{" "}
-            <span className="text-meadow-600">Meadow</span>
+            The <span className="text-meadow-600">Meadow</span>
           </h2>
           <p className="text-meadow-700/60 max-w-xl mx-auto">
-            A practical toolkit shaped by software, data, testing, and cloud
-            work — blooming across disciplines.
+            A practical toolkit shaped by software, data, testing, and cloud work — blooming across
+            disciplines.
           </p>
         </motion.div>
 
         {/* Skill categories grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {Object.entries(groupedSkills).map(
-            ([category, categorySkills], index) => (
-              <SkillCategoryCard
-                key={category}
-                category={category as SkillCategory}
-                categorySkills={categorySkills}
-                index={index}
-              />
-            )
-          )}
+          {Object.entries(groupedSkills).map(([category, categorySkills], index) => (
+            <SkillCategoryCard
+              key={category}
+              category={category as SkillCategory}
+              categorySkills={categorySkills}
+              index={index}
+            />
+          ))}
         </div>
 
         {/* Summary stats */}
@@ -241,9 +232,7 @@ export const SkillsSection = () => {
               color: "text-meadow-700",
             },
             {
-              value: `${Math.round(
-                skills.reduce((acc, s) => acc + s.level, 0) / skills.length
-              )}%`,
+              value: `${Math.round(skills.reduce((acc, s) => acc + s.level, 0) / skills.length)}%`,
               label: "Avg. Proficiency",
               color: "text-forest-600",
             },

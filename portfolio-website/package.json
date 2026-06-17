@@ -7,9 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
     "type-check": "tsc --noEmit",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "prepare": "cd .. && husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.0",
@@ -51,8 +55,21 @@
     "autoprefixer": "^10.4.0",
     "eslint": "^8.52.0",
     "eslint-config-next": "14.0.4",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
-    "postcss": "^8.4.0"
+    "lint-staged": "^17.0.7",
+    "postcss": "^8.4.0",
+    "prettier": "^3.8.4"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix --max-warnings=0"
+    ],
+    "src/**/*.css": [
+      "prettier --write"
+    ]
   }
 }

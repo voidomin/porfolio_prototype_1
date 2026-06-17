@@ -35,7 +35,15 @@ function createFlock(): Bird[] {
   }));
 }
 
-const BirdShape = ({ size, color, isMobile }: { size: number; color: string; isMobile: boolean }) => (
+const BirdShape = ({
+  size,
+  color,
+  isMobile,
+}: {
+  size: number;
+  color: string;
+  isMobile: boolean;
+}) => (
   <svg
     width={24 * size}
     height={12 * size}
@@ -106,10 +114,7 @@ export const BirdFlock = () => {
   if (prefersReducedMotion || isMobile) return null;
 
   return (
-    <div
-      className="fixed inset-0 pointer-events-none overflow-hidden"
-      style={{ zIndex: 5 }}
-    >
+    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 5 }}>
       <AnimatePresence>
         {flocks.map((flock) => (
           <div key={`flock-${flock.id}`}>
@@ -133,11 +138,7 @@ export const BirdFlock = () => {
                   ease: "linear",
                 }}
               >
-                <BirdShape
-                  size={bird.size}
-                  color="rgba(30,30,30,0.35)"
-                  isMobile={isMobile}
-                />
+                <BirdShape size={bird.size} color="rgba(30,30,30,0.35)" isMobile={isMobile} />
               </motion.div>
             ))}
           </div>

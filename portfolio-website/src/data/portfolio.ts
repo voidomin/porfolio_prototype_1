@@ -72,7 +72,6 @@ import galleryData from "./gallery.json";
 
 export const galleryImages: GalleryImage[] = galleryData;
 
-
 export const publications: Publication[] = [
   {
     id: "pub-1",

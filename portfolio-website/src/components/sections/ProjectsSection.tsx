@@ -29,21 +29,13 @@ const categories: { value: ProjectCategory | "all"; label: string }[] = [
   { value: "other", label: "Other" },
 ];
 
-const ProjectCard = ({
-  project,
-  index,
-}: {
-  project: Project;
-  index: number;
-}) => {
+const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [selectedSubId, setSelectedSubId] = useState<string | null>(null);
 
   const activeSub = project.subProjects?.find((s) => s.id === selectedSubId);
   const displayTitle = activeSub ? activeSub.title : project.title;
-  const displayDescription = activeSub
-    ? activeSub.description
-    : project.description;
+  const displayDescription = activeSub ? activeSub.description : project.description;
   const displayImage = activeSub ? activeSub.image : project.image;
   const displayDemoUrl = activeSub ? activeSub.demoUrl : project.demoUrl;
   const displayTech = activeSub ? activeSub.technologies : project.technologies;
@@ -102,7 +94,9 @@ const ProjectCard = ({
     web: "bg-[radial-gradient(circle,rgba(240,180,41,0.15)_0%,transparent_70%)]",
     other: "bg-[radial-gradient(circle,rgba(125,181,35,0.15)_0%,transparent_70%)]",
   };
-  const auraColorClass = AURA_COLORS[project.category] || "bg-[radial-gradient(circle,rgba(147,210,253,0.18)_0%,transparent_70%)]";
+  const auraColorClass =
+    AURA_COLORS[project.category] ||
+    "bg-[radial-gradient(circle,rgba(147,210,253,0.18)_0%,transparent_70%)]";
 
   return (
     <div className={cn("animate-stone-float", delayClass, "relative group w-full")}>
@@ -162,7 +156,7 @@ const ProjectCard = ({
                         "px-2 py-1 text-[9px] font-medium rounded-t-lg transition-all border-t border-x shrink-0 select-none",
                         selectedSubId === null
                           ? "bg-white border-stone-200/50 text-forest-800 font-bold shadow-[0_-2px_6px_rgba(0,0,0,0.03)]"
-                          : "bg-transparent border-transparent text-stone-400 hover:text-stone-600",
+                          : "bg-transparent border-transparent text-stone-400 hover:text-stone-600"
                       )}
                     >
                       ✦ Studio
@@ -178,7 +172,7 @@ const ProjectCard = ({
                           "px-2 py-1 text-[9px] font-medium rounded-t-lg transition-all border-t border-x shrink-0 select-none",
                           selectedSubId === sub.id
                             ? "bg-white border-stone-200/50 text-forest-800 font-bold shadow-[0_-2px_6px_rgba(0,0,0,0.03)]"
-                            : "bg-transparent border-transparent text-stone-400 hover:text-stone-600",
+                            : "bg-transparent border-transparent text-stone-400 hover:text-stone-600"
                         )}
                       >
                         {sub.title.split(" ")[0]}
@@ -258,10 +252,7 @@ const ProjectCard = ({
           </div>
 
           {/* Editorial Text Content Block */}
-          <div
-            className="relative p-6 z-10 select-none"
-            style={{ transform: "translateZ(30px)" }}
-          >
+          <div className="relative p-6 z-10 select-none" style={{ transform: "translateZ(30px)" }}>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-bold text-forest-700 uppercase tracking-widest bg-forest-600/10 px-2 py-0.5 rounded-md">
                 {project.category}
@@ -340,7 +331,7 @@ function useHorizontalScroll(
   stickyRef: React.RefObject<HTMLDivElement | null>,
   bgRef: React.RefObject<HTMLDivElement | null>,
   progressBarRef: React.RefObject<HTMLDivElement | null>,
-  progressTextRef: React.RefObject<HTMLSpanElement | null>,
+  progressTextRef: React.RefObject<HTMLSpanElement | null>
 ) {
   const [scrollRange, setScrollRange] = useState(0);
   const [containerHeight, setContainerHeight] = useState<number | null>(null);
@@ -433,20 +424,18 @@ function useHorizontalScroll(
 
     const loop = () => {
       const diff = targetProgress.current - animatedProgress.current;
-      animatedProgress.current = Math.abs(diff) > 0.0002
-        ? animatedProgress.current + diff * 0.2
-        : targetProgress.current;
+      animatedProgress.current =
+        Math.abs(diff) > 0.0002 ? animatedProgress.current + diff * 0.2 : targetProgress.current;
 
       const p = animatedProgress.current;
       const range = scrollRangeRef.current;
 
       // GPU-composited transform — no layout, no paint
       if (track) track.style.transform = `translate3d(${-range * p}px, 0, 0)`;
-      if (bg)    bg.style.transform    = `translate3d(${-range * 0.32 * p}px, 0, 0)`;
+      if (bg) bg.style.transform = `translate3d(${-range * 0.32 * p}px, 0, 0)`;
 
       // Direct DOM updates — zero React re-renders
-      if (progressBarRef.current)
-        progressBarRef.current.style.width = `${p * 100}%`;
+      if (progressBarRef.current) progressBarRef.current.style.width = `${p * 100}%`;
       if (progressTextRef.current)
         progressTextRef.current.textContent = `${Math.round(p * 100)}% Crossed`;
 
@@ -467,7 +456,7 @@ function useHorizontalScroll(
     return () => {
       cancelAnimationFrame(rafId);
       if (track) track.style.willChange = "auto";
-      if (bg)    bg.style.willChange    = "auto";
+      if (bg) bg.style.willChange = "auto";
     };
   }, [isDesktop, trackRef, bgRef, progressBarRef, progressTextRef]);
 
@@ -495,10 +484,18 @@ interface DesktopLayoutProps {
 }
 
 function DesktopLayout({
-  stickyRef, bgRef, trackRef, progressBarRef, progressTextRef,
-  activeCategory, filteredProjects, currentIndex,
-  canScrollLeft, canScrollRight,
-  handleCategoryChange, scrollToProject,
+  stickyRef,
+  bgRef,
+  trackRef,
+  progressBarRef,
+  progressTextRef,
+  activeCategory,
+  filteredProjects,
+  currentIndex,
+  canScrollLeft,
+  canScrollRight,
+  handleCategoryChange,
+  scrollToProject,
 }: DesktopLayoutProps) {
   return (
     <div
@@ -511,16 +508,39 @@ function DesktopLayout({
         className="absolute inset-y-0 left-0 w-[200vw] pointer-events-none select-none opacity-[0.22] z-0"
       >
         <svg className="w-full h-full text-river-400" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 0,200 Q 400,280 800,200 T 1600,200 T 2400,200 T 3200,200" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="10,12" className="animate-river-flow-1" />
-          <path d="M 100,450 Q 500,400 900,450 T 1700,450 T 2500,450 T 3300,450" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="6,8" className="animate-river-flow-2" />
-          <path d="M 50,700 Q 450,780 850,700 T 1650,700 T 2450,700 T 3250,700" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="14,14" className="animate-river-flow-3" />
+          <path
+            d="M 0,200 Q 400,280 800,200 T 1600,200 T 2400,200 T 3200,200"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeDasharray="10,12"
+            className="animate-river-flow-1"
+          />
+          <path
+            d="M 100,450 Q 500,400 900,450 T 1700,450 T 2500,450 T 3300,450"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeDasharray="6,8"
+            className="animate-river-flow-2"
+          />
+          <path
+            d="M 50,700 Q 450,780 850,700 T 1650,700 T 2450,700 T 3250,700"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeDasharray="14,14"
+            className="animate-river-flow-3"
+          />
         </svg>
       </div>
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-12 md:px-24 mb-6 flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0 select-none">
         <div>
           <p className="text-river-600/50 text-xs tracking-[0.3em] uppercase mb-2">Chapter Four</p>
-          <h2 className="text-4xl font-bold text-stone-900">Stepping <span className="text-river-600">Stones</span></h2>
+          <h2 className="text-4xl font-bold text-stone-900">
+            Stepping <span className="text-river-600">Stones</span>
+          </h2>
         </div>
         <div className="flex gap-2">
           {categories.map((cat) => (
@@ -531,7 +551,7 @@ function DesktopLayout({
                 "px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-300",
                 activeCategory === cat.value
                   ? "bg-forest-700 text-white shadow-md shadow-forest-900/15"
-                  : "bg-white/50 text-stone-600 border border-stone-300/30 hover:bg-white/80",
+                  : "bg-white/50 text-stone-600 border border-stone-300/30 hover:bg-white/80"
               )}
             >
               {cat.label}
@@ -544,23 +564,43 @@ function DesktopLayout({
         <div className="absolute inset-y-0 left-0 right-0 pointer-events-none flex items-center justify-between px-10 z-30">
           <motion.button
             initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: canScrollLeft ? 1 : 0, x: canScrollLeft ? 0 : -10, pointerEvents: canScrollLeft ? "auto" : "none" }}
+            animate={{
+              opacity: canScrollLeft ? 1 : 0,
+              x: canScrollLeft ? 0 : -10,
+              pointerEvents: canScrollLeft ? "auto" : "none",
+            }}
             onClick={() => scrollToProject(currentIndex - 1)}
             className="p-4 rounded-full bg-white/85 hover:bg-white text-stone-850 border border-stone-200/60 backdrop-blur-md shadow-lg transition-all duration-300 pointer-events-auto hover:scale-110 active:scale-95 group/btn"
             aria-label="Previous Project"
           >
-            <svg className="w-5 h-5 transition-transform group-hover/btn:-translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <svg
+              className="w-5 h-5 transition-transform group-hover/btn:-translate-x-0.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </motion.button>
           <motion.button
             initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: canScrollRight ? 1 : 0, x: canScrollRight ? 0 : 10, pointerEvents: canScrollRight ? "auto" : "none" }}
+            animate={{
+              opacity: canScrollRight ? 1 : 0,
+              x: canScrollRight ? 0 : 10,
+              pointerEvents: canScrollRight ? "auto" : "none",
+            }}
             onClick={() => scrollToProject(currentIndex + 1)}
             className="p-4 rounded-full bg-white/85 hover:bg-white text-stone-850 border border-stone-200/60 backdrop-blur-md shadow-lg transition-all duration-300 pointer-events-auto hover:scale-110 active:scale-95 group/btn"
             aria-label="Next Project"
           >
-            <svg className="w-5 h-5 transition-transform group-hover/btn:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <svg
+              className="w-5 h-5 transition-transform group-hover/btn:translate-x-0.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </motion.button>
@@ -592,7 +632,11 @@ function DesktopLayout({
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-12 md:px-24 mt-6 flex flex-col gap-4 select-none shrink-0">
         <div className="w-full h-1 bg-stone-200/50 rounded-full relative">
-          <div ref={progressBarRef} className="absolute top-0 bottom-0 left-0 bg-forest-600 rounded-full" style={{ width: "0%" }} />
+          <div
+            ref={progressBarRef}
+            className="absolute top-0 bottom-0 left-0 bg-forest-600 rounded-full"
+            style={{ width: "0%" }}
+          />
           {filteredProjects.map((proj, idx) => {
             const isActive = idx <= currentIndex;
             return (
@@ -601,9 +645,14 @@ function DesktopLayout({
                 onClick={() => scrollToProject(idx)}
                 className={cn(
                   "absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-2 transition-all duration-500 cursor-pointer shadow-sm hover:scale-125",
-                  isActive ? "bg-forest-600 border-forest-600 scale-110" : "bg-white border-stone-300 hover:border-forest-400"
+                  isActive
+                    ? "bg-forest-600 border-forest-600 scale-110"
+                    : "bg-white border-stone-300 hover:border-forest-400"
                 )}
-                style={{ left: `${(idx / (filteredProjects.length - 1 || 1)) * 100}%`, transform: `translate(-50%, -50%)` }}
+                style={{
+                  left: `${(idx / (filteredProjects.length - 1 || 1)) * 100}%`,
+                  transform: `translate(-50%, -50%)`,
+                }}
                 aria-label={`Go to project ${idx + 1}`}
               />
             );
@@ -611,7 +660,9 @@ function DesktopLayout({
         </div>
         <div className="flex justify-between items-center text-xs text-stone-450 mt-1">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-stone-500">Scroll down to step across the river.</span>
+            <span className="font-semibold text-stone-500">
+              Scroll down to step across the river.
+            </span>
             <span className="animate-bounce">→</span>
           </div>
           <div className="flex gap-6 font-mono font-medium">
@@ -630,13 +681,21 @@ interface MobileLayoutProps {
   readonly handleCategoryChange: (cat: ProjectCategory | "all") => void;
 }
 
-function MobileLayout({ activeCategory, filteredProjects, handleCategoryChange }: MobileLayoutProps) {
+function MobileLayout({
+  activeCategory,
+  filteredProjects,
+  handleCategoryChange,
+}: MobileLayoutProps) {
   return (
     <div className="relative z-10 max-w-7xl mx-auto px-6">
       <div className="text-center mb-12">
         <p className="text-river-600/50 text-sm tracking-[0.3em] uppercase mb-4">Chapter Four</p>
-        <h2 className="text-3xl font-bold text-stone-900 mb-4">Stepping <span className="text-river-600">Stones</span></h2>
-        <p className="text-stone-600/70 max-w-xl mx-auto text-sm">Products and experiments — stepping stones across the river of practice.</p>
+        <h2 className="text-3xl font-bold text-stone-900 mb-4">
+          Stepping <span className="text-river-600">Stones</span>
+        </h2>
+        <p className="text-stone-600/70 max-w-xl mx-auto text-sm">
+          Products and experiments — stepping stones across the river of practice.
+        </p>
       </div>
       <div className="flex flex-wrap justify-center gap-2 mb-8">
         {categories.map((cat) => (
@@ -647,7 +706,7 @@ function MobileLayout({ activeCategory, filteredProjects, handleCategoryChange }
               "px-4 py-2 rounded-full text-xs font-medium transition-all duration-300",
               activeCategory === cat.value
                 ? "bg-forest-700 text-white"
-                : "bg-white/60 text-stone-600 border border-stone-300/40",
+                : "bg-white/60 text-stone-600 border border-stone-300/40"
             )}
           >
             {cat.label}
@@ -655,14 +714,22 @@ function MobileLayout({ activeCategory, filteredProjects, handleCategoryChange }
         ))}
       </div>
       <AnimatePresence mode="wait">
-        <motion.div key={activeCategory} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <motion.div
+          key={activeCategory}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+        >
           {filteredProjects.map((project, index) => (
             <ProjectCard key={project.id} project={project} index={index} />
           ))}
         </motion.div>
       </AnimatePresence>
       {filteredProjects.length === 0 && (
-        <div className="text-center py-12"><p className="text-stone-500">No projects found in this category.</p></div>
+        <div className="text-center py-12">
+          <p className="text-stone-500">No projects found in this category.</p>
+        </div>
       )}
     </div>
   );
@@ -673,17 +740,20 @@ export const ProjectsSection = () => {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => { setIsDesktop(globalThis.innerWidth >= 1024); };
+    const handleResize = () => {
+      setIsDesktop(globalThis.innerWidth >= 1024);
+    };
     handleResize();
     globalThis.addEventListener("resize", handleResize);
     return () => globalThis.removeEventListener("resize", handleResize);
   }, []);
 
-  const filteredProjects = activeCategory === "all"
-    ? projects
-    : projects.filter((p) => p.category === activeCategory);
+  const filteredProjects =
+    activeCategory === "all" ? projects : projects.filter((p) => p.category === activeCategory);
 
-  const handleCategoryChange = (category: ProjectCategory | "all") => { setActiveCategory(category); };
+  const handleCategoryChange = (category: ProjectCategory | "all") => {
+    setActiveCategory(category);
+  };
 
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -694,8 +764,14 @@ export const ProjectsSection = () => {
   const progressTextRef = useRef<HTMLSpanElement>(null);
 
   const { scrollRange, containerHeight, currentIndex } = useHorizontalScroll(
-    isDesktop, filteredProjects, containerRef, trackRef, stickyRef, bgRef,
-    progressBarRef, progressTextRef,
+    isDesktop,
+    filteredProjects,
+    containerRef,
+    trackRef,
+    stickyRef,
+    bgRef,
+    progressBarRef,
+    progressTextRef
   );
 
   const scrollToProject = (index: number) => {
@@ -711,10 +787,14 @@ export const ProjectsSection = () => {
     <section
       id="projects"
       ref={isDesktop ? containerRef : undefined}
-      className={cn("relative", isDesktop ? "py-0 overflow-visible" : "overflow-hidden py-24 md:py-32")}
+      className={cn(
+        "relative",
+        isDesktop ? "py-0 overflow-visible" : "overflow-hidden py-24 md:py-32"
+      )}
       style={{
         height: isDesktop ? `${containerHeight ?? window.innerHeight}px` : undefined,
-        background: "linear-gradient(180deg, rgba(211, 237, 158, 0.2) 0%, rgba(219, 239, 254, 0.15) 10%, rgba(239, 248, 255, 0.1) 30%, rgba(239, 248, 255, 0.1) 70%, rgba(219, 239, 254, 0.15) 90%, rgba(191, 227, 254, 0.25) 100%)",
+        background:
+          "linear-gradient(180deg, rgba(211, 237, 158, 0.2) 0%, rgba(219, 239, 254, 0.15) 10%, rgba(239, 248, 255, 0.1) 30%, rgba(239, 248, 255, 0.1) 70%, rgba(219, 239, 254, 0.15) 90%, rgba(191, 227, 254, 0.25) 100%)",
       }}
     >
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -726,9 +806,13 @@ export const ProjectsSection = () => {
 
       {isDesktop ? (
         <DesktopLayout
-          stickyRef={stickyRef} bgRef={bgRef} trackRef={trackRef}
-          progressBarRef={progressBarRef} progressTextRef={progressTextRef}
-          activeCategory={activeCategory} filteredProjects={filteredProjects}
+          stickyRef={stickyRef}
+          bgRef={bgRef}
+          trackRef={trackRef}
+          progressBarRef={progressBarRef}
+          progressTextRef={progressTextRef}
+          activeCategory={activeCategory}
+          filteredProjects={filteredProjects}
           currentIndex={currentIndex}
           canScrollLeft={currentIndex > 0}
           canScrollRight={currentIndex < filteredProjects.length - 1}
@@ -736,16 +820,27 @@ export const ProjectsSection = () => {
           scrollToProject={scrollToProject}
         />
       ) : (
-        <MobileLayout activeCategory={activeCategory} filteredProjects={filteredProjects} handleCategoryChange={handleCategoryChange} />
+        <MobileLayout
+          activeCategory={activeCategory}
+          filteredProjects={filteredProjects}
+          handleCategoryChange={handleCategoryChange}
+        />
       )}
 
       {!isDesktop && (
         <div className="max-w-7xl mx-auto px-6 mt-16 grid grid-cols-2 gap-4 text-center">
           {[
             { value: `${projects.length}+`, label: "Total Projects", color: "text-forest-700" },
-            { value: `${new Set(projects.flatMap((p) => p.technologies)).size}+`, label: "Tech Used", color: "text-river-600" },
+            {
+              value: `${new Set(projects.flatMap((p) => p.technologies)).size}+`,
+              label: "Tech Used",
+              color: "text-river-600",
+            },
           ].map((stat) => (
-            <div key={stat.label} className="p-4 bg-white/40 backdrop-blur-sm rounded-xl border border-stone-200/30">
+            <div
+              key={stat.label}
+              className="p-4 bg-white/40 backdrop-blur-sm rounded-xl border border-stone-200/30"
+            >
               <div className={`text-xl font-bold ${stat.color} mb-1`}>{stat.value}</div>
               <div className="text-xs text-stone-500">{stat.label}</div>
             </div>
@@ -755,4 +850,3 @@ export const ProjectsSection = () => {
     </section>
   );
 };
-

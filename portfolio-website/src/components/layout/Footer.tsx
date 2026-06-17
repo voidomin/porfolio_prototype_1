@@ -48,7 +48,8 @@ export const Footer = () => {
     <footer
       className="relative overflow-hidden"
       style={{
-        background: "linear-gradient(180deg, rgba(26, 10, 9, 0.5) 0%, rgba(15, 13, 46, 0.7) 30%, rgba(10, 8, 32, 0.85) 100%)",
+        background:
+          "linear-gradient(180deg, rgba(26, 10, 9, 0.5) 0%, rgba(15, 13, 46, 0.7) 30%, rgba(10, 8, 32, 0.85) 100%)",
       }}
       onMouseEnter={handleHover}
     >
@@ -108,8 +109,7 @@ export const Footer = () => {
           {/* Social links as constellation */}
           <div className="flex justify-center gap-4 mb-8">
             {socialLinks.map((link) => {
-              const IconComponent =
-                iconMap[link.icon as keyof typeof iconMap];
+              const IconComponent = iconMap[link.icon as keyof typeof iconMap];
               if (!IconComponent) return null;
 
               return (
@@ -138,8 +138,8 @@ export const Footer = () => {
 
           {/* Copyright */}
           <p className="text-sm text-night-300/40">
-            © {currentYear} {personalProfile.name}. Built with calm focus and
-            care under starlit skies.
+            © {currentYear} {personalProfile.name}. Built with calm focus and care under starlit
+            skies.
           </p>
         </motion.div>
       </div>

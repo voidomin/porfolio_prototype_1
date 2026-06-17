@@ -46,7 +46,9 @@ export const InteractiveTrail = () => {
 
   // Keep the ref current without triggering re-renders
   useEffect(() => {
-    return scrollYProgress.on("change", (v) => { scrollProgressRef.current = v; });
+    return scrollYProgress.on("change", (v) => {
+      scrollProgressRef.current = v;
+    });
   }, [scrollYProgress]);
 
   useEffect(() => {
@@ -178,7 +180,7 @@ export const InteractiveTrail = () => {
         globalThis.dispatchEvent(
           new CustomEvent("nature-wind-gust", {
             detail: { vx: normX * 14, vy: normY * 14 },
-          }),
+          })
         );
       }
 
@@ -191,7 +193,7 @@ export const InteractiveTrail = () => {
     // Track touch movement (mobile)
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length === 0) return;
-      
+
       // Throttle touch events to ~30fps (32ms) to prevent scrolling jank
       const now = Date.now();
       if (now - lastTouchTime.current < 32) return;
@@ -217,7 +219,7 @@ export const InteractiveTrail = () => {
         globalThis.dispatchEvent(
           new CustomEvent("nature-wind-gust", {
             detail: { vx: normX * 10, vy: normY * 10 },
-          }),
+          })
         );
       }
 
@@ -273,8 +275,7 @@ export const InteractiveTrail = () => {
           y: Math.random() * (globalThis.innerHeight || 800),
           vx: vx + (Math.random() - 0.5) * 4,
           vy: vy + (Math.random() - 0.5) * 4,
-          size:
-            type === "leaf" ? Math.random() * 5 + 5 : Math.random() * 3.5 + 2.5,
+          size: type === "leaf" ? Math.random() * 5 + 5 : Math.random() * 3.5 + 2.5,
           alpha: 1,
           decay: type === "ember" ? 0.032 : type === "leaf" ? 0.008 : 0.015, // Faster decay for embers
           rotation: Math.random() * Math.PI * 2,
@@ -394,12 +395,12 @@ export const InteractiveTrail = () => {
           ctx.strokeStyle = p.color;
           ctx.lineWidth = p.size;
           ctx.lineCap = "round";
-          
+
           if (!isMobile) {
             ctx.shadowColor = "rgba(255, 95, 30, 0.8)";
             ctx.shadowBlur = p.size * 2;
           }
-          
+
           ctx.stroke();
         }
 
@@ -416,10 +417,7 @@ export const InteractiveTrail = () => {
       globalThis.removeEventListener("touchstart", handleTouchStart);
       globalThis.removeEventListener("touchmove", handleTouchMove);
       globalThis.removeEventListener("nature-wind-gust", handleWindGust);
-      globalThis.removeEventListener(
-        "nature-campfire-stoke",
-        handleCampfireStoke,
-      );
+      globalThis.removeEventListener("nature-campfire-stoke", handleCampfireStoke);
       cancelAnimationFrame(animationId);
     };
   }, [isMobile]);

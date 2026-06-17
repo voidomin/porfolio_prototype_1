@@ -48,7 +48,6 @@ export const useIntersectionObserver = ({
   return { elementRef, isIntersecting };
 };
 
-
 export const useScrollDirection = () => {
   const { scrollY } = useScrollContext();
   // Only re-render when crossing the threshold Navbar actually cares about

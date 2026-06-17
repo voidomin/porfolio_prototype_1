@@ -37,10 +37,11 @@ export const PhotographySection = () => {
 
   // Memoized — only recomputes when the active category filter changes
   const filteredPhotos = useMemo(
-    () => galleryImages.filter((photo) => {
-      if (activeCategory === "all") return true;
-      return photo.category.toLowerCase() === activeCategory.toLowerCase();
-    }),
+    () =>
+      galleryImages.filter((photo) => {
+        if (activeCategory === "all") return true;
+        return photo.category.toLowerCase() === activeCategory.toLowerCase();
+      }),
     [activeCategory]
   );
 
@@ -138,15 +139,13 @@ export const PhotographySection = () => {
           viewport={{ once: true }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
-          <p className="text-dawn-700/50 text-sm tracking-[0.3em] uppercase mb-4">
-            Chapter Six
-          </p>
+          <p className="text-dawn-700/50 text-sm tracking-[0.3em] uppercase mb-4">Chapter Six</p>
           <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4 font-sans">
             Golden <span className="text-dawn-600">Hour</span>
           </h2>
           <p className="text-stone-600/60 max-w-lg mx-auto text-sm leading-relaxed">
-            Moments captured in transit. Stored with camera exposure profiles (EXIF)
-            to preserve the exact light and setting of each memory.
+            Moments captured in transit. Stored with camera exposure profiles (EXIF) to preserve the
+            exact light and setting of each memory.
           </p>
         </motion.div>
 
@@ -179,68 +178,70 @@ export const PhotographySection = () => {
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: "easeOut" }}
         >
-        <div
-          ref={carouselContainerRef}
-          className="relative w-full overflow-hidden py-4"
-        >
-          <motion.div
-            ref={carouselTrackRef}
-            drag="x"
-            dragConstraints={{ left: dragConstraintsLeft, right: 0 }}
-            dragElastic={0.25}
-            dragTransition={{ power: 0.3, timeConstant: 250 }}
-            onDragStart={() => setIsDragging(true)}
-            onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
-            className="flex gap-8 cursor-grab active:cursor-grabbing w-max px-4"
-          >
-            {homepagePhotos.map((photo) => (
-              <button
-                key={photo.id}
-                type="button"
-                className="group select-none shrink-0 text-left cursor-pointer"
-                onClick={() => { if (!isDragging) openLightbox(photo); }}
-              >
-                <div className="bg-white p-4 pb-6 rounded-xl shadow-xl shadow-stone-900/5 border border-stone-100 hover:shadow-2xl hover:shadow-stone-900/10 transition-all duration-500">
-                  {/* pulse-shimmer bg shows until the Next.js Image renders on top */}
-                  <div
-                    className="relative rounded-lg overflow-hidden pulse-shimmer h-[180px] sm:h-[240px] md:h-[280px]"
-                    style={{ aspectRatio: photo.width && photo.height ? `${photo.width}/${photo.height}` : "3/2" }}
-                  >
-                    <Image
-                      src={photo.src}
-                      alt={photo.alt}
-                      fill
-                      sizes="(max-width: 640px) 180px, (max-width: 1024px) 240px, 280px"
-                      quality={90}
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-between p-4">
-                      {photo.exif?.location && (
-                        <span className="text-white text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 drop-shadow-sm">
-                          <MapPin className="w-3.5 h-3.5 text-dawn-400" />
-                          {photo.exif.location}
+          <div ref={carouselContainerRef} className="relative w-full overflow-hidden py-4">
+            <motion.div
+              ref={carouselTrackRef}
+              drag="x"
+              dragConstraints={{ left: dragConstraintsLeft, right: 0 }}
+              dragElastic={0.25}
+              dragTransition={{ power: 0.3, timeConstant: 250 }}
+              onDragStart={() => setIsDragging(true)}
+              onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
+              className="flex gap-8 cursor-grab active:cursor-grabbing w-max px-4"
+            >
+              {homepagePhotos.map((photo) => (
+                <button
+                  key={photo.id}
+                  type="button"
+                  className="group select-none shrink-0 text-left cursor-pointer"
+                  onClick={() => {
+                    if (!isDragging) openLightbox(photo);
+                  }}
+                >
+                  <div className="bg-white p-4 pb-6 rounded-xl shadow-xl shadow-stone-900/5 border border-stone-100 hover:shadow-2xl hover:shadow-stone-900/10 transition-all duration-500">
+                    {/* pulse-shimmer bg shows until the Next.js Image renders on top */}
+                    <div
+                      className="relative rounded-lg overflow-hidden pulse-shimmer h-[180px] sm:h-[240px] md:h-[280px]"
+                      style={{
+                        aspectRatio:
+                          photo.width && photo.height ? `${photo.width}/${photo.height}` : "3/2",
+                      }}
+                    >
+                      <Image
+                        src={photo.src}
+                        alt={photo.alt}
+                        fill
+                        sizes="(max-width: 640px) 180px, (max-width: 1024px) 240px, 280px"
+                        quality={90}
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-between p-4">
+                        {photo.exif?.location && (
+                          <span className="text-white text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 drop-shadow-sm">
+                            <MapPin className="w-3.5 h-3.5 text-dawn-400" />
+                            {photo.exif.location}
+                          </span>
+                        )}
+                        <span className="p-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-stone-900 transition-all duration-300 shadow">
+                          <Maximize2 className="w-3.5 h-3.5" />
                         </span>
+                      </div>
+                    </div>
+                    <div className="mt-4 px-1 text-center max-w-full">
+                      <h3 className="text-stone-800 font-semibold tracking-wide text-sm font-sans truncate">
+                        {photo.title || "Untitled"}
+                      </h3>
+                      {photo.exif?.camera && (
+                        <p className="text-stone-400/80 text-[10px] tracking-widest uppercase mt-1 truncate">
+                          {photo.exif.camera}
+                        </p>
                       )}
-                      <span className="p-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-stone-900 transition-all duration-300 shadow">
-                        <Maximize2 className="w-3.5 h-3.5" />
-                      </span>
                     </div>
                   </div>
-                  <div className="mt-4 px-1 text-center max-w-full">
-                    <h3 className="text-stone-800 font-semibold tracking-wide text-sm font-sans truncate">
-                      {photo.title || "Untitled"}
-                    </h3>
-                    {photo.exif?.camera && (
-                      <p className="text-stone-400/80 text-[10px] tracking-widest uppercase mt-1 truncate">
-                        {photo.exif.camera}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </motion.div>
-        </div>
+                </button>
+              ))}
+            </motion.div>
+          </div>
         </motion.div>
 
         {/* View More Button for full gallery page */}
@@ -353,8 +354,12 @@ export const PhotographySection = () => {
                         <div className="flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5">
                           <Camera className="w-4 h-4 text-dawn-400 shrink-0" />
                           <div>
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider">Camera Body</span>
-                            <span className="text-white font-semibold">{selectedPhoto.exif.camera}</span>
+                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider">
+                              Camera Body
+                            </span>
+                            <span className="text-white font-semibold">
+                              {selectedPhoto.exif.camera}
+                            </span>
                           </div>
                         </div>
                       )}
@@ -364,8 +369,12 @@ export const PhotographySection = () => {
                         <div className="flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5">
                           <Aperture className="w-4 h-4 text-dawn-400 shrink-0" />
                           <div>
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider">Optics / Lens</span>
-                            <span className="text-white font-semibold">{selectedPhoto.exif.lens}</span>
+                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider">
+                              Optics / Lens
+                            </span>
+                            <span className="text-white font-semibold">
+                              {selectedPhoto.exif.lens}
+                            </span>
                           </div>
                         </div>
                       )}
@@ -374,25 +383,39 @@ export const PhotographySection = () => {
                       <div className="grid grid-cols-2 gap-3">
                         {selectedPhoto.exif?.focalLength && (
                           <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">Focal</span>
-                            <span className="text-white font-bold">{selectedPhoto.exif.focalLength}</span>
+                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">
+                              Focal
+                            </span>
+                            <span className="text-white font-bold">
+                              {selectedPhoto.exif.focalLength}
+                            </span>
                           </div>
                         )}
                         {selectedPhoto.exif?.aperture && (
                           <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">Aperture</span>
-                            <span className="text-white font-bold">{selectedPhoto.exif.aperture}</span>
+                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">
+                              Aperture
+                            </span>
+                            <span className="text-white font-bold">
+                              {selectedPhoto.exif.aperture}
+                            </span>
                           </div>
                         )}
                         {selectedPhoto.exif?.shutterSpeed && (
                           <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">Shutter</span>
-                            <span className="text-white font-bold">{selectedPhoto.exif.shutterSpeed}</span>
+                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">
+                              Shutter
+                            </span>
+                            <span className="text-white font-bold">
+                              {selectedPhoto.exif.shutterSpeed}
+                            </span>
                           </div>
                         )}
                         {selectedPhoto.exif?.iso && (
                           <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">ISO Speed</span>
+                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">
+                              ISO Speed
+                            </span>
                             <span className="text-white font-bold">{selectedPhoto.exif.iso}</span>
                           </div>
                         )}

@@ -145,16 +145,16 @@ export const HeroSection = () => {
           animate="visible"
           className="flex flex-wrap gap-3 justify-center mt-10"
         >
-          {(personalProfile.tags ?? ["Data + Craft", "Full-Stack", "Mountain calm", "Dawn trails"]).map(
-            (label) => (
-              <span
-                key={label}
-                className="px-4 py-2 rounded-full bg-forest-950/5 backdrop-blur-sm border border-forest-950/10 text-sm text-forest-900/70"
-              >
-                {label}
-              </span>
-            )
-          )}
+          {(
+            personalProfile.tags ?? ["Data + Craft", "Full-Stack", "Mountain calm", "Dawn trails"]
+          ).map((label) => (
+            <span
+              key={label}
+              className="px-4 py-2 rounded-full bg-forest-950/5 backdrop-blur-sm border border-forest-950/10 text-sm text-forest-900/70"
+            >
+              {label}
+            </span>
+          ))}
         </motion.div>
       </div>
 

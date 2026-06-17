@@ -20,7 +20,7 @@ export const SoundscapeManager = () => {
   // Audio Context and Node References
   const audioCtxRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
-  
+
   const windGainRef = useRef<GainNode | null>(null);
   const cricketGainRef = useRef<GainNode | null>(null);
   const fireGainRef = useRef<GainNode | null>(null);
@@ -44,7 +44,7 @@ export const SoundscapeManager = () => {
       if (v > 0.75) targetWind = 0.05;
 
       let targetCrickets = 0.0;
-      if (v >= 0.35) targetCrickets = Math.min(0.20, (v - 0.35) * 0.5);
+      if (v >= 0.35) targetCrickets = Math.min(0.2, (v - 0.35) * 0.5);
       if (v >= 0.7) targetCrickets = 0.22;
 
       let targetFire = 0.0;
@@ -242,14 +242,13 @@ export const SoundscapeManager = () => {
 
       // Set active playing triggers
       isPlayingRef.current = true;
-      
+
       // Warm, smooth master fade-in over 1.5 seconds to avoid audio shocks
       masterGain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 1.5);
 
       // Start scheduling loops
       scheduleCrickets();
       scheduleCampfire();
-
     } catch (err) {
       console.warn("Failed to initialize procedural soundscape engine:", err);
     }

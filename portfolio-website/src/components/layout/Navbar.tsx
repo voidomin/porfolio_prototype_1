@@ -75,8 +75,12 @@ const NavLink = ({ href, label, hasScrolled, isActive, onClick }: NavLinkProps) 
       className={cn(
         "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
         hasScrolled
-          ? isActive ? "text-white bg-white/10" : "text-white/70 hover:text-white hover:bg-white/10"
-          : isActive ? "text-forest-950 bg-forest-950/10" : "text-forest-950/80 hover:text-forest-950 hover:bg-forest-950/10"
+          ? isActive
+            ? "text-white bg-white/10"
+            : "text-white/70 hover:text-white hover:bg-white/10"
+          : isActive
+            ? "text-forest-950 bg-forest-950/10"
+            : "text-forest-950/80 hover:text-forest-950 hover:bg-forest-950/10"
       )}
     >
       {label}
@@ -329,8 +333,12 @@ export const Navbar = () => {
               )}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              title={soundEnabled ? "Mute ambient mountain sounds" : "Unmute ambient mountain sounds"}
-              aria-label={soundEnabled ? "Mute ambient mountain sounds" : "Unmute ambient mountain sounds"}
+              title={
+                soundEnabled ? "Mute ambient mountain sounds" : "Unmute ambient mountain sounds"
+              }
+              aria-label={
+                soundEnabled ? "Mute ambient mountain sounds" : "Unmute ambient mountain sounds"
+              }
               aria-pressed={soundEnabled}
             >
               <EqualizerBars
@@ -389,11 +397,7 @@ export const Navbar = () => {
       </motion.nav>
 
       {/* Mobile menu */}
-      <MobileMenu
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onLinkClick={handleLinkClick}
-      />
+      <MobileMenu isOpen={isOpen} onClose={() => setIsOpen(false)} onLinkClick={handleLinkClick} />
     </>
   );
 };

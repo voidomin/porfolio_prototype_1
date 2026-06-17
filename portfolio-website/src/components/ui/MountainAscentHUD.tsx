@@ -65,19 +65,18 @@ export const MountainAscentHUD = () => {
   };
 
   return (
-    <nav 
+    <nav
       className="fixed right-5 lg:right-8 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-center select-none pointer-events-auto"
       onMouseLeave={() => setHoveredItem(null)} // Returns to scroll-active dot solely when leaving the entire sidebar HUD
       aria-label="Hiking trail section navigator"
     >
       {/* HUD Container - More compact, ultra-refined */}
       <div className="relative flex flex-col items-center py-3.5 px-1.5 rounded-xl bg-black/15 backdrop-blur-md border border-white/5 shadow-2xl">
-        
         {/* Base Hiking Trail (Background Dotted Line) */}
         <div className="absolute w-[2px] h-[calc(100%-32px)] bg-white/10 top-4 bottom-4 border-dashed border-r border-white/5" />
 
         {/* Lit Hiking Trail (Active Scroll Track) */}
-        <div 
+        <div
           className="absolute w-[1.5px] bg-gradient-to-b from-dawn-400 via-forest-400 to-amber-500 top-4 transition-all duration-300 origin-top"
           style={{
             height: `${(scrollPercentage / 100) * 88}%`,
@@ -137,7 +136,7 @@ export const MountainAscentHUD = () => {
                       animate={{ scale: [1.0, 1.35, 1.0] }}
                       transition={{
                         scale: { duration: 1.0, repeat: Infinity, ease: "easeInOut" },
-                        layout: { type: "spring", stiffness: 380, damping: 25 } // High stiffness spring snap!
+                        layout: { type: "spring", stiffness: 380, damping: 25 }, // High stiffness spring snap!
                       }}
                     />
                   )}

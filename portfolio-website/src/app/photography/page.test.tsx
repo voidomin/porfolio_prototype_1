@@ -9,13 +9,21 @@ jest.mock("framer-motion", () => {
   const MockDiv = React.forwardRef<HTMLDivElement, any>(({ children, ...props }, ref) => {
     // Remove framer-motion props to avoid React warnings in console
     const { initial, animate, exit, transition, ...rest } = props;
-    return <div ref={ref} {...rest}>{children}</div>;
+    return (
+      <div ref={ref} {...rest}>
+        {children}
+      </div>
+    );
   });
   MockDiv.displayName = "MockDiv";
 
   const MockButton = React.forwardRef<HTMLButtonElement, any>(({ children, ...props }, ref) => {
     const { initial, animate, exit, transition, ...rest } = props;
-    return <button ref={ref} {...rest}>{children}</button>;
+    return (
+      <button ref={ref} {...rest}>
+        {children}
+      </button>
+    );
   });
   MockButton.displayName = "MockButton";
 
@@ -41,7 +49,11 @@ jest.mock("next/image", () => {
 // Mock next/link to render standard a tags
 jest.mock("next/link", () => {
   const MockLink = ({ children, href, ...props }: any) => {
-    return <a href={href} {...props}>{children}</a>;
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    );
   };
   MockLink.displayName = "MockLink";
   return MockLink;
@@ -102,17 +114,17 @@ describe("PhotographyGalleryPage", () => {
     fireEvent.click(streetBtn);
 
     // Verify only 'street' category images are rendered in grid
-    const streetImages = galleryImages.filter(img => img.category === "street");
-    const otherImages = galleryImages.filter(img => img.category !== "street");
+    const streetImages = galleryImages.filter((img) => img.category === "street");
+    const otherImages = galleryImages.filter((img) => img.category !== "street");
 
-    streetImages.forEach(img => {
+    streetImages.forEach((img) => {
       if (img.title) {
         expect(screen.getByText(img.title)).toBeInTheDocument();
       }
     });
 
     // Check that some other category image title is NOT in the document
-    const nonStreetFeatured = otherImages.find(img => img.title && img.featured);
+    const nonStreetFeatured = otherImages.find((img) => img.title && img.featured);
     if (nonStreetFeatured?.title) {
       expect(screen.queryByText(nonStreetFeatured.title)).not.toBeInTheDocument();
     }
@@ -122,9 +134,9 @@ describe("PhotographyGalleryPage", () => {
     render(<PhotographyGalleryPage />);
 
     const searchInput = screen.getByPlaceholderText(/Search by title, location, camera body.../i);
-    
+
     // Find a unique image title to search for, e.g., "Neon Raindrops"
-    const targetImage = galleryImages.find(img => img.title === "Neon Raindrops");
+    const targetImage = galleryImages.find((img) => img.title === "Neon Raindrops");
     expect(targetImage).toBeDefined();
 
     // Search for a specific image
@@ -134,7 +146,7 @@ describe("PhotographyGalleryPage", () => {
     expect(screen.getByText("Neon Raindrops")).toBeInTheDocument();
 
     // Other images should be filtered out
-    const otherImage = galleryImages.find(img => img.title === "Cathedral of Trees");
+    const otherImage = galleryImages.find((img) => img.title === "Cathedral of Trees");
     if (otherImage?.title) {
       expect(screen.queryByText(otherImage.title)).not.toBeInTheDocument();
     }
@@ -144,11 +156,11 @@ describe("PhotographyGalleryPage", () => {
     render(<PhotographyGalleryPage />);
 
     const cameraDropdown = screen.getAllByRole("combobox")[0];
-    
+
     // Leica Q3 camera images
     const targetCamera = "Leica Q3";
-    const leicaQ3Image = galleryImages.find(img => img.exif?.camera === targetCamera);
-    const otherCameraImage = galleryImages.find(img => img.exif?.camera === "Sony Alpha 7R V");
+    const leicaQ3Image = galleryImages.find((img) => img.exif?.camera === targetCamera);
+    const otherCameraImage = galleryImages.find((img) => img.exif?.camera === "Sony Alpha 7R V");
 
     expect(leicaQ3Image).toBeDefined();
     expect(otherCameraImage).toBeDefined();
@@ -168,17 +180,17 @@ describe("PhotographyGalleryPage", () => {
     render(<PhotographyGalleryPage />);
 
     // Click on the first featured photo card in the grid
-    const firstFeaturedImage = galleryImages.find(img => img.featured && img.title);
+    const firstFeaturedImage = galleryImages.find((img) => img.featured && img.title);
     expect(firstFeaturedImage).toBeDefined();
 
     if (firstFeaturedImage?.title) {
       const searchTitle = firstFeaturedImage.title;
       // Find button corresponding to this image. We can search by text of the title or get the button
-      const imageButton = screen.getAllByRole("button").find(
-        btn => btn.textContent?.includes(searchTitle)
-      );
+      const imageButton = screen
+        .getAllByRole("button")
+        .find((btn) => btn.textContent?.includes(searchTitle));
       expect(imageButton).toBeDefined();
-      
+
       if (imageButton) {
         fireEvent.click(imageButton);
       }
@@ -199,7 +211,9 @@ describe("PhotographyGalleryPage", () => {
   test("lightbox modal allows copy, next/prev navigation and closes", async () => {
     render(<PhotographyGalleryPage />);
 
-    const featuredImagesWithExif = galleryImages.filter(img => img.featured && img.title && img.exif?.camera);
+    const featuredImagesWithExif = galleryImages.filter(
+      (img) => img.featured && img.title && img.exif?.camera
+    );
     expect(featuredImagesWithExif.length).toBeGreaterThan(1);
 
     const firstImage = featuredImagesWithExif[0];
@@ -207,9 +221,9 @@ describe("PhotographyGalleryPage", () => {
     if (firstImage.title) {
       const searchTitle = firstImage.title;
       // Open lightbox for the first image
-      const imageButton = screen.getAllByRole("button").find(
-        btn => btn.textContent?.includes(searchTitle)
-      );
+      const imageButton = screen
+        .getAllByRole("button")
+        .find((btn) => btn.textContent?.includes(searchTitle));
       expect(imageButton).toBeDefined();
       if (imageButton) {
         fireEvent.click(imageButton);
@@ -245,7 +259,7 @@ describe("PhotographyGalleryPage", () => {
 
     const matteBtn = screen.getByRole("button", { name: "Museum Matte" });
     fireEvent.click(matteBtn);
-    
+
     // Check that Minimal button exists and can be clicked to switch back
     const minimalBtn = screen.getByRole("button", { name: "Minimal" });
     expect(minimalBtn).toBeInTheDocument();

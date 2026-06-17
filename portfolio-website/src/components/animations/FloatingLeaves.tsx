@@ -53,27 +53,10 @@ const LeafSVG = ({ size, color }: { size: number; color: string }) => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <path
-      d="M10,1 Q18,8 16,18 Q14,24 10,25 Q6,24 4,18 Q2,8 10,1 Z"
-      fill={color}
-    />
-    <path
-      d="M10,4 L10,22"
-      stroke="rgba(255,255,255,0.3)"
-      strokeWidth={0.5}
-    />
-    <path
-      d="M10,10 Q7,8 5,10"
-      stroke="rgba(255,255,255,0.2)"
-      strokeWidth={0.4}
-      fill="none"
-    />
-    <path
-      d="M10,14 Q13,12 15,14"
-      stroke="rgba(255,255,255,0.2)"
-      strokeWidth={0.4}
-      fill="none"
-    />
+    <path d="M10,1 Q18,8 16,18 Q14,24 10,25 Q6,24 4,18 Q2,8 10,1 Z" fill={color} />
+    <path d="M10,4 L10,22" stroke="rgba(255,255,255,0.3)" strokeWidth={0.5} />
+    <path d="M10,10 Q7,8 5,10" stroke="rgba(255,255,255,0.2)" strokeWidth={0.4} fill="none" />
+    <path d="M10,14 Q13,12 15,14" stroke="rgba(255,255,255,0.2)" strokeWidth={0.4} fill="none" />
   </svg>
 );
 
@@ -93,10 +76,7 @@ export const FloatingLeaves = () => {
   if (prefersReducedMotion || isMobile || !mounted) return null;
 
   return (
-    <div
-      className="fixed inset-0 pointer-events-none overflow-hidden"
-      style={{ zIndex: 4 }}
-    >
+    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 4 }}>
       {leaves.map((leaf) => (
         <motion.div
           key={leaf.id}

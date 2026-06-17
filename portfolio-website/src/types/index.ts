@@ -170,19 +170,8 @@ export interface ThemeConfig {
 
 export type ProjectCategory = "web" | "mobile" | "design" | "other";
 export type BlogCategory = "tech" | "design" | "personal" | "tutorial";
-export type GalleryCategory =
-  | "nature"
-  | "portrait"
-  | "street"
-  | "architecture"
-  | "other";
-export type SkillCategory =
-  | "frontend"
-  | "backend"
-  | "design"
-  | "tools"
-  | "other"
-  | "hobbies";
+export type GalleryCategory = "nature" | "portrait" | "street" | "architecture" | "other";
+export type SkillCategory = "frontend" | "backend" | "design" | "tools" | "other" | "hobbies";
 
 export interface FABAction {
   id: string;

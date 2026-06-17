@@ -11,8 +11,7 @@ export default function NotFound() {
     <div
       className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6"
       style={{
-        background:
-          "linear-gradient(180deg, #fef7e0 0%, #fdedb7 30%, #fbdf85 60%, #f0b429 100%)",
+        background: "linear-gradient(180deg, #fef7e0 0%, #fdedb7 30%, #fbdf85 60%, #f0b429 100%)",
       }}
     >
       {/* Mountain silhouettes */}
@@ -63,12 +62,9 @@ export default function NotFound() {
           404
         </h1>
 
-        <p className="text-xl font-medium text-forest-900/80 mb-3">
-          This path doesn&apos;t exist
-        </p>
+        <p className="text-xl font-medium text-forest-900/80 mb-3">This path doesn&apos;t exist</p>
         <p className="text-forest-900/50 text-sm leading-relaxed mb-10 max-w-xs mx-auto">
-          The trail you were following has faded. Head back to the trailhead
-          and find your way.
+          The trail you were following has faded. Head back to the trailhead and find your way.
         </p>
 
         <Link

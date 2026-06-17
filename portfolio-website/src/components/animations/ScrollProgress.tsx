@@ -31,11 +31,7 @@ export const ScrollProgress: React.FC = () => {
   );
 
   // Dot color (sun → moon)
-  const dotColor = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    ["#f0b429", "#7db523", "#c7cfff"]
-  );
+  const dotColor = useTransform(scrollYProgress, [0, 0.5, 1], ["#f0b429", "#7db523", "#c7cfff"]);
 
   const dotGlow = useTransform(
     scrollYProgress,

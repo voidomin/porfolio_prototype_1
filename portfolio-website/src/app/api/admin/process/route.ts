@@ -22,9 +22,9 @@ interface CropCoordinates {
 
 interface ImageAdjustments {
   brightness?: number; // 0.5 to 2.0
-  contrast?: number;   // 0.5 to 2.0
+  contrast?: number; // 0.5 to 2.0
   saturation?: number; // 0.5 to 2.0
-  rotation?: number;   // 0, 90, 180, 270
+  rotation?: number; // 0, 90, 180, 270
 }
 
 interface WatermarkOptions {
@@ -68,7 +68,10 @@ export async function POST(request: NextRequest) {
 
     // Validate inputs
     if (!filename || !id || !category) {
-      return NextResponse.json({ error: "Missing required fields: filename, id, category" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields: filename, id, category" },
+        { status: 400 }
+      );
     }
 
     const pendingDir = path.join(process.cwd(), "images-to-process");
@@ -90,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     // Process image using sharp: extract crop if specified, resize to max 1920 width, convert to webp (quality 82)
     const imageProcessor = sharp(inputPath);
-    
+
     // 1. Crop
     if (crop && crop.width > 0 && crop.height > 0) {
       imageProcessor.extract({
@@ -130,7 +133,7 @@ export async function POST(request: NextRequest) {
       const watermarkText = watermark.text || "© Akash Photography";
       const svgWidth = 500;
       const svgHeight = 80;
-      
+
       // Determine text anchor and alignment coordinates based on gravity position
       const isWest = watermark.position === "southwest" || watermark.position === "northwest";
       const textAnchor = isWest ? "start" : "end";
@@ -157,14 +160,12 @@ export async function POST(request: NextRequest) {
         {
           input: watermarkBuffer,
           gravity: watermark.position || "southeast",
-        }
+        },
       ]);
     }
 
     // 7. Output WebP
-    const imageInfo = await imageProcessor
-      .webp({ quality: 82 })
-      .toFile(outputPath);
+    const imageInfo = await imageProcessor.webp({ quality: 82 }).toFile(outputPath);
 
     // Read and update gallery.json
     const dbPath = path.join(process.cwd(), "src", "data", "gallery.json");
@@ -178,8 +179,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for duplicate ID
-    const duplicateIndex = gallery.findIndex(item => item.id === id);
-    
+    const duplicateIndex = gallery.findIndex((item) => item.id === id);
+
     const newImageEntry = {
       id,
       src: webpSrcPath,
@@ -199,11 +200,11 @@ export async function POST(request: NextRequest) {
         shutterSpeed: exif?.shutterSpeed || "",
         iso: exif?.iso || "",
         location: exif?.location || "",
-      }
+      },
     };
 
     // Filter out empty exif metadata block if no exif is specified
-    const hasExif = Object.values(newImageEntry.exif).some(val => val !== "");
+    const hasExif = Object.values(newImageEntry.exif).some((val) => val !== "");
     if (!hasExif) {
       delete (newImageEntry as any).exif;
     }
@@ -223,7 +224,7 @@ export async function POST(request: NextRequest) {
       fs.mkdirSync(importedDir, { recursive: true });
     }
     const archivePath = path.join(importedDir, filename);
-    
+
     // If a file with the same name already exists in archive, append timestamp to avoid overwrite error
     let finalArchivePath = archivePath;
     if (fs.existsSync(archivePath)) {
