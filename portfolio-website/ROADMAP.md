@@ -35,6 +35,22 @@
 
 ---
 
+## Code Quality & Tooling
+
+### Active (set up)
+- [x] ESLint — extended with `prettier`, `no-console` warn, `prefer-const`, unused vars
+- [x] Prettier — auto-format on commit (100 char width, double quotes, LF line endings)
+- [x] Husky + lint-staged — pre-commit hook formats and lints staged files automatically
+
+### To explore
+- [ ] **Snyk** — scans npm dependencies for known CVEs; free tier, 2-min GitHub connect
+- [ ] **GitHub CodeQL** — free on public repos, runs in GitHub Actions, catches security bugs (XSS, injection) in your own code; zero maintenance once set up
+- [ ] **DeepScan** — TypeScript-specific static analysis, catches subtle runtime bugs ESLint misses; free for public repos
+- [ ] **Codacy** — full quality dashboard (grades, trends, PR comments), closest alternative to SonarCloud; free for public repos
+- [ ] **Code Climate** — maintainability scores and test coverage trends over time; free for open source
+
+---
+
 ## Completed
 
 - [x] Shared ScrollContext — consolidated 7 separate `useScroll()` calls into one
