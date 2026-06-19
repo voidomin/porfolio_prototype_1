@@ -14,10 +14,12 @@ import {
   FileText,
   Plus,
   Trash2,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
+// @ts-ignore: allow importing CSS side-effect when no type declarations are present
 import "react-image-crop/dist/ReactCrop.css";
 
 interface ExifData {
@@ -447,6 +449,215 @@ function StatusBanner({ statusMessage }: Readonly<StatusBannerProps>) {
   );
 }
 
+interface RatioOption {
+  label: string;
+  sublabel: string;
+  value: number | undefined;
+  w: number;
+  h: number;
+}
+
+const ASPECT_RATIOS: RatioOption[] = [
+  { label: "Full", sublabel: "No crop", value: undefined, w: 32, h: 22 },
+  { label: "1:1", sublabel: "Square", value: 1, w: 22, h: 22 },
+  { label: "3:2", sublabel: "Landscape", value: 3 / 2, w: 30, h: 20 },
+  { label: "2:3", sublabel: "Portrait", value: 2 / 3, w: 20, h: 30 },
+  { label: "4:3", sublabel: "Classic", value: 4 / 3, w: 28, h: 21 },
+  { label: "16:9", sublabel: "Widescreen", value: 16 / 9, w: 32, h: 18 },
+];
+
+interface CropWorkspaceProps {
+  readonly selectedFile: string;
+  readonly crop: Crop | undefined;
+  readonly setCrop: (c: Crop | undefined) => void;
+  readonly setCompletedCrop: (c: PixelCrop | null) => void;
+  readonly onImageLoad: (e: React.SyntheticEvent<HTMLImageElement>) => void;
+  readonly brightness: number;
+  readonly setBrightness: (v: number) => void;
+  readonly contrast: number;
+  readonly setContrast: (v: number) => void;
+  readonly saturation: number;
+  readonly setSaturation: (v: number) => void;
+  readonly rotation: number;
+  readonly setRotation: (v: number) => void;
+}
+
+function CropWorkspace({
+  selectedFile,
+  crop,
+  setCrop,
+  setCompletedCrop,
+  onImageLoad,
+  brightness,
+  setBrightness,
+  contrast,
+  setContrast,
+  saturation,
+  setSaturation,
+  rotation,
+  setRotation,
+}: CropWorkspaceProps) {
+  const [aspectRatio, setAspectRatio] = useState<number | undefined>(undefined);
+  const [imgNaturalSize, setImgNaturalSize] = useState<{ w: number; h: number } | null>(null);
+  const [imgDisplaySize, setImgDisplaySize] = useState<{ w: number; h: number } | null>(null);
+
+  const handleRatioChange = (value: number | undefined) => {
+    setAspectRatio(value);
+    setCrop(undefined);
+    setCompletedCrop(null);
+  };
+
+  const handleLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    setImgNaturalSize({ w: img.naturalWidth, h: img.naturalHeight });
+    setImgDisplaySize({ w: img.width, h: img.height });
+    onImageLoad(e);
+  };
+
+  const cropPixelW =
+    crop && imgNaturalSize && imgDisplaySize
+      ? Math.round((crop.width / 100) * imgNaturalSize.w)
+      : null;
+  const cropPixelH =
+    crop && imgNaturalSize && imgDisplaySize
+      ? Math.round((crop.height / 100) * imgNaturalSize.h)
+      : null;
+
+  return (
+    <>
+      {/* ── Ratio picker ── */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold">
+            Crop Ratio
+          </span>
+          {crop && (
+            <button
+              type="button"
+              onClick={() => { setCrop(undefined); setCompletedCrop(null); }}
+              className="text-[10px] font-bold text-rose-400 hover:text-rose-300 transition cursor-pointer"
+            >
+              ✕ Clear crop
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-6 gap-1.5">
+          {ASPECT_RATIOS.map((r) => {
+            const active = r.value === undefined ? aspectRatio === undefined : aspectRatio === r.value;
+            return (
+              <button
+                key={r.label}
+                type="button"
+                onClick={() => handleRatioChange(r.value)}
+                className={`flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-xl border transition cursor-pointer ${
+                  active
+                    ? "border-dawn-500 bg-dawn-950/40 text-dawn-400"
+                    : "border-stone-800 bg-stone-950/60 text-stone-500 hover:border-stone-600 hover:text-stone-300"
+                }`}
+              >
+                <svg width="36" height="28" viewBox="0 0 36 28">
+                  {r.value === undefined ? (
+                    // Full — dashed border with diagonal lines indicating "all"
+                    <>
+                      <rect x="2" y="3" width="32" height="22" rx="2"
+                        fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2" />
+                      <line x1="2" y1="3" x2="34" y2="25" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.4" />
+                    </>
+                  ) : (
+                    // Solid rect proportional to the ratio
+                    <rect
+                      x={(36 - r.w) / 2}
+                      y={(28 - r.h) / 2}
+                      width={r.w}
+                      height={r.h}
+                      rx="2"
+                      fill="currentColor"
+                      fillOpacity={active ? "0.25" : "0.12"}
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                  )}
+                </svg>
+                <span className="text-[9px] font-bold leading-none">{r.label}</span>
+                <span className="text-[8px] leading-none opacity-60">{r.sublabel}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Image + crop overlay ── */}
+      <div className="relative mb-3 rounded-xl overflow-hidden border border-stone-800 bg-stone-950">
+        <ReactCrop
+          crop={crop}
+          onChange={(c) => setCrop(c)}
+          onComplete={(c) => setCompletedCrop(c)}
+          aspect={aspectRatio}
+          style={{ display: "block", width: "100%" }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`/api/admin/view?file=${encodeURIComponent(selectedFile)}`}
+            alt="Crop preview"
+            onLoad={handleLoad}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "auto",
+              filter: `brightness(${brightness}) contrast(${contrast}) saturate(${saturation})`,
+            }}
+          />
+        </ReactCrop>
+
+        {/* Drag hint — shown until any crop is drawn */}
+        {!crop && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="bg-stone-950/70 backdrop-blur-sm border border-stone-700 rounded-xl px-4 py-2.5 text-center">
+              <p className="text-xs font-semibold text-white">
+                {aspectRatio === undefined ? "Choose a ratio above, then drag to crop" : "Drag anywhere on the image to crop"}
+              </p>
+              <p className="text-[10px] text-stone-400 mt-0.5">Leave empty to use full resolution</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Crop status bar ── */}
+      <div className="flex items-center justify-between mb-4 px-1">
+        {crop && cropPixelW && cropPixelH ? (
+          <p className="text-[10px] text-dawn-400 font-mono font-bold">
+            ✂ {cropPixelW} × {cropPixelH} px
+            {imgNaturalSize && (
+              <span className="text-stone-600 font-sans ml-1">
+                ({Math.round((cropPixelW / imgNaturalSize.w) * 100)}% of original)
+              </span>
+            )}
+          </p>
+        ) : (
+          <p className="text-[10px] text-stone-600">Full resolution — no crop applied</p>
+        )}
+        {imgNaturalSize && (
+          <p className="text-[10px] text-stone-600 font-mono">
+            {imgNaturalSize.w} × {imgNaturalSize.h}
+          </p>
+        )}
+      </div>
+
+      {/* ── Adjustments ── */}
+      <AdjustmentsSection
+        brightness={brightness}
+        setBrightness={setBrightness}
+        contrast={contrast}
+        setContrast={setContrast}
+        saturation={saturation}
+        setSaturation={setSaturation}
+        rotation={rotation}
+        setRotation={setRotation}
+      />
+    </>
+  );
+}
+
 interface WorkspaceCanvasProps {
   readonly editingPhotoId: string | null;
   readonly selectedFile: string;
@@ -510,49 +721,21 @@ function WorkspaceCanvas({
   }
 
   return (
-    <>
-      {/* Top: Interactive Cropper Canvas */}
-      <div className="flex flex-col items-center justify-center border-b border-stone-850 pb-5 mb-5 overflow-hidden">
-        <span className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold mb-3 block text-center">
-          Cropping Laboratory (Free-Crop)
-        </span>
-        <div className="w-full overflow-auto max-h-[82vh] xl:max-h-[850px] flex items-center justify-center rounded-xl border border-stone-950 bg-stone-900/20 p-2">
-          <ReactCrop
-            crop={crop}
-            onChange={(c) => setCrop(c)}
-            onComplete={(c) => setCompletedCrop(c)}
-            className="w-full flex justify-center"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`/api/admin/view?file=${encodeURIComponent(selectedFile)}`}
-              alt="Interactive crop preview"
-              onLoad={onImageLoad}
-              className="w-full max-h-[78vh] xl:max-h-[800px] object-contain rounded-xl pointer-events-auto transition-all"
-              style={{
-                filter: `brightness(${brightness}) contrast(${contrast}) saturate(${saturation})`,
-                transform: `rotate(${rotation}deg)`,
-              }}
-            />
-          </ReactCrop>
-        </div>
-        <p className="text-[10px] text-stone-500 mt-3 text-center max-w-sm leading-relaxed">
-          Drag on image to crop. Leave unselected to import full resolution.
-        </p>
-      </div>
-
-      {/* Bottom: Live Adjustments Laboratory */}
-      <AdjustmentsSection
-        brightness={brightness}
-        setBrightness={setBrightness}
-        contrast={contrast}
-        setContrast={setContrast}
-        saturation={saturation}
-        setSaturation={setSaturation}
-        rotation={rotation}
-        setRotation={setRotation}
-      />
-    </>
+    <CropWorkspace
+      selectedFile={selectedFile}
+      crop={crop}
+      setCrop={setCrop}
+      setCompletedCrop={setCompletedCrop}
+      onImageLoad={onImageLoad}
+      brightness={brightness}
+      setBrightness={setBrightness}
+      contrast={contrast}
+      setContrast={setContrast}
+      saturation={saturation}
+      setSaturation={setSaturation}
+      rotation={rotation}
+      setRotation={setRotation}
+    />
   );
 }
 
@@ -1513,6 +1696,14 @@ function useAdminDashboardState() {
   const [saturation, setSaturation] = useState(1);
   const [rotation, setRotation] = useState(0);
 
+  // Clear any active crop when rotation changes — the ReactCrop overlay is drawn
+  // on the unrotated layout box so coordinates become invalid after rotation.
+  const setRotationAndClearCrop = (angle: number) => {
+    setRotation(angle);
+    setCrop(undefined);
+    setCompletedCrop(null);
+  };
+
   const [watermarkEnabled, setWatermarkEnabled] = useState(false);
   const [watermarkText, setWatermarkText] = useState("© Akash Photography");
   const [watermarkPosition, setWatermarkPosition] = useState<WatermarkPosition>("southeast");
@@ -1908,13 +2099,21 @@ function useAdminDashboardState() {
   const processNewPhoto = async () => {
     let cropData = undefined;
     if (completedCrop && imgRef && completedCrop.width > 0 && completedCrop.height > 0) {
+      // img is displayed with max-width/max-height and no object-contain, so the element
+      // dimensions exactly match the rendered image pixels — simple scale factor only.
       const scaleX = imgRef.naturalWidth / imgRef.width;
       const scaleY = imgRef.naturalHeight / imgRef.height;
+
+      const left = Math.max(0, Math.round(completedCrop.x * scaleX));
+      const top = Math.max(0, Math.round(completedCrop.y * scaleY));
+      const width = Math.round(completedCrop.width * scaleX);
+      const height = Math.round(completedCrop.height * scaleY);
+
       cropData = {
-        left: Math.max(0, Math.round(completedCrop.x * scaleX)),
-        top: Math.max(0, Math.round(completedCrop.y * scaleY)),
-        width: Math.min(imgRef.naturalWidth, Math.round(completedCrop.width * scaleX)),
-        height: Math.min(imgRef.naturalHeight, Math.round(completedCrop.height * scaleY)),
+        left,
+        top,
+        width: Math.min(width, imgRef.naturalWidth - left),
+        height: Math.min(height, imgRef.naturalHeight - top),
       };
     }
 
@@ -2051,7 +2250,7 @@ function useAdminDashboardState() {
     saturation,
     setSaturation,
     rotation,
-    setRotation,
+    setRotation: setRotationAndClearCrop,
     watermarkEnabled,
     setWatermarkEnabled,
     watermarkText,
@@ -2166,6 +2365,48 @@ function SubmitPhotoActions({
   return <>{submitButtonText}</>;
 }
 
+interface CaptionSuggestion {
+  title: string;
+  altText: string;
+  description: string;
+}
+
+function useAiCaption(filename: string | null) {
+  const [isCaptioning, setIsCaptioning] = useState(false);
+  const [suggestions, setSuggestions] = useState<CaptionSuggestion[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const generate = async () => {
+    if (!filename) return;
+    setIsCaptioning(true);
+    setError(null);
+    setSuggestions([]);
+    try {
+      const res = await fetch("/api/admin/caption", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.suggestions) {
+        setError(data.error || "Caption generation failed.");
+      } else {
+        setSuggestions(data.suggestions);
+      }
+    } catch {
+      setError("Network error. Could not reach caption API.");
+    }
+    setIsCaptioning(false);
+  };
+
+  const reset = () => {
+    setSuggestions([]);
+    setError(null);
+  };
+
+  return { isCaptioning, suggestions, error, generate, reset };
+}
+
 interface PhotoMetadataFormFieldsProps {
   readonly state: ReturnType<typeof useAdminDashboardState>;
 }
@@ -2201,9 +2442,18 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
     handleDelete,
     setSelectedFile,
     setEditingPhotoId,
+    selectedFile,
   } = state;
 
   const submitButtonText = editingPhotoId ? "Save Changes" : "Process & Save to Exhibition";
+  const ai = useAiCaption(editingPhotoId ? null : selectedFile);
+
+  const handleApplyCaption = (s: CaptionSuggestion) => {
+    setTitle(s.title);
+    setAlt(s.altText);
+    setDescription(s.description);
+    ai.reset();
+  };
 
   return (
     <>
@@ -2228,12 +2478,34 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
           />
         </div>
         <div>
-          <label
-            htmlFor="title"
-            className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-2"
-          >
-            Exhibition Title
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label
+              htmlFor="title"
+              className="block text-[11px] uppercase tracking-wider text-stone-400 font-bold"
+            >
+              Exhibition Title
+            </label>
+            {!editingPhotoId && (
+              <button
+                type="button"
+                onClick={ai.generate}
+                disabled={ai.isCaptioning}
+                className="flex items-center gap-1 px-2.5 py-1 bg-dawn-600/15 hover:bg-dawn-600/30 border border-dawn-700/40 text-dawn-400 text-[9px] font-bold rounded-lg transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {ai.isCaptioning ? (
+                  <>
+                    <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                    Scanning…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-2.5 h-2.5" />
+                    AI Suggest
+                  </>
+                )}
+              </button>
+            )}
+          </div>
           <input
             id="title"
             type="text"
@@ -2245,6 +2517,33 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
           />
         </div>
       </div>
+
+      {/* AI suggestions — only visible after clicking AI Suggest */}
+      {!editingPhotoId && ai.error && (
+        <p className="text-[10px] text-rose-400 -mt-2">{ai.error}</p>
+      )}
+      {!editingPhotoId && ai.suggestions.length > 0 && (
+        <div className="space-y-2 -mt-2">
+          <p className="text-[10px] text-stone-500 font-semibold uppercase tracking-wider">
+            Pick a suggestion — fills title, alt text &amp; description:
+          </p>
+          {ai.suggestions.map((s, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => handleApplyCaption(s)}
+              className="w-full text-left px-4 py-3 rounded-xl border border-stone-800 bg-stone-900/50 hover:border-dawn-600 hover:bg-dawn-950/20 transition group"
+            >
+              <p className="text-xs font-bold text-white group-hover:text-dawn-300 transition">
+                {s.title}
+              </p>
+              <p className="text-[10px] text-stone-500 mt-1 leading-relaxed line-clamp-2">
+                {s.description}
+              </p>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Image Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

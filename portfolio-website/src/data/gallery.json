@@ -1,5 +1,17 @@
 [
   {
+    "id": "gal-ruben-madila-rpz2c6jh58m-unsplash",
+    "src": "/images/photography/gal-ruben-madila-rpz2c6jh58m-unsplash.webp",
+    "alt": "Looking through a dark underground passage at a sun-drenched stairwell with curved, ribbed beige walls and dark stone steps.",
+    "title": "Subterranean Glow",
+    "description": "An evocative exploration of architectural geometry, where harsh shadows frame a warm, inviting staircase ascending into the brilliant afternoon sun.",
+    "category": "architecture",
+    "width": 1920,
+    "height": 3067,
+    "featured": true,
+    "createdAt": "2026-06-17"
+  },
+  {
     "id": "gal-1",
     "src": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&auto=format&fit=crop&q=80",
     "alt": "Mist-shrouded mountain peaks at dawn",

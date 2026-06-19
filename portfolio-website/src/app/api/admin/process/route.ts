@@ -94,7 +94,13 @@ export async function POST(request: NextRequest) {
     // Process image using sharp: extract crop if specified, resize to max 1920 width, convert to webp (quality 82)
     const imageProcessor = sharp(inputPath);
 
-    // 1. Crop
+    // 1. Rotation first — crop coordinates come from the browser's rotated view,
+    //    so the image must be in that orientation before extracting the region.
+    if (adjustments?.rotation !== undefined && adjustments.rotation !== 0) {
+      imageProcessor.rotate(adjustments.rotation);
+    }
+
+    // 2. Crop on the (now-rotated) image
     if (crop && crop.width > 0 && crop.height > 0) {
       imageProcessor.extract({
         left: Math.round(crop.left),
@@ -102,11 +108,6 @@ export async function POST(request: NextRequest) {
         width: Math.round(crop.width),
         height: Math.round(crop.height),
       });
-    }
-
-    // 2. Rotation (applied after crop based on view coordinates)
-    if (adjustments?.rotation !== undefined && adjustments.rotation !== 0) {
-      imageProcessor.rotate(adjustments.rotation);
     }
 
     // 3. Brightness & Saturation modulation

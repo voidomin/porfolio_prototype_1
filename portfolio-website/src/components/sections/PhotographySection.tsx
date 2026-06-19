@@ -82,7 +82,7 @@ export const PhotographySection = () => {
     setSelectedPhoto(homepagePhotos[prevIdx]);
   }, [photoIndex, homepagePhotos]);
 
-  // Keyboard navigation for lightbox
+  // Keyboard navigation + body scroll lock when lightbox is open
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedPhoto) return;
@@ -94,6 +94,18 @@ export const PhotographySection = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedPhoto, nextPhoto, prevPhoto]);
+
+  // Lock body scroll while lightbox is open
+  useEffect(() => {
+    if (selectedPhoto) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedPhoto]);
 
   // Update drag constraints
   useEffect(() => {
@@ -265,180 +277,179 @@ export const PhotographySection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-stone-950/95 backdrop-blur-xl"
+            className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/95 backdrop-blur-xl"
             role="dialog"
             aria-modal="true"
           >
-            {/* Background close click */}
-            <button
-              type="button"
-              className="absolute inset-0 w-full h-full cursor-default bg-transparent border-0 focus:outline-none"
+            {/* Click backdrop to close */}
+            <div
+              className="fixed inset-0 cursor-default"
               onClick={() => setSelectedPhoto(null)}
-              aria-label="Close lightbox"
             />
 
-            {/* Navigation buttons */}
-            <button
-              onClick={prevPhoto}
-              className="absolute left-4 md:left-8 z-50 p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white hover:text-stone-950 transition-all duration-300"
-              aria-label="Previous photo"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-
-            <button
-              onClick={nextPhoto}
-              className="absolute right-4 md:right-8 z-50 p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white hover:text-stone-950 transition-all duration-300"
-              aria-label="Next photo"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            <button
-              onClick={() => setSelectedPhoto(null)}
-              className="absolute top-4 right-4 md:top-8 md:right-8 z-50 p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white hover:text-stone-950 transition-all duration-300"
-              aria-label="Close dialog"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            {/* Centering wrapper — sits above backdrop, centers content */}
+            <div className="relative z-10 min-h-full flex items-center justify-center p-4 md:p-8">
 
             {/* Main Lightbox Canvas */}
             <motion.div
-              initial={{ scale: 0.95, y: 15 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 15 }}
-              transition={{ type: "spring", damping: 25, stiffness: 180 }}
-              className="relative w-full max-w-6xl bg-stone-900 rounded-2xl overflow-hidden shadow-2xl border border-white/5 grid grid-cols-1 lg:grid-cols-3 z-10"
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.97 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="relative w-full max-w-6xl flex flex-col lg:flex-row rounded-2xl overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
             >
-              {/* Image Canvas container (Left 2/3) */}
-              <div className="lg:col-span-2 relative bg-black flex items-center justify-center min-h-[300px] md:min-h-[500px] max-h-[75vh]">
-                <Image
+              {/* ── Image pane ── */}
+              <div className="relative bg-stone-950 flex items-center justify-center lg:flex-1 min-h-[220px]">
+                {/* Blurred bg fill — hides any remaining empty strips */}
+                <div
+                  className="absolute inset-0 scale-110 blur-2xl opacity-40 pointer-events-none"
+                  style={{
+                    backgroundImage: `url(${selectedPhoto.src})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
+                <img
                   src={selectedPhoto.src}
                   alt={selectedPhoto.alt}
-                  fill
-                  unoptimized
-                  className="object-contain max-h-[75vh]"
-                  priority
+                  className="relative z-10 block max-w-full max-h-[90vh] lg:max-h-[90vh] object-contain"
+                  style={{ maxHeight: "min(90vh, 70vw)" }}
                 />
+
+                {/* Photo counter pill */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-full bg-stone-950/70 backdrop-blur-sm border border-white/10 text-[10px] font-bold text-stone-400 tabular-nums">
+                  {photoIndex + 1} / {homepagePhotos.length}
+                </div>
               </div>
 
-              {/* Technical EXIF Metadata Drawer (Right 1/3) */}
-              <div className="p-6 md:p-8 bg-stone-900/90 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-white/5 text-stone-300">
-                <div className="space-y-6">
-                  {/* Photo Title */}
+              {/* ── Info panel ── */}
+              <div
+                className="lg:w-72 xl:w-80 shrink-0 flex flex-col bg-stone-950/95 backdrop-blur-xl border-t lg:border-t-0 lg:border-l border-white/8 overflow-y-auto"
+                style={{ maxHeight: "90vh" }}
+              >
+                {/* Close button inside panel */}
+                <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-white/5">
+                  <span className="text-[9px] uppercase tracking-[0.3em] text-dawn-500 font-bold">
+                    Exhibition
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPhoto(null)}
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-stone-400 hover:text-white transition cursor-pointer"
+                    aria-label="Close"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="flex-1 px-6 py-5 space-y-5">
+                  {/* Title & description */}
                   <div>
-                    <span className="text-[10px] uppercase tracking-[0.25em] text-dawn-400 font-bold">
-                      Photography Exhibition
-                    </span>
-                    <h3 className="text-2xl font-bold text-white mt-1">
+                    <h3 className="text-xl font-bold text-white leading-snug">
                       {selectedPhoto.title || "Untitled"}
                     </h3>
                     {selectedPhoto.description && (
-                      <p className="text-stone-400 text-sm mt-3 leading-relaxed">
+                      <p className="text-stone-400 text-sm mt-2.5 leading-relaxed">
                         {selectedPhoto.description}
                       </p>
                     )}
                   </div>
 
-                  <hr className="border-white/5" />
-
-                  {/* Camera Settings / EXIF Panels */}
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.25em] text-stone-500 font-bold mb-4">
-                      Technical Profile (EXIF)
-                    </p>
-
-                    <div className="grid grid-cols-1 gap-4 text-xs font-mono">
-                      {/* Camera Body */}
-                      {selectedPhoto.exif?.camera && (
-                        <div className="flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5">
-                          <Camera className="w-4 h-4 text-dawn-400 shrink-0" />
-                          <div>
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider">
-                              Camera Body
-                            </span>
-                            <span className="text-white font-semibold">
-                              {selectedPhoto.exif.camera}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Lens */}
-                      {selectedPhoto.exif?.lens && (
-                        <div className="flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5">
-                          <Aperture className="w-4 h-4 text-dawn-400 shrink-0" />
-                          <div>
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider">
-                              Optics / Lens
-                            </span>
-                            <span className="text-white font-semibold">
-                              {selectedPhoto.exif.lens}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Exposures parameters */}
-                      <div className="grid grid-cols-2 gap-3">
-                        {selectedPhoto.exif?.focalLength && (
-                          <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">
-                              Focal
-                            </span>
-                            <span className="text-white font-bold">
-                              {selectedPhoto.exif.focalLength}
-                            </span>
-                          </div>
-                        )}
-                        {selectedPhoto.exif?.aperture && (
-                          <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">
-                              Aperture
-                            </span>
-                            <span className="text-white font-bold">
-                              {selectedPhoto.exif.aperture}
-                            </span>
-                          </div>
-                        )}
-                        {selectedPhoto.exif?.shutterSpeed && (
-                          <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">
-                              Shutter
-                            </span>
-                            <span className="text-white font-bold">
-                              {selectedPhoto.exif.shutterSpeed}
-                            </span>
-                          </div>
-                        )}
-                        {selectedPhoto.exif?.iso && (
-                          <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                            <span className="block text-stone-500 text-[9px] uppercase tracking-wider mb-0.5">
-                              ISO Speed
-                            </span>
-                            <span className="text-white font-bold">{selectedPhoto.exif.iso}</span>
-                          </div>
-                        )}
+                  {/* Location + date */}
+                  <div className="flex flex-col gap-2">
+                    {selectedPhoto.exif?.location && (
+                      <div className="flex items-center gap-2 text-xs text-stone-400">
+                        <MapPin className="w-3.5 h-3.5 text-dawn-500 shrink-0" />
+                        <span>{selectedPhoto.exif.location}</span>
                       </div>
+                    )}
+                    <div className="flex items-center gap-2 text-xs text-stone-600">
+                      <Calendar className="w-3.5 h-3.5 shrink-0" />
+                      <span>{selectedPhoto.createdAt}</span>
                     </div>
                   </div>
+
+                  {/* EXIF — only shown if any data present */}
+                  {selectedPhoto.exif &&
+                    Object.values(selectedPhoto.exif).some(Boolean) && (
+                      <>
+                        <div className="border-t border-white/5 pt-5">
+                          <p className="text-[9px] uppercase tracking-[0.25em] text-stone-600 font-bold mb-3">
+                            Camera &amp; Exposure
+                          </p>
+                          <div className="space-y-2.5">
+                            {selectedPhoto.exif.camera && (
+                              <div className="flex items-center gap-3">
+                                <Camera className="w-3.5 h-3.5 text-dawn-500 shrink-0" />
+                                <div>
+                                  <p className="text-[9px] text-stone-600 uppercase tracking-wider">Body</p>
+                                  <p className="text-xs text-white font-medium">{selectedPhoto.exif.camera}</p>
+                                </div>
+                              </div>
+                            )}
+                            {selectedPhoto.exif.lens && (
+                              <div className="flex items-center gap-3">
+                                <Aperture className="w-3.5 h-3.5 text-dawn-500 shrink-0" />
+                                <div>
+                                  <p className="text-[9px] text-stone-600 uppercase tracking-wider">Lens</p>
+                                  <p className="text-xs text-white font-medium">{selectedPhoto.exif.lens}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Exposure grid */}
+                          {(selectedPhoto.exif.focalLength ||
+                            selectedPhoto.exif.aperture ||
+                            selectedPhoto.exif.shutterSpeed ||
+                            selectedPhoto.exif.iso) && (
+                            <div className="grid grid-cols-2 gap-2 mt-3">
+                              {[
+                                { label: "Focal", value: selectedPhoto.exif.focalLength },
+                                { label: "Aperture", value: selectedPhoto.exif.aperture },
+                                { label: "Shutter", value: selectedPhoto.exif.shutterSpeed },
+                                { label: "ISO", value: selectedPhoto.exif.iso },
+                              ]
+                                .filter((x) => x.value)
+                                .map((x) => (
+                                  <div
+                                    key={x.label}
+                                    className="bg-white/4 rounded-lg px-3 py-2.5 border border-white/5"
+                                  >
+                                    <p className="text-[9px] text-stone-600 uppercase tracking-wider mb-0.5">
+                                      {x.label}
+                                    </p>
+                                    <p className="text-xs text-white font-bold font-mono">{x.value}</p>
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
                 </div>
 
-                {/* Footnotes: Location and Date */}
-                <div className="space-y-3 pt-6 border-t border-white/5 text-xs text-stone-400 mt-6 lg:mt-0">
-                  {selectedPhoto.exif?.location && (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-dawn-400 shrink-0" />
-                      <span>{selectedPhoto.exif.location}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-stone-500 shrink-0" />
-                    <span>Captured on {selectedPhoto.createdAt}</span>
-                  </div>
+                {/* Navigation footer */}
+                <div className="px-6 py-4 border-t border-white/5 flex items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={prevPhoto}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white text-xs font-semibold transition cursor-pointer"
+                  >
+                    <ChevronLeft className="w-4 h-4" /> Prev
+                  </button>
+                  <button
+                    type="button"
+                    onClick={nextPhoto}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white text-xs font-semibold transition cursor-pointer"
+                  >
+                    Next <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </motion.div>
+            </div>{/* end centering wrapper */}
           </motion.div>
         )}
       </AnimatePresence>

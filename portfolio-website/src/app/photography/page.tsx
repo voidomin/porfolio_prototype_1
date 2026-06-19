@@ -346,6 +346,18 @@ export default function PhotographyGalleryPage() {
     return () => globalThis.removeEventListener("keydown", handleKeyDown);
   }, [selectedPhoto, isCinemaMode, nextPhoto, prevPhoto]);
 
+  // Body scroll lock when lightbox is open
+  useEffect(() => {
+    if (selectedPhoto) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedPhoto]);
+
   // Dynamic dominant color extraction for active photo in lightbox
   useEffect(() => {
     if (!selectedPhoto) {
@@ -731,7 +743,7 @@ export default function PhotographyGalleryPage() {
           className={`transition-opacity duration-750 ${isCinemaMode ? "opacity-5 pointer-events-none" : "opacity-100"}`}
         >
           {/* Header navigation */}
-          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-900 pb-8 mb-12 px-6 md:px-8">
+          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-900 pb-4 sm:pb-8 mb-6 sm:mb-12 px-4 sm:px-6 md:px-8">
             <div className="flex items-center gap-4">
               <Link
                 href="/#photography"
@@ -748,7 +760,7 @@ export default function PhotographyGalleryPage() {
                 </h1>
               </div>
             </div>
-            <p className="text-xs text-stone-500 max-w-xs leading-relaxed">
+            <p className="hidden sm:block text-xs text-stone-500 max-w-xs leading-relaxed">
               A comprehensive visual record of settings, light, and optics. Move your cursor over
               cards to view details.
             </p>
@@ -763,7 +775,7 @@ export default function PhotographyGalleryPage() {
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
+                    className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
                       isActive
                         ? "bg-white text-stone-950 shadow-md"
                         : "text-stone-400 hover:text-stone-200"
@@ -777,7 +789,7 @@ export default function PhotographyGalleryPage() {
           </div>
 
           {/* Advanced Filters Panel */}
-          <div className="mb-8 px-6 md:px-8 w-full grid grid-cols-1 md:grid-cols-4 gap-4 bg-stone-900/20 p-4 border border-stone-900/40 rounded-2xl">
+          <div className="mb-6 sm:mb-8 px-4 sm:px-6 md:px-8 w-full grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4 bg-stone-900/20 p-3 sm:p-4 border border-stone-900/40 rounded-2xl">
             <div className="relative col-span-1 md:col-span-2">
               <input
                 type="text"
@@ -818,7 +830,7 @@ export default function PhotographyGalleryPage() {
           </div>
 
           {/* View Mode & Cinema Controller */}
-          <div className="flex justify-between items-center mb-10 px-6 md:px-8 w-full">
+          <div className="flex flex-wrap justify-between items-center gap-y-3 mb-6 sm:mb-10 px-4 sm:px-6 md:px-8 w-full">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2 border-r border-white/5 pr-4 mr-2">
                 <button
@@ -880,7 +892,7 @@ export default function PhotographyGalleryPage() {
 
               <button
                 onClick={() => setIsCinemaMode(true)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider text-stone-400 hover:text-stone-200 bg-stone-900/30 border border-stone-850 transition flex items-center gap-2 cursor-pointer"
+                className="hidden sm:flex px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider text-stone-400 hover:text-stone-200 bg-stone-900/30 border border-stone-850 transition items-center gap-2 cursor-pointer"
               >
                 <Tv className="w-3.5 h-3.5" />
                 Lights Out
@@ -903,7 +915,7 @@ export default function PhotographyGalleryPage() {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-stone-950/98 backdrop-blur-xl"
+            className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 md:p-8 bg-stone-950/98 backdrop-blur-xl"
             role="dialog"
             aria-modal="true"
           >
@@ -923,10 +935,10 @@ export default function PhotographyGalleryPage() {
               }}
             />
 
-            {/* Navigation buttons */}
+            {/* Navigation buttons — hidden on mobile (swipe to navigate) */}
             <button
               onClick={prevPhoto}
-              className="absolute left-4 md:left-8 z-50 p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white hover:text-stone-950 transition-all duration-300"
+              className="hidden sm:block absolute left-4 md:left-8 z-50 p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white hover:text-stone-950 transition-all duration-300"
               aria-label="Previous photo"
             >
               <ChevronLeft className="w-6 h-6" />
@@ -934,7 +946,7 @@ export default function PhotographyGalleryPage() {
 
             <button
               onClick={nextPhoto}
-              className="absolute right-4 md:right-8 z-50 p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white hover:text-stone-950 transition-all duration-300"
+              className="hidden sm:block absolute right-4 md:right-8 z-50 p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white hover:text-stone-950 transition-all duration-300"
               aria-label="Next photo"
             >
               <ChevronRight className="w-6 h-6" />
@@ -942,10 +954,10 @@ export default function PhotographyGalleryPage() {
 
             <button
               onClick={() => setSelectedPhoto(null)}
-              className="absolute top-4 right-4 md:top-8 md:right-8 z-50 p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white hover:text-stone-950 transition-all duration-300"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 md:top-8 md:right-8 z-50 p-2 sm:p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white hover:text-stone-950 transition-all duration-300"
               aria-label="Close dialog"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
             {/* Main Lightbox Canvas */}
@@ -954,25 +966,33 @@ export default function PhotographyGalleryPage() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 15 }}
               transition={{ type: "spring", damping: 25, stiffness: 180 }}
-              className="relative w-full max-w-6xl bg-stone-900 rounded-2xl overflow-hidden shadow-2xl border border-white/5 grid grid-cols-1 lg:grid-cols-3 z-10"
+              className="relative w-full max-w-6xl max-h-screen sm:max-h-[calc(100vh-2rem)] md:max-h-[calc(100vh-4rem)] bg-stone-900 rounded-none sm:rounded-2xl overflow-hidden shadow-2xl border-0 sm:border border-white/5 flex flex-col lg:flex-row z-10"
             >
               {/* Image Canvas container (Left 2/3) with Loupe Zoom */}
               <div
                 ref={imageContainerRef}
                 onMouseLeave={() => setShowLoupe(false)}
                 onMouseMove={handleLoupeMouseMove}
-                className="lg:col-span-2 relative bg-black flex items-center justify-center min-h-[300px] md:min-h-[500px] max-h-[75vh] overflow-hidden cursor-crosshair"
+                className="h-[42vh] lg:h-auto lg:flex-1 relative bg-stone-950 flex items-center justify-center overflow-hidden cursor-crosshair"
                 role="img"
                 aria-label="Magnifiable photo preview"
               >
-                <Image
+                {/* Blurred bg fill — hides any empty strips */}
+                <div
+                  className="absolute inset-0 scale-110 blur-2xl opacity-30 pointer-events-none"
+                  style={{
+                    backgroundImage: `url(${selectedPhoto.src})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={selectedPhoto.src}
                   alt={selectedPhoto.alt}
-                  fill
-                  unoptimized
-                  className="object-contain max-h-[75vh] select-none"
+                  className="relative z-10 block max-w-full object-contain select-none"
+                  style={{ maxHeight: "min(72vh, 55vw)" }}
                   draggable="false"
-                  priority
                 />
 
                 {/* Loupe magnifier circular display */}
@@ -1003,7 +1023,7 @@ export default function PhotographyGalleryPage() {
               </div>
 
               {/* Technical EXIF Metadata Drawer (Right 1/3) */}
-              <div className="p-6 md:p-8 bg-stone-900/90 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-white/5 text-stone-300">
+              <div className="flex-1 min-h-0 lg:flex-none lg:w-80 xl:w-96 p-4 sm:p-6 md:p-8 bg-stone-900/90 flex flex-col border-t lg:border-t-0 lg:border-l border-white/5 text-stone-300 overflow-y-auto">
                 <div className="space-y-6">
                   {/* Slideshow Playback Controls */}
                   <div className="bg-stone-950/60 p-4 rounded-xl border border-white/5 space-y-3">
@@ -1180,7 +1200,7 @@ export default function PhotographyGalleryPage() {
                 </div>
 
                 {/* Footnotes: Location and Date */}
-                <div className="space-y-3 pt-6 border-t border-white/5 text-xs text-stone-400 mt-6 lg:mt-0">
+                <div className="space-y-3 pt-6 border-t border-white/5 text-xs text-stone-400 mt-auto pt-6">
                   {selectedPhoto.exif?.location && (
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-dawn-400 shrink-0" />
