@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { skills } from "@/data/portfolio";
+import { skills, hobbies } from "@/data/portfolio";
 import { Skill, type SkillCategory } from "@/types";
 
 /* ──────────────────────────────────────────────────────────
@@ -11,13 +11,12 @@ import { Skill, type SkillCategory } from "@/types";
    garden beds, skill bars become growing vines/stems.
    ────────────────────────────────────────────────────────── */
 
-const skillCategories: { [key in SkillCategory]: { name: string; emoji: string } } = {
+const skillCategories: Record<SkillCategory, { name: string; emoji: string }> = {
   frontend: { name: "Frontend Development", emoji: "🌿" },
   backend: { name: "Backend Development", emoji: "🌱" },
   design: { name: "Design & UI/UX", emoji: "🌻" },
   tools: { name: "Tools & DevOps", emoji: "🍃" },
-  other: { name: "Other Skills", emoji: "🌾" },
-  hobbies: { name: "Hobbies & Interests", emoji: "📸" },
+  other: { name: "Research & Computer Science", emoji: "🧬" },
 };
 
 const SkillBar = ({ skill, index }: { skill: Skill; index: number }) => (
@@ -250,6 +249,31 @@ export const SkillsSection = () => {
             <StatCard key={stat.label} stat={stat} index={i} />
           ))}
         </motion.div>
+
+        {/* Beyond work — hobbies as plain tags, not skill percentages */}
+        {hobbies.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-12 text-center"
+          >
+            <p className="text-xs uppercase tracking-[0.25em] text-meadow-700/50 mb-4">
+              Beyond the Screen
+            </p>
+            <div className="flex flex-wrap justify-center gap-2.5">
+              {hobbies.map((hobby) => (
+                <span
+                  key={hobby}
+                  className="px-4 py-1.5 rounded-full bg-white/60 border border-meadow-300/40 text-sm text-meadow-800 backdrop-blur-sm"
+                >
+                  {hobby}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </section>
   );

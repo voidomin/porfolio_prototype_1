@@ -232,25 +232,10 @@ export const skills: Skill[] = [
     category: "other",
     color: "#E11D48",
   },
-  {
-    id: "23",
-    name: "Landscape Photography",
-    level: 88,
-    category: "hobbies",
-    color: "#F59E0B",
-  },
-  {
-    id: "24",
-    name: "Acoustic Guitar & Music",
-    level: 80,
-    category: "hobbies",
-    color: "#EC4899",
-  },
-  {
-    id: "25",
-    name: "Trekking & Mountain Hiking",
-    level: 85,
-    category: "hobbies",
-    color: "#10B981",
-  },
+];
+
+export const hobbies: string[] = [
+  "Landscape Photography",
+  "Acoustic Guitar & Music",
+  "Trekking & Mountain Hiking",
 ];
