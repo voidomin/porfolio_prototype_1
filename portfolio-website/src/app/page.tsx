@@ -4,6 +4,7 @@ import { SkillsSection } from "@/components/sections/SkillsSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { PublicationsSection } from "@/components/sections/PublicationsSection";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
+import { WritingSection } from "@/components/sections/WritingSection";
 import { PhotographySection } from "@/components/sections/PhotographySection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { Navbar } from "@/components/layout/Navbar";
@@ -104,8 +105,16 @@ export default function Home() {
         <PhotographySection />
       </SectionErrorBoundary>
 
-      {/* Terrain: dusk horizon → campfire */}
+      {/* Terrain: dusk horizon → writing */}
       <SectionDivider variant="dusk-horizon" fillColor="rgba(252, 232, 230, 0.2)" />
+
+      {/* Field Notes — renders nothing until blogPosts has entries */}
+      <SectionErrorBoundary name="writing">
+        <WritingSection />
+      </SectionErrorBoundary>
+
+      {/* Terrain: rolling hills → campfire */}
+      <SectionDivider variant="rolling-hills" fillColor="rgba(252, 232, 230, 0.2)" />
 
       {/* Chapter 7: Campfire at Dusk */}
       <SectionErrorBoundary name="contact">
