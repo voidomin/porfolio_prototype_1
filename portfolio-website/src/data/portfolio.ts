@@ -33,6 +33,7 @@ export const navigationItems: NavigationItem[] = [
   { label: "Projects", href: "#projects" },
   { label: "Publications", href: "#publications" },
   { label: "Photography", href: "#photography" },
+  { label: "Writing", href: "/blog" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -68,7 +69,25 @@ export const experienceTimeline: ExperienceItem[] = experienceData;
 import projectsData from "./projects.json";
 export const projects: Project[] = projectsData;
 
-export const blogPosts: BlogPost[] = [];
+export const blogPosts: BlogPost[] = [
+  {
+    id: "blog-1",
+    slug: "trusting-a-single-signal",
+    title: "What a Hundred Mutations Taught Me About Trusting a Single Answer",
+    excerpt:
+      "Before I wrote a line of production code, I spent months mutating a single protein, one amino acid at a time, across a row of Linux machines at IISc. The lesson from that project still shapes how I build software today.",
+    content:
+      "Before I was an engineer, I was mutating a protein called CcdB, one amino acid at a time, on a row of four Linux cluster machines in a lab at the Indian Institute of Science.\n\nCcdB is small as proteins go, about a hundred amino acids long. The question we were asking was simple to state and hard to answer. If you change one amino acid, does the protein get more stable, less stable, or does it stop folding properly altogether? Multiply that question by every position in the sequence and you get roughly a hundred separate experiments, each one needing its own simulation run.\n\nThe day to day was pretty unglamorous. I'd log into the cluster, kick off a batch of Rosetta jobs, one for each candidate mutation at a given position, and then wait. Rosetta would model what happens structurally when you swap in that one amino acid. Does it clash with its neighbors. Does it break a hydrogen bond that was holding the fold together. Does it destabilize the whole thing. Do that across a hundred positions and you end up with a huge pile of per residue output to go through.\n\nThe actual finding, once it came together into a paper two years later, was more interesting than just \"run Rosetta and read the numbers.\" We tested several computational predictors against real experimental binding data, and a newer method called ThermoMPNN came out ahead of the rest. But even the best computational predictor on its own wasn't the full answer. The biggest gains in accuracy came from combining the computational scoring with high throughput experimental binding measurements. Neither one alone told the whole story. Together they gave a more practical way to find stabilizing mutations without having to test every single possibility in the wet lab.\n\nThat's stuck with me longer than the actual biology has. I don't fully trust a single signal anymore, wherever it comes from. A model's confidence score, a test suite going green, one metric on a dashboard, none of these tell the whole story on their own, the same way ThermoMPNN alone didn't. What I took from that cluster room is to look for a second, independently derived signal before I believe the first one. It's slower. It's also the only way I've found that actually holds up over time.\n\nI don't run Rosetta jobs anymore. But somewhere underneath the frontend work and the data pipelines, there's still a research fellow waiting for a hundred simulations to finish, learning to be patient with a slow careful process instead of a fast confident one that might just be wrong.",
+    image: "/images/blog/protein-research",
+    author: personalProfile.name,
+    category: "personal",
+    tags: ["research", "computational biology", "career reflection"],
+    publishedAt: "2026-09-03",
+    updatedAt: "2026-09-03",
+    readingTime: 4,
+    featured: true,
+  },
+];
 
 export const testimonials: Testimonial[] = [];
 

@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { projects } from "@/data/portfolio";
+import { projects, blogPosts } from "@/data/portfolio";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://goldenhourlabs.vercel.app";
 
@@ -23,5 +23,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.6,
     })),
+    ...(blogPosts.length > 0
+      ? [
+          {
+            url: `${BASE_URL}/blog`,
+            lastModified: new Date(),
+            changeFrequency: "weekly" as const,
+            priority: 0.6,
+          },
+          ...blogPosts.map((post) => ({
+            url: `${BASE_URL}/blog/${post.slug}`,
+            lastModified: new Date(post.updatedAt),
+            changeFrequency: "monthly" as const,
+            priority: 0.5,
+          })),
+        ]
+      : []),
   ];
 }

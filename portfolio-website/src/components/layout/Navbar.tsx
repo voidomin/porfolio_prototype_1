@@ -69,8 +69,10 @@ const NavLink = ({ href, label, hasScrolled, isActive, onClick }: NavLinkProps) 
     <motion.a
       href={href}
       onClick={(e) => {
-        e.preventDefault();
-        onClick(href);
+        if (href.startsWith("#")) {
+          e.preventDefault();
+          onClick(href);
+        }
       }}
       className={cn(
         "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
@@ -163,7 +165,9 @@ const MobileMenu = ({ isOpen, onClose, onLinkClick }: MobileMenuProps) => {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: i * 0.08 + 0.15, duration: 0.3 }}
                     onClick={(e) => {
-                      e.preventDefault();
+                      if (item.href.startsWith("#")) {
+                        e.preventDefault();
+                      }
                       onLinkClick(item.href);
                     }}
                     className="block text-lg font-medium py-3 px-4 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-all"
@@ -238,6 +242,7 @@ export const Navbar = () => {
     );
 
     navigationItems.forEach((item) => {
+      if (!item.href.startsWith("#")) return;
       const el = document.querySelector(item.href);
       if (el) observer.observe(el);
     });
