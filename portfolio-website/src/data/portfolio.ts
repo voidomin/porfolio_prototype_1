@@ -8,6 +8,7 @@ import {
   SocialLink,
   PersonalProfile,
   ExperienceItem,
+  Testimonial,
 } from "@/types";
 
 export const personalProfile: PersonalProfile = {
@@ -22,6 +23,7 @@ export const personalProfile: PersonalProfile = {
     "Across my journey—from analyzing stabilizing mutations at IISc to developing software at Merck, freelancing for Param Adventures, and engineering data products at ParentOf—I have kept moving toward end-to-end engineering roles. Today, I work on robust data-driven solutions while staying open to product-minded collaborations and specialized engineering challenges.",
   avatar: "/images/avatar.png",
   tags: ["Data + Craft", "Mountain calm", "Full-Stack", "Dawn trails"],
+  openToWork: true,
 };
 
 export const navigationItems: NavigationItem[] = [
@@ -67,6 +69,8 @@ import projectsData from "./projects.json";
 export const projects: Project[] = projectsData;
 
 export const blogPosts: BlogPost[] = [];
+
+export const testimonials: Testimonial[] = [];
 
 import galleryData from "./gallery.json";
 

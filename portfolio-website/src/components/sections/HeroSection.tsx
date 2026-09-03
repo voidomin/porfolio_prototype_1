@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowDown, MapPin } from "lucide-react";
+import { ArrowDown, MapPin, CircleDot } from "lucide-react";
 import { personalProfile } from "@/data/portfolio";
 
 /* ──────────────────────────────────────────────────────────
@@ -48,17 +48,35 @@ export const HeroSection = () => {
 
       {/* Central content */}
       <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-        {/* Location badge */}
-        <motion.div
-          custom={0.3}
-          variants={fadeUpVariants}
-          initial="hidden"
-          animate="visible"
-          className="inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full bg-forest-950/5 backdrop-blur-md border border-forest-950/15 text-sm"
-        >
-          <MapPin className="h-4 w-4 text-forest-800" />
-          <span className="text-forest-900 font-medium">{personalProfile.location}</span>
-        </motion.div>
+        {/* Location & availability badges */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+          <motion.div
+            custom={0.3}
+            variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-forest-950/5 backdrop-blur-md border border-forest-950/15 text-sm"
+          >
+            <MapPin className="h-4 w-4 text-forest-800" />
+            <span className="text-forest-900 font-medium">{personalProfile.location}</span>
+          </motion.div>
+
+          {personalProfile.openToWork && (
+            <motion.div
+              custom={0.4}
+              variants={fadeUpVariants}
+              initial="hidden"
+              animate="visible"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-forest-950/5 backdrop-blur-md border border-forest-950/15 text-sm"
+            >
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
+                <CircleDot className="relative h-2.5 w-2.5 text-green-600" />
+              </span>
+              <span className="text-forest-900 font-medium">Open to work</span>
+            </motion.div>
+          )}
+        </div>
 
         {/* Name — cinematic letter-by-letter reveal */}
         <div className="overflow-hidden mb-4">

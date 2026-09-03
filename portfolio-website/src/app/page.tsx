@@ -3,6 +3,7 @@ import { AboutSection } from "@/components/sections/AboutSection";
 import { SkillsSection } from "@/components/sections/SkillsSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { PublicationsSection } from "@/components/sections/PublicationsSection";
+import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { PhotographySection } from "@/components/sections/PhotographySection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { Navbar } from "@/components/layout/Navbar";
@@ -14,6 +15,7 @@ import { NatureScene } from "@/components/animations/NatureScene";
 import { BirdFlock } from "@/components/animations/BirdFlock";
 import { FloatingLeaves } from "@/components/animations/FloatingLeaves";
 import { InteractiveTrail } from "@/components/animations/InteractiveTrail";
+import { MobileTouchRipple } from "@/components/animations/MobileTouchRipple";
 import { SoundscapeManager } from "@/components/audio/SoundscapeManager";
 import { SectionDivider } from "@/components/animations/SectionDivider";
 import { SectionErrorBoundary } from "@/components/ui/SectionErrorBoundary";
@@ -37,6 +39,9 @@ export default function Home() {
       {/* Interactive trailing micro-particles */}
       <SectionErrorBoundary name="interactive-trail">
         <InteractiveTrail />
+      </SectionErrorBoundary>
+      <SectionErrorBoundary name="mobile-touch-ripple">
+        <MobileTouchRipple />
       </SectionErrorBoundary>
 
       {/* Ambient soundscape manager (procedural audio) */}
@@ -84,6 +89,11 @@ export default function Home() {
       {/* Chapter 5: The Clearing */}
       <SectionErrorBoundary name="publications">
         <PublicationsSection />
+      </SectionErrorBoundary>
+
+      {/* Testimonials — renders nothing until real quotes are added */}
+      <SectionErrorBoundary name="testimonials">
+        <TestimonialsSection />
       </SectionErrorBoundary>
 
       {/* Terrain: rolling hills → golden hour */}

@@ -113,6 +113,16 @@ export interface PersonalProfile {
   aboutExtended: string;
   avatar?: string;
   tags?: string[];
+  openToWork?: boolean;
+}
+
+export interface Testimonial {
+  id: string;
+  quote: string;
+  name: string;
+  role: string;
+  company?: string;
+  avatar?: string;
 }
 
 export interface ExperienceItem {

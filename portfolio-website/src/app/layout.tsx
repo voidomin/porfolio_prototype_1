@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope, Fraunces, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
@@ -7,6 +7,7 @@ import { StorybookCursor } from "@/components/layout/StorybookCursor";
 import { ScrollProvider } from "@/contexts/ScrollContext";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { Analytics } from "@vercel/analytics/react";
+import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { personalProfile, socialLinks, contactInfo } from "@/data/portfolio";
 
 const manrope = Manrope({
@@ -60,6 +61,15 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: personalProfile.name,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#f0b429",
 };
 
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://akashportfolio.dev").replace(
@@ -121,6 +131,7 @@ export default function RootLayout({
           </SmoothScroll>
         </ScrollProvider>
         <Analytics />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

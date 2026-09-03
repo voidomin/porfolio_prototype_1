@@ -25,13 +25,13 @@
 
 - [x] Resume / CV download button — added to hero CTA row, links to `/resume.pdf`. **Action needed: add the actual `public/resume.pdf` file** — the link 404s until it's there.
 - [x] Project detail pages — `/projects/[slug]` with case study layout (Overview → Approach → Outcome → Tech Stack). Content is auto-derived from existing `description`/`longDescription` fields as a starting draft — worth a human pass to sharpen the writing.
-- [ ] Testimonials / recommendations section — 2-3 quotes from colleagues or managers
-- [ ] Availability badge — "Open to work" or "Available for freelance" toggle in hero or navbar
-- [ ] Blog / writing section — `blogPosts` data layer already exists in `src/data/portfolio.ts`
-- [ ] Mobile touch ripple — lightweight tap effect to replace the cursor trail (disabled on mobile)
-- [ ] PWA support — `manifest.json` + offline page so site installs on mobile
+- [ ] Testimonials / recommendations section — shell is built (`TestimonialsSection.tsx`, renders nothing while `testimonials` in `src/data/portfolio.ts` is empty). **Action needed:** add 2-3 real quotes to `testimonials`, and add `{ label: "Testimonials", href: "#testimonials" }` to `navigationItems` at the same time.
+- [x] Availability badge — "Open to work" pill added to hero, driven by `personalProfile.openToWork` in `src/data/portfolio.ts` (flip to `false` to hide it)
+- [ ] Blog / writing section — shell is built (`/blog` and `/blog/[slug]` routes work today). **Action needed:** add real posts to `blogPosts` in `src/data/portfolio.ts`, then add a "Writing" entry to `navigationItems` and a `/blog` entry to `sitemap.ts` — left out while the section is empty so nothing thin gets indexed.
+- [x] Mobile touch ripple — `MobileTouchRipple.tsx`, tap-to-ripple feedback on screens under 768px, mounted alongside the desktop-only `InteractiveTrail`
+- [x] PWA support — `manifest.ts` + generated icons (`/icon-192`, `/icon-512`) + `sw.js`/`offline.html` for a basic offline fallback page
 - [ ] Copy-email-to-clipboard button — next to email address in contact section
-- [ ] Animated page transitions — between home and project detail pages
+- [x] Animated page transitions — `src/app/template.tsx` fades/slides in on every route change (home ↔ photography ↔ project/blog pages)
 
 ---
 
