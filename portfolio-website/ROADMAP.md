@@ -16,15 +16,15 @@
 - [ ] Skills section — separate hobbies from technical skills (recruiters see them mixed together)
 - [ ] About timeline — icons (Tent, Compass, Flame) don't match actual job roles; replace with relevant ones
 - [ ] MountainAscentHUD — checkpoint labels ("Sunny Meadow") don't match section titles ("The Meadow"); sync them
-- [ ] Navbar — no active section highlighting as user scrolls
+- [x] Navbar — active section highlighting as user scrolls (already implemented via IntersectionObserver in `Navbar.tsx`)
 - [ ] Hero intro — paragraph is slightly long for a first impression; tighten the copy
 
 ---
 
 ## New Features
 
-- [ ] Resume / CV download button — add to hero or navbar; recruiters always want this
-- [ ] Project detail pages — `/projects/[slug]` with full case study layout (problem → approach → outcome → tech stack)
+- [x] Resume / CV download button — added to hero CTA row, links to `/resume.pdf`. **Action needed: add the actual `public/resume.pdf` file** — the link 404s until it's there.
+- [x] Project detail pages — `/projects/[slug]` with case study layout (Overview → Approach → Outcome → Tech Stack). Content is auto-derived from existing `description`/`longDescription` fields as a starting draft — worth a human pass to sharpen the writing.
 - [ ] Testimonials / recommendations section — 2-3 quotes from colleagues or managers
 - [ ] Availability badge — "Open to work" or "Available for freelance" toggle in hero or navbar
 - [ ] Blog / writing section — `blogPosts` data layer already exists in `src/data/portfolio.ts`
@@ -69,3 +69,6 @@
 - [x] Custom 404 page — on-brand dawn/nature theme with back-to-trailhead CTA
 - [x] Content proofread — all section copy checked; one punctuation fix applied
 - [x] `RESEND_API_KEY` added to Vercel environment variables
+- [x] Photo admin CMS streamlined — browser drag-and-drop batch upload, GPS-based location auto-fill, one-click Process & Commit (local commit, no auto-push), Quick-Import All batch action, and visual re-edit (crop/color/watermark) without delete + redo
+- [x] JSON-LD structured data — Person + WebSite schema added to root layout
+- [x] `/photography` metadata — own title/description/OG instead of inheriting the homepage's

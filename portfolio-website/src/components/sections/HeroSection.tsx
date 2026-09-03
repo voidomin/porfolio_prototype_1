@@ -135,6 +135,15 @@ export const HeroSection = () => {
           >
             Get In Touch
           </motion.a>
+          <motion.a
+            href="/resume.pdf"
+            download
+            className="px-8 py-4 bg-transparent border border-forest-950/20 text-forest-950 font-semibold rounded-full hover:bg-forest-950/5 transition-all duration-300"
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            Download Resume
+          </motion.a>
         </motion.div>
 
         {/* Floating tags */}

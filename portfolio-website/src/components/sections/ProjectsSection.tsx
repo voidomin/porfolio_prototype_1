@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   motion,
   AnimatePresence,
@@ -309,6 +310,12 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                   Codebase
                 </a>
               )}
+              <Link
+                href={`/projects/${project.slug}`}
+                className="text-forest-700 hover:text-forest-900 text-xs font-bold transition-colors uppercase tracking-wider border-b border-transparent hover:border-forest-700"
+              >
+                Case Study →
+              </Link>
             </div>
           </div>
         </motion.div>

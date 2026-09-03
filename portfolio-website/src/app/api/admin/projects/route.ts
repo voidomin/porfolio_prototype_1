@@ -13,6 +13,7 @@ interface SubProject {
 
 interface Project {
   id: string;
+  slug: string;
   title: string;
   description: string;
   longDescription?: string;
@@ -29,6 +30,23 @@ interface Project {
 
 const getDbPath = () => path.join(process.cwd(), "src", "data", "projects.json");
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function uniqueSlug(base: string, existing: Project[]): string {
+  let slug = base || "project";
+  let counter = 2;
+  while (existing.some((p) => p.slug === slug)) {
+    slug = `${base}-${counter}`;
+    counter += 1;
+  }
+  return slug;
+}
+
 // Read all projects
 export async function GET() {
   try {
@@ -39,7 +57,7 @@ export async function GET() {
       const fileData = fs.readFileSync(dbPath, "utf-8");
       try {
         projects = JSON.parse(fileData);
-      } catch (e) {
+      } catch {
         projects = [];
       }
     }
@@ -79,7 +97,7 @@ export async function POST(request: NextRequest) {
       const fileData = fs.readFileSync(dbPath, "utf-8");
       try {
         projects = JSON.parse(fileData);
-      } catch (e) {
+      } catch {
         projects = [];
       }
     }
@@ -89,6 +107,7 @@ export async function POST(request: NextRequest) {
 
     const newProject: Project = {
       id: newId,
+      slug: uniqueSlug(slugify(title), projects),
       title,
       description,
       longDescription: longDescription || "",
@@ -144,7 +163,7 @@ export async function PUT(request: NextRequest) {
     let projects: Project[] = [];
     try {
       projects = JSON.parse(fileData);
-    } catch (e) {
+    } catch {
       return NextResponse.json({ error: "Corrupted database" }, { status: 500 });
     }
 
@@ -200,7 +219,7 @@ export async function DELETE(request: NextRequest) {
     let projects: Project[] = [];
     try {
       projects = JSON.parse(fileData);
-    } catch (e) {
+    } catch {
       return NextResponse.json({ error: "Corrupted database" }, { status: 500 });
     }
 

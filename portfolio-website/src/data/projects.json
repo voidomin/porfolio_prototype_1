@@ -1,6 +1,7 @@
 [
   {
     "id": "1",
+    "slug": "react-projects-studio",
     "title": "React Projects Studio",
     "description": "A curated ecosystem of React + Vite builds demonstrating polished UI, modular architecture, and focused product craft.",
     "longDescription": "A portfolio umbrella showcasing multiple shipped applications with cohesive design language and practical functionality.",
@@ -80,6 +81,7 @@
   },
   {
     "id": "2",
+    "slug": "mustang-pipeline",
     "title": "Mustang Pipeline",
     "description": "Biotechnology pipeline for protein structure alignment with advanced structural analysis.",
     "longDescription": "A Python-driven scientific workflow focused on protein alignment and RMSD analysis, deployed for practical use.",
@@ -97,6 +99,7 @@
   },
   {
     "id": "3",
+    "slug": "param-adventures",
     "title": "Param Adventures",
     "description": "Production website for a travel company with immersive storytelling and conversion-focused sections.",
     "longDescription": "Built as a freelance engagement during a transition period, with strong focus on visual flow and deployment readiness.",
@@ -114,6 +117,7 @@
   },
   {
     "id": "4",
+    "slug": "smart-resume-ai",
     "title": "Smart Resume AI",
     "description": "AI-powered resume optimizer with parsing, tailoring, and real-time feedback.",
     "longDescription": "An intelligent platform that analyzes resumes against job descriptions, suggesting targeted improvements and keywords to pass ATS filters.",
@@ -132,6 +136,7 @@
   },
   {
     "id": "5",
+    "slug": "caloriq",
     "title": "Caloriq",
     "description": "Clean, visual calorie tracker and meal logging platform with smart food search.",
     "longDescription": "A product-minded nutrition app with a focus on quick logging, macro breakdowns, and visual history tracking.",

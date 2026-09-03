@@ -7,6 +7,7 @@ import { StorybookCursor } from "@/components/layout/StorybookCursor";
 import { ScrollProvider } from "@/contexts/ScrollContext";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { Analytics } from "@vercel/analytics/react";
+import { personalProfile, socialLinks, contactInfo } from "@/data/portfolio";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -61,6 +62,34 @@ export const metadata: Metadata = {
   },
 };
 
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://akashportfolio.dev").replace(
+  /\/$/,
+  ""
+);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      name: personalProfile.name,
+      jobTitle: personalProfile.headline,
+      url: siteUrl,
+      email: contactInfo.email,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: personalProfile.location,
+      },
+      sameAs: socialLinks.map((link) => link.url),
+    },
+    {
+      "@type": "WebSite",
+      name: `${personalProfile.name} — Portfolio`,
+      url: siteUrl,
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -73,6 +102,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-[9999] focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-900 focus:rounded-lg focus:shadow-lg focus:font-semibold focus:text-sm"
