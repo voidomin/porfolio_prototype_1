@@ -12,6 +12,32 @@ function formatShutterSpeed(seconds: number | undefined): string {
   return `1/${denominator}s`;
 }
 
+async function reverseGeocode(lat: number, lng: number): Promise<string> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=10`,
+      {
+        headers: { "User-Agent": "akash-portfolio-admin-cms/1.0 (photo geotagging)" },
+        signal: controller.signal,
+      }
+    );
+    clearTimeout(timeout);
+    if (!res.ok) return "";
+
+    const data = await res.json();
+    const address = data?.address || {};
+    const city = address.city || address.town || address.village || address.hamlet || "";
+    const region = address.state || address.county || "";
+    const country = address.country || "";
+
+    return [city, region || country].filter(Boolean).join(", ");
+  } catch {
+    return "";
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -60,12 +86,12 @@ export async function GET(request: NextRequest) {
       captureDate = new Date(stats.birthtime).toISOString().split("T")[0];
     }
 
-    // Try to get GPS coordinates if present
-    const location = ""; // Default empty, user can input manually
+    // Try to get GPS coordinates if present, and reverse-geocode to a readable location
     const gps =
       exifData?.latitude && exifData?.longitude
         ? { lat: exifData.latitude, lng: exifData.longitude }
         : null;
+    const location = gps ? await reverseGeocode(gps.lat, gps.lng) : "";
 
     return NextResponse.json({
       exif: {

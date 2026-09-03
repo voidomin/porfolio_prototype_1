@@ -75,10 +75,18 @@ export async function POST(request: NextRequest) {
     }
 
     const pendingDir = path.join(process.cwd(), "images-to-process");
-    const inputPath = path.join(pendingDir, filename);
+    const importedDir = path.join(pendingDir, "imported");
+    let inputPath = path.join(pendingDir, filename);
+    let isReEditOfArchived = false;
 
     if (!fs.existsSync(inputPath)) {
-      return NextResponse.json({ error: `File not found: ${filename}` }, { status: 404 });
+      const archivedPath = path.join(importedDir, filename);
+      if (fs.existsSync(archivedPath)) {
+        inputPath = archivedPath;
+        isReEditOfArchived = true;
+      } else {
+        return NextResponse.json({ error: `File not found: ${filename}` }, { status: 404 });
+      }
     }
 
     // Prepare outputs paths
@@ -168,13 +176,30 @@ export async function POST(request: NextRequest) {
     // 7. Output WebP
     const imageInfo = await imageProcessor.webp({ quality: 82 }).toFile(outputPath);
 
+    // Archive the raw original first (skip if it's already sitting in the archive,
+    // i.e. this is a re-edit of an already-published photo's visuals).
+    let archivedFilename = filename;
+    if (!isReEditOfArchived) {
+      if (!fs.existsSync(importedDir)) {
+        fs.mkdirSync(importedDir, { recursive: true });
+      }
+      let finalArchivePath = path.join(importedDir, filename);
+      if (fs.existsSync(finalArchivePath)) {
+        const ext = path.extname(filename);
+        const base = path.basename(filename, ext);
+        archivedFilename = `${base}-${Date.now()}${ext}`;
+        finalArchivePath = path.join(importedDir, archivedFilename);
+      }
+      fs.renameSync(inputPath, finalArchivePath);
+    }
+
     // Read and update gallery.json
     const dbPath = path.join(process.cwd(), "src", "data", "gallery.json");
     let gallery: any[] = [];
     if (fs.existsSync(dbPath)) {
       try {
         gallery = JSON.parse(fs.readFileSync(dbPath, "utf-8"));
-      } catch (e) {
+      } catch {
         gallery = [];
       }
     }
@@ -193,6 +218,10 @@ export async function POST(request: NextRequest) {
       height: imageInfo.height,
       featured: !!featured,
       createdAt: createdAt || new Date().toISOString().split("T")[0],
+      sourceFile: archivedFilename,
+      crop: crop || null,
+      adjustments: adjustments || null,
+      watermark: watermark?.enabled ? watermark : null,
       exif: {
         camera: exif?.camera || "",
         lens: exif?.lens || "",
@@ -218,23 +247,6 @@ export async function POST(request: NextRequest) {
 
     // Write back to gallery.json
     fs.writeFileSync(dbPath, JSON.stringify(gallery, null, 2), "utf-8");
-
-    // Move raw file to imported folder to keep things clean
-    const importedDir = path.join(pendingDir, "imported");
-    if (!fs.existsSync(importedDir)) {
-      fs.mkdirSync(importedDir, { recursive: true });
-    }
-    const archivePath = path.join(importedDir, filename);
-
-    // If a file with the same name already exists in archive, append timestamp to avoid overwrite error
-    let finalArchivePath = archivePath;
-    if (fs.existsSync(archivePath)) {
-      const ext = path.extname(filename);
-      const base = path.basename(filename, ext);
-      finalArchivePath = path.join(importedDir, `${base}-${Date.now()}${ext}`);
-    }
-
-    fs.renameSync(inputPath, finalArchivePath);
 
     return NextResponse.json({ success: true, entry: newImageEntry });
   } catch (error: any) {

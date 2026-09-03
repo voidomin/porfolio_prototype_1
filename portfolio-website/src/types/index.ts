@@ -51,6 +51,19 @@ export interface GalleryImage {
   height: number;
   featured: boolean;
   createdAt: string;
+  sourceFile?: string;
+  crop?: { left: number; top: number; width: number; height: number } | null;
+  adjustments?: {
+    brightness?: number;
+    contrast?: number;
+    saturation?: number;
+    rotation?: number;
+  } | null;
+  watermark?: {
+    enabled: boolean;
+    text?: string;
+    position?: "southeast" | "southwest" | "northeast" | "northwest";
+  } | null;
   exif?: {
     camera?: string;
     lens?: string;

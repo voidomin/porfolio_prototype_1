@@ -12,11 +12,19 @@ export async function GET(request: NextRequest) {
     }
 
     const dirPath = path.join(process.cwd(), "images-to-process");
-    const filePath = path.resolve(path.join(dirPath, filename));
+    let filePath = path.resolve(path.join(dirPath, filename));
 
     // Prevent directory traversal attacks
     if (!filePath.startsWith(dirPath)) {
       return NextResponse.json({ error: "Unauthorized access path" }, { status: 403 });
+    }
+
+    // Fall back to the archived original when re-editing an already-published photo.
+    if (!fs.existsSync(filePath)) {
+      const archivedPath = path.resolve(path.join(dirPath, "imported", filename));
+      if (archivedPath.startsWith(path.join(dirPath, "imported")) && fs.existsSync(archivedPath)) {
+        filePath = archivedPath;
+      }
     }
 
     if (!fs.existsSync(filePath)) {

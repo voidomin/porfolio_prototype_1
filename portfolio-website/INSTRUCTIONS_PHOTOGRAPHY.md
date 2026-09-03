@@ -1,77 +1,28 @@
-# How to Add Your Own Photos & EXIF Metadata
+# How to Add Photos to the Golden Hour Gallery
 
-This guide explains how to easily add, manage, and upload your own personal landscape and travel photos to the **Golden Hour** photography section.
+Photos are managed through the local admin CMS at `/admin/upload` — you never need to hand-edit `gallery.json` or `portfolio.ts` directly (both are now written by the CMS, and any manual edits will just get overwritten).
 
----
+## Setup (one-time)
 
-## ─── 3-Step Upload Procedure ───
+1. Add `ENABLE_ADMIN=true` to your `.env.local` in `portfolio-website/` (never set this in production — the middleware 404s `/admin` and `/api/admin/*` unless it's present).
+2. Run `npm run dev` and open `http://localhost:3000/admin/upload`.
 
-### Step 1: Save Your Photo
-Save your high-resolution or compressed photo (`.jpg`, `.jpeg`, `.png`, or `.webp`) inside the project's static assets folder:
-📁 `public/images/photography/`
+## Publishing a photo
 
-*Example: Save your file as `kashmir-dawn.jpg`*
+1. **Queue tab** — drag your raw photo(s) onto the drop-zone (or click it to browse). Multiple files at once are fine; they land in the Queue automatically.
+2. Click a queued photo. Camera EXIF (model, lens, aperture, shutter speed, ISO) and — if the photo has GPS data — a location string are auto-filled. Adjust title/description/category/crop/color as needed, or click "AI Suggest" for title/alt/description ideas.
+3. Click **Process & Commit**. This crops/adjusts/encodes the photo to WebP, updates `src/data/gallery.json`, and creates a local git commit — it does **not** push.
+4. For a large batch where you don't want to review each photo individually, use **Quick-Import All** in the Queue tab instead of step 2-3: it publishes every queued photo with auto-derived title/EXIF and no crop, then commits them together. Go refine titles/categories afterward from the **Published** tab.
+5. When you're happy with the commit(s), run `git push` yourself and wait for the Vercel deploy — the CMS never pushes automatically.
 
-### Step 2: Open your Portfolio Data file
-Open the data file where all your portfolio entries are stored:
-📄 `src/data/portfolio.ts`
+## Fixing a photo after it's published
 
-Scroll down to the `galleryImages` array (around line 229).
+Open the **Published** tab, select the photo, and:
+- To fix title/description/category/EXIF/location: edit the fields and click **Save Changes**.
+- To fix crop/rotation/brightness/contrast/saturation/watermark: click **Re-edit Visuals**, adjust, and click **Process & Commit** again — no need to delete and re-import.
 
-### Step 3: Copy, Paste & Edit the Template
-Copy the empty template below, paste it inside the `galleryImages` array, and fill in the fields.
+## Notes
 
-```typescript
-  {
-    id: "gal-unique-id", // Change this to a unique ID (e.g., "gal-kashmir")
-    src: "/images/photography/your-photo-name.jpg", // The local path to your image
-    alt: "A short, descriptive alt text of what is in the photo",
-    title: "Your Photograph Title",
-    description: "A beautiful, optional one-sentence backstory about when or why you took this shot.",
-    category: "nature", // Keep as "nature" to show up under the nature filter
-    width: 1920, // Optional: aspect ratio width
-    height: 1280, // Optional: aspect ratio height
-    featured: true, // True to showcase it, false to hide/place lower
-    createdAt: "2026-05-12", // Date of capture
-    exif: {
-      camera: "Sony Alpha 7R V", // Your camera body (leave empty or omit if not wanted)
-      lens: "FE 24-70mm F2.8 GM II", // Your lens model
-      focalLength: "24mm", // Focal length (e.g., "35mm")
-      aperture: "f/8.0", // Aperture (e.g., "f/2.8", "f/8.0")
-      shutterSpeed: "1/125s", // Shutter speed (e.g., "1/250s", "2s")
-      iso: "100", // ISO (e.g., "100", "400")
-      location: "Kashmir, India", // Where you took it
-    },
-  },
-```
-
----
-
-## 💡 Pro-Tips to Make It Even Easier
-
-### 1. File Compression (Highly Recommended)
-High-resolution photos straight from DSLR/Mirrorless cameras can be 10MB–40MB each, which will make the website load very slowly.
-* Before uploading, compress your images using free tools like [TinyJPG / TinyPNG](https://tinypng.com/) or export them from Lightroom/Photoshop as **WebP** or **JPEG** at `70% - 80% quality` and a maximum width of `1600px` to `2000px`. This keeps them looking razor-sharp while being less than `500KB`!
-
-### 2. Finding Your EXIF Data
-If you don't remember the exact settings:
-* **On Windows:** Right-click your original image file → select **Properties** → go to the **Details** tab. Scroll down to the "Camera" section to see your Camera model, Lens, Aperture, Shutter Speed, and ISO!
-* **On Mac:** Double-click to open the image in Preview → press `Cmd + I` (Show Inspector) → click the **"i"** tab → click **EXIF**.
-
-### 3. Hiding or Omitting Metadata
-If you took a photo on your phone or don't have/want to show EXIF metadata, simply delete or omit the `exif` block entirely, or leave fields empty! The system is built to safely ignore missing EXIF fields and will hide those specific labels dynamically in the Lightbox drawer:
-
-```typescript
-  {
-    id: "gal-mobile-shot",
-    src: "/images/photography/my-mobile-photo.jpg",
-    alt: "Sunset over Bangalore",
-    title: "City Dusk",
-    category: "nature",
-    width: 1920,
-    height: 1280,
-    featured: true,
-    createdAt: "2026-05-12",
-    // No EXIF section needed!
-  },
-```
+- File size limit for the drop-zone is 50MB per photo; supported types are JPG/PNG/WebP.
+- Location auto-fill uses free reverse geocoding (OpenStreetMap Nominatim) and only works if the source photo has embedded GPS coordinates — phone photos usually do, most cameras don't unless paired with a GPS unit/app.
+- The AI caption suggestions require `GEMINI_API_KEY` to be set locally.

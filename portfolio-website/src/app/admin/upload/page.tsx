@@ -15,6 +15,9 @@ import {
   Plus,
   Trash2,
   Sparkles,
+  Upload,
+  RotateCcw,
+  Layers,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -32,8 +35,83 @@ interface ExifData {
   location?: string;
 }
 
-interface PendingFile {
-  name: string;
+interface UploadDropZoneProps {
+  readonly isUploading: boolean;
+  readonly onFilesSelected: (files: FileList) => void;
+}
+
+function UploadDropZone({ isUploading, onFilesSelected }: Readonly<UploadDropZoneProps>) {
+  const [isDragOver, setIsDragOver] = useState(false);
+  const inputId = "batch-upload-input";
+
+  return (
+    <button
+      type="button"
+      onClick={() => document.getElementById(inputId)?.click()}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDragOver(true);
+      }}
+      onDragLeave={() => setIsDragOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+        if (e.dataTransfer.files?.length) {
+          onFilesSelected(e.dataTransfer.files);
+        }
+      }}
+      className={`w-full flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-6 mb-4 text-center transition cursor-pointer ${
+        isDragOver
+          ? "border-dawn-500 bg-dawn-950/10"
+          : "border-stone-800 hover:border-stone-700 hover:bg-stone-900/40"
+      }`}
+    >
+      <input
+        id={inputId}
+        type="file"
+        multiple
+        accept="image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files?.length) {
+            onFilesSelected(e.target.files);
+            e.target.value = "";
+          }
+        }}
+      />
+      {isUploading ? (
+        <>
+          <Loader2 className="w-6 h-6 animate-spin text-dawn-500" />
+          <span className="text-xs font-semibold text-stone-300">Uploading...</span>
+        </>
+      ) : (
+        <>
+          <Upload className="w-6 h-6 text-stone-500" />
+          <span className="text-xs font-semibold text-stone-300">
+            Drag &amp; drop photos here, or click to browse
+          </span>
+          <span className="text-[10px] text-stone-600">JPG, PNG or WebP — multiple files OK</span>
+        </>
+      )}
+    </button>
+  );
+}
+
+async function apiUploadFiles(files: FileList) {
+  try {
+    const formData = new FormData();
+    Array.from(files).forEach((file) => formData.append("files", file));
+    const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+    const data = await res.json();
+    return {
+      ok: res.ok && data.success,
+      accepted: data.accepted || [],
+      rejected: data.rejected || [],
+      error: data.error,
+    };
+  } catch (err: any) {
+    return { ok: false, accepted: [], rejected: [], error: err.message };
+  }
 }
 
 interface PendingQueueProps {
@@ -534,7 +612,10 @@ function CropWorkspace({
           {crop && (
             <button
               type="button"
-              onClick={() => { setCrop(undefined); setCompletedCrop(null); }}
+              onClick={() => {
+                setCrop(undefined);
+                setCompletedCrop(null);
+              }}
               className="text-[10px] font-bold text-rose-400 hover:text-rose-300 transition cursor-pointer"
             >
               ✕ Clear crop
@@ -543,7 +624,8 @@ function CropWorkspace({
         </div>
         <div className="grid grid-cols-6 gap-1.5">
           {ASPECT_RATIOS.map((r) => {
-            const active = r.value === undefined ? aspectRatio === undefined : aspectRatio === r.value;
+            const active =
+              r.value === undefined ? aspectRatio === undefined : aspectRatio === r.value;
             return (
               <button
                 key={r.label}
@@ -559,9 +641,26 @@ function CropWorkspace({
                   {r.value === undefined ? (
                     // Full — dashed border with diagonal lines indicating "all"
                     <>
-                      <rect x="2" y="3" width="32" height="22" rx="2"
-                        fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2" />
-                      <line x1="2" y1="3" x2="34" y2="25" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.4" />
+                      <rect
+                        x="2"
+                        y="3"
+                        width="32"
+                        height="22"
+                        rx="2"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeDasharray="3 2"
+                      />
+                      <line
+                        x1="2"
+                        y1="3"
+                        x2="34"
+                        y2="25"
+                        stroke="currentColor"
+                        strokeWidth="0.8"
+                        strokeOpacity="0.4"
+                      />
                     </>
                   ) : (
                     // Solid rect proportional to the ratio
@@ -614,9 +713,13 @@ function CropWorkspace({
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="bg-stone-950/70 backdrop-blur-sm border border-stone-700 rounded-xl px-4 py-2.5 text-center">
               <p className="text-xs font-semibold text-white">
-                {aspectRatio === undefined ? "Choose a ratio above, then drag to crop" : "Drag anywhere on the image to crop"}
+                {aspectRatio === undefined
+                  ? "Choose a ratio above, then drag to crop"
+                  : "Drag anywhere on the image to crop"}
               </p>
-              <p className="text-[10px] text-stone-400 mt-0.5">Leave empty to use full resolution</p>
+              <p className="text-[10px] text-stone-400 mt-0.5">
+                Leave empty to use full resolution
+              </p>
             </div>
           </div>
         )}
@@ -690,8 +793,9 @@ function WorkspaceCanvas({
   setSaturation,
   rotation,
   setRotation,
-}: Readonly<WorkspaceCanvasProps>) {
-  if (editingPhotoId) {
+  isReEditingVisuals,
+}: Readonly<WorkspaceCanvasProps & { readonly isReEditingVisuals?: boolean }>) {
+  if (editingPhotoId && !isReEditingVisuals) {
     return (
       <div className="flex flex-col items-center justify-center overflow-hidden">
         <span className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold mb-3 block text-center">
@@ -711,9 +815,8 @@ function WorkspaceCanvas({
             EDITING PUBLISHED PHOTO
           </p>
           <p className="text-[10px] text-stone-500 mt-1.5 leading-relaxed">
-            Visual processing (cropping, rotation, and color lab sliders) is finalized. To modify
-            the visuals of this image, please delete it from the gallery and re-import the original
-            file from the Queue.
+            You&apos;re editing metadata only. Use &quot;Re-edit Visuals&quot; below to reopen the
+            crop/color tools on the original photo without deleting this entry.
           </p>
         </div>
       </div>
@@ -1574,6 +1677,20 @@ async function apiProcessNewPhoto(payload: any) {
   }
 }
 
+async function apiCommitFiles(files: string[], message: string) {
+  try {
+    const res = await fetch("/api/admin/commit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ files, message }),
+    });
+    const data = await res.json();
+    return { ok: res.ok && data.success, commit: data.commit, error: data.error };
+  } catch (err: any) {
+    return { ok: false, error: err.message };
+  }
+}
+
 async function apiFetchExif(filename: string) {
   try {
     const res = await fetch(`/api/admin/exif?file=${encodeURIComponent(filename)}`);
@@ -1631,6 +1748,10 @@ async function apiSubmitExperience(payload: any, isNew: boolean) {
 
 function useAdminDashboardState() {
   const [pendingFiles, setPendingFiles] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isReEditingVisuals, setIsReEditingVisuals] = useState(false);
+  const [publishedSourceFile, setPublishedSourceFile] = useState<string | null>(null);
+  const [isBatchProcessing, setIsBatchProcessing] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLoadingFiles, setIsLoadingFiles] = useState(true);
@@ -1726,6 +1847,30 @@ function useAdminDashboardState() {
   const fetchPublishedPhotos = async () => {
     const photos = await apiFetchPublishedPhotos();
     setPublishedPhotos(photos);
+  };
+
+  const uploadFiles = async (files: FileList) => {
+    setIsUploading(true);
+    setStatusMessage(null);
+    const res = await apiUploadFiles(files);
+    await fetchPendingFiles();
+    if (res.rejected.length > 0) {
+      setStatusMessage({
+        type: res.accepted.length > 0 ? "success" : "error",
+        text:
+          res.accepted.length > 0
+            ? `Uploaded ${res.accepted.length} photo(s). Skipped: ${res.rejected.map((r: any) => `${r.name} (${r.reason})`).join(", ")}`
+            : `Upload failed: ${res.rejected.map((r: any) => `${r.name} (${r.reason})`).join(", ")}`,
+      });
+    } else if (res.ok) {
+      setStatusMessage({
+        type: "success",
+        text: `Uploaded ${res.accepted.length} photo(s) to the queue.`,
+      });
+    } else {
+      setStatusMessage({ type: "error", text: res.error || "Upload failed." });
+    }
+    setIsUploading(false);
   };
 
   const fetchProjects = async () => {
@@ -1950,15 +2095,19 @@ function useAdminDashboardState() {
     setSelectedFile(photo.src);
     setStatusMessage(null);
     setConfirmDelete(false);
+    setIsReEditingVisuals(false);
+    setPublishedSourceFile(photo.sourceFile || null);
 
     setCrop(undefined);
     setCompletedCrop(null);
     setImgRef(null);
-    setBrightness(1);
-    setContrast(1);
-    setSaturation(1);
-    setRotation(0);
-    setWatermarkEnabled(false);
+    setBrightness(photo.adjustments?.brightness ?? 1);
+    setContrast(photo.adjustments?.contrast ?? 1);
+    setSaturation(photo.adjustments?.saturation ?? 1);
+    setRotation(photo.adjustments?.rotation ?? 0);
+    setWatermarkEnabled(photo.watermark?.enabled ?? false);
+    setWatermarkText(photo.watermark?.text || "© Akash Photography");
+    setWatermarkPosition(photo.watermark?.position || "southeast");
 
     setPhotoId(photo.id);
     setTitle(photo.title || "");
@@ -1976,6 +2125,22 @@ function useAdminDashboardState() {
       iso: photo.exif?.iso || "",
       location: photo.exif?.location || "",
     });
+  };
+
+  const handleReEditVisuals = () => {
+    if (!publishedSourceFile) {
+      setStatusMessage({
+        type: "error",
+        text: "Original source file isn't available for this photo (it was published before this feature was added). Delete and re-upload it to edit its crop/color again.",
+      });
+      return;
+    }
+    setIsReEditingVisuals(true);
+    setSelectedFile(publishedSourceFile);
+    setCrop(undefined);
+    setCompletedCrop(null);
+    setImgRef(null);
+    setStatusMessage(null);
   };
 
   const handleDelete = async () => {
@@ -2143,19 +2308,32 @@ function useAdminDashboardState() {
 
     const res = await apiProcessNewPhoto(payload);
     if (res.ok) {
+      const commitRes = await apiCommitFiles(
+        [`public/images/photography/${photoId}.webp`, "src/data/gallery.json"],
+        `photo: publish "${title}" (${photoId})`
+      );
+
       setStatusMessage({
-        type: "success",
-        text: `Successfully processed and imported "${title}" to your gallery!`,
+        type: commitRes.ok ? "success" : "error",
+        text: commitRes.ok
+          ? `Processed "${title}" and committed locally${commitRes.commit ? ` (${commitRes.commit})` : ""}. Run \`git push\` when you're ready to go live.`
+          : `Processed "${title}", but the local commit failed: ${commitRes.error}. Run \`git add\`/\`git commit\` manually.`,
       });
 
+      const wasReEdit = isReEditingVisuals;
       const finishedFile = selectedFile;
       setSelectedFile(null);
+      setEditingPhotoId(null);
+      setIsReEditingVisuals(false);
 
-      const remainingQueue = pendingFiles.filter((f) => f !== finishedFile);
-      await fetchPendingFiles();
-
-      if (remainingQueue.length > 0) {
-        handleSelectFile(remainingQueue[0]);
+      if (wasReEdit) {
+        await fetchPublishedPhotos();
+      } else {
+        const remainingQueue = pendingFiles.filter((f) => f !== finishedFile);
+        await fetchPendingFiles();
+        if (remainingQueue.length > 0) {
+          handleSelectFile(remainingQueue[0]);
+        }
       }
     } else {
       setStatusMessage({
@@ -2165,6 +2343,65 @@ function useAdminDashboardState() {
     }
   };
 
+  const handleProcessAllQueued = async () => {
+    setIsBatchProcessing(true);
+    setStatusMessage(null);
+    const queue = [...pendingFiles];
+    let successCount = 0;
+    const failures: string[] = [];
+    const succeededIds: string[] = [];
+
+    for (const filename of queue) {
+      const exifRes = await apiFetchExif(filename);
+      const baseName = filename
+        .toLowerCase()
+        .replace(/\.[^/.]+$/, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+      const derivedTitle = filename
+        .replace(/\.[^/.]+$/, "")
+        .replace(/[-_]+/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+      const derivedId = `gal-${baseName}`;
+
+      const payload = {
+        filename,
+        id: derivedId,
+        title: derivedTitle,
+        alt: `Photograph titled ${derivedTitle}`,
+        description: "",
+        category: "nature",
+        featured: false,
+        createdAt: exifRes.createdAt || new Date().toISOString().split("T")[0],
+        exif: exifRes.exif || {},
+      };
+
+      const res = await apiProcessNewPhoto(payload);
+      if (res.ok) {
+        successCount += 1;
+        succeededIds.push(derivedId);
+      } else {
+        failures.push(`${filename}: ${res.error || "unknown error"}`);
+      }
+    }
+
+    if (successCount > 0) {
+      const files = succeededIds.map((id) => `public/images/photography/${id}.webp`);
+      files.push("src/data/gallery.json");
+      await apiCommitFiles(files, `photo: batch import ${successCount} photo(s) from queue`);
+    }
+
+    await fetchPendingFiles();
+    setStatusMessage({
+      type: failures.length === 0 ? "success" : "error",
+      text:
+        failures.length === 0
+          ? `Quick-imported ${successCount} photo(s) with default metadata. Refine titles/categories from the Published tab, then \`git push\` when ready.`
+          : `Imported ${successCount} photo(s). Failed: ${failures.join("; ")}`,
+    });
+    setIsBatchProcessing(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) return;
@@ -2172,7 +2409,7 @@ function useAdminDashboardState() {
     setIsProcessing(true);
     setStatusMessage(null);
 
-    if (editingPhotoId) {
+    if (editingPhotoId && !isReEditingVisuals) {
       await updatePublishedPhoto();
     } else {
       await processNewPhoto();
@@ -2272,6 +2509,13 @@ function useAdminDashboardState() {
     handleDelete,
     handleSelectFile,
     handleSubmit,
+    isUploading,
+    uploadFiles,
+    isReEditingVisuals,
+    setIsReEditingVisuals,
+    handleReEditVisuals,
+    isBatchProcessing,
+    handleProcessAllQueued,
     experiencesList,
     selectedExperienceId,
     isExperiencesLoading,
@@ -2443,10 +2687,14 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
     setSelectedFile,
     setEditingPhotoId,
     selectedFile,
+    isReEditingVisuals,
+    setIsReEditingVisuals,
+    handleReEditVisuals,
   } = state;
 
-  const submitButtonText = editingPhotoId ? "Save Changes" : "Process & Save to Exhibition";
-  const ai = useAiCaption(editingPhotoId ? null : selectedFile);
+  const submitButtonText =
+    editingPhotoId && !isReEditingVisuals ? "Save Changes" : "Process & Commit";
+  const ai = useAiCaption(editingPhotoId && !isReEditingVisuals ? null : selectedFile);
 
   const handleApplyCaption = (s: CaptionSuggestion) => {
     setTitle(s.title);
@@ -2519,9 +2767,7 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
       </div>
 
       {/* AI suggestions — only visible after clicking AI Suggest */}
-      {!editingPhotoId && ai.error && (
-        <p className="text-[10px] text-rose-400 -mt-2">{ai.error}</p>
-      )}
+      {!editingPhotoId && ai.error && <p className="text-[10px] text-rose-400 -mt-2">{ai.error}</p>}
       {!editingPhotoId && ai.suggestions.length > 0 && (
         <div className="space-y-2 -mt-2">
           <p className="text-[10px] text-stone-500 font-semibold uppercase tracking-wider">
@@ -2658,20 +2904,41 @@ function PhotoMetadataFormFields({ state }: PhotoMetadataFormFieldsProps) {
 
       {/* Actions */}
       <div className="flex items-center justify-between gap-3 pt-4 border-t border-stone-850">
-        <DeletePhotoActions
-          editingPhotoId={editingPhotoId}
-          confirmDelete={confirmDelete}
-          setConfirmDelete={setConfirmDelete}
-          handleDelete={handleDelete}
-          isProcessing={isProcessing}
-        />
+        <div className="flex items-center gap-3">
+          <DeletePhotoActions
+            editingPhotoId={editingPhotoId}
+            confirmDelete={confirmDelete}
+            setConfirmDelete={setConfirmDelete}
+            handleDelete={handleDelete}
+            isProcessing={isProcessing}
+          />
+          {editingPhotoId && !isReEditingVisuals && (
+            <button
+              type="button"
+              onClick={handleReEditVisuals}
+              disabled={isProcessing}
+              className="px-4 py-2.5 rounded-xl border border-stone-805 text-xs font-bold text-dawn-400 hover:text-dawn-300 hover:bg-stone-900 transition cursor-pointer flex items-center gap-2"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Re-edit Visuals
+            </button>
+          )}
+        </div>
 
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => {
-              setSelectedFile(null);
-              setEditingPhotoId(null);
+              if (isReEditingVisuals) {
+                // Back out of visual re-edit into the metadata-only view, not out of the photo entirely.
+                setIsReEditingVisuals(false);
+                setSelectedFile(
+                  state.publishedPhotos?.find((p: any) => p.id === editingPhotoId)?.src || null
+                );
+              } else {
+                setSelectedFile(null);
+                setEditingPhotoId(null);
+              }
               setConfirmDelete(false);
             }}
             className="px-5 py-2.5 rounded-xl border border-stone-805 text-xs font-bold text-stone-400 hover:text-white hover:bg-stone-900 transition cursor-pointer"
@@ -2717,6 +2984,7 @@ function PhotoExhibitionWorkspace({ state }: PhotoExhibitionWorkspaceProps) {
     rotation,
     setRotation,
     editingPhotoId,
+    isReEditingVisuals,
     handleSubmit,
   } = state;
 
@@ -2734,6 +3002,7 @@ function PhotoExhibitionWorkspace({ state }: PhotoExhibitionWorkspaceProps) {
         <div className="bg-stone-900/60 backdrop-blur-md rounded-2xl border border-stone-850 p-6">
           <WorkspaceCanvas
             editingPhotoId={editingPhotoId}
+            isReEditingVisuals={isReEditingVisuals}
             selectedFile={selectedFile}
             crop={crop}
             setCrop={setCrop}
@@ -2799,6 +3068,10 @@ function ExhibitionSidebar({ state }: ExhibitionSidebarProps) {
     editingPhotoId,
     handleSelectPublishedFile,
     fetchPublishedPhotos,
+    isUploading,
+    uploadFiles,
+    isBatchProcessing,
+    handleProcessAllQueued,
   } = state;
 
   return (
@@ -2850,13 +3123,25 @@ function ExhibitionSidebar({ state }: ExhibitionSidebarProps) {
 
       {activeTab === "pending" ? (
         <>
-          <p className="text-xs text-stone-500 mb-6 leading-relaxed">
-            Place raw camera photos in the local project directory under{" "}
-            <code className="bg-stone-950 px-1.5 py-0.5 rounded text-dawn-400 font-mono">
-              /images-to-process/
-            </code>{" "}
-            to import them.
-          </p>
+          <UploadDropZone isUploading={isUploading} onFilesSelected={uploadFiles} />
+          {pendingFiles.length > 1 && (
+            <button
+              type="button"
+              onClick={handleProcessAllQueued}
+              disabled={isBatchProcessing}
+              className="w-full flex items-center justify-center gap-2 mb-4 px-3 py-2 rounded-xl bg-stone-850 border border-stone-800 text-xs font-bold text-stone-300 hover:bg-stone-800 disabled:opacity-50 transition cursor-pointer"
+              title="Publishes every queued photo with auto-derived title/EXIF and no crop — refine metadata afterward from the Published tab."
+            >
+              {isBatchProcessing ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Layers className="w-4 h-4" />
+              )}
+              {isBatchProcessing
+                ? "Processing all..."
+                : `Quick-Import All (${pendingFiles.length})`}
+            </button>
+          )}
           <PendingQueue
             isLoadingFiles={isLoadingFiles}
             pendingFiles={pendingFiles}
