@@ -133,10 +133,10 @@ export const InteractiveTrail = () => {
           color = "rgba(255, 95, 30, 0.95)";
         }
 
-        let vx = (Math.random() - 0.5) * 2.5;
+        const vx = (Math.random() - 0.5) * 2.5;
         let vy = (Math.random() - 0.5) * 2.5;
-        let size = Math.random() * 3 + 1.5;
-        let decay = 0.022;
+        const size = Math.random() * 3 + 1.5;
+        const decay = 0.022;
 
         if (type === "ember") {
           vy = -Math.random() * 3 - 1.5;
