@@ -13,7 +13,7 @@
 ## Existing Feature Improvements
 
 - [ ] Photography section — carousel is empty until real images are added
-- [ ] Skills section — separate hobbies from technical skills (recruiters see them mixed together)
+- [x] Skills section — hobbies moved to a plain "Beyond the Screen" tag strip (no fake percentages); "Other Skills" renamed to "Research & Computer Science"
 - [ ] About timeline — icons (Tent, Compass, Flame) don't match actual job roles; replace with relevant ones
 - [ ] MountainAscentHUD — checkpoint labels ("Sunny Meadow") don't match section titles ("The Meadow"); sync them
 - [x] Navbar — active section highlighting as user scrolls (already implemented via IntersectionObserver in `Navbar.tsx`)
@@ -72,3 +72,4 @@
 - [x] Photo admin CMS streamlined — browser drag-and-drop batch upload, GPS-based location auto-fill, one-click Process & Commit (local commit, no auto-push), Quick-Import All batch action, and visual re-edit (crop/color/watermark) without delete + redo
 - [x] JSON-LD structured data — Person + WebSite schema added to root layout
 - [x] `/photography` metadata — own title/description/OG instead of inheriting the homepage's
+- [x] Fixed a long-standing ESLint crash on `SkillsSection.tsx` (a `TSMappedType` parser bug in this typescript-eslint version) that was silently aborting lint before it ever reached later files — this had been masking real `prefer-const` compile errors in `InteractiveTrail.tsx` that `next build`'s lint step would otherwise fail on. Both are fixed; `npm run build` now lints cleanly (warnings only, no errors).
