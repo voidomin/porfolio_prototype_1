@@ -2,7 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Mail, MapPin, Send, CheckCircle, AlertCircle, Github, Linkedin } from "lucide-react";
+import {
+  Mail,
+  MapPin,
+  Send,
+  CheckCircle,
+  AlertCircle,
+  Github,
+  Linkedin,
+  Copy,
+  Check,
+} from "lucide-react";
 import { socialLinks, contactInfo } from "@/data/portfolio";
 import { ContactFormData } from "@/types";
 import { cn } from "@/lib/utils";
@@ -240,6 +250,17 @@ export const ContactSection = () => {
     status: "idle",
     message: "",
   });
+  const [emailCopied, setEmailCopied] = useState(false);
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(contactInfo.email);
+      setEmailCopied(true);
+      setTimeout(() => setEmailCopied(false), 2000);
+    } catch {
+      // Clipboard API unavailable — the mailto link next to it still works.
+    }
+  };
   const [fireflies, setFireflies] = useState<
     { id: number; x: number; y: number; delay: number; duration: number; size: number }[]
   >([]);
@@ -411,14 +432,29 @@ export const ContactSection = () => {
                   <div className="w-11 h-11 bg-dawn-500/80 rounded-full flex items-center justify-center shadow-lg shadow-dawn-500/20">
                     <Mail className="w-5 h-5 text-white" />
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-white text-sm">Email</h4>
-                    <a
-                      href={`mailto:${contactInfo.email}`}
-                      className="text-dusk-200/60 hover:text-dawn-300 transition-colors text-sm"
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <h4 className="font-semibold text-white text-sm">Email</h4>
+                      <a
+                        href={`mailto:${contactInfo.email}`}
+                        className="text-dusk-200/60 hover:text-dawn-300 transition-colors text-sm"
+                      >
+                        {contactInfo.email}
+                      </a>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCopyEmail}
+                      className="p-1.5 rounded-full text-dusk-200/50 hover:text-dawn-300 hover:bg-white/5 transition-colors"
+                      title="Copy email address"
+                      aria-label="Copy email address"
                     >
-                      {contactInfo.email}
-                    </a>
+                      {emailCopied ? (
+                        <Check className="w-3.5 h-3.5 text-green-400" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
                   </div>
                 </motion.div>
 
