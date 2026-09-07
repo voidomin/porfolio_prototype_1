@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowDown, MapPin, CircleDot } from "lucide-react";
 import { personalProfile } from "@/data/portfolio";
+import { Magnetic } from "@/components/ui/Magnetic";
 
 /* ──────────────────────────────────────────────────────────
    HeroSection – "Chapter 1: Dawn"
@@ -138,22 +139,26 @@ export const HeroSection = () => {
           animate="visible"
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <motion.a
-            href="#projects"
-            className="px-8 py-4 bg-forest-950/5 backdrop-blur-md border border-forest-950/20 text-forest-950 font-semibold rounded-full hover:bg-forest-950/10 transition-all duration-300"
-            whileHover={{ scale: 1.03, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            Explore My Journey
-          </motion.a>
-          <motion.a
-            href="#contact"
-            className="px-8 py-4 bg-forest-800 text-white font-semibold rounded-full hover:bg-forest-700 transition-all duration-300 shadow-lg shadow-forest-900/10"
-            whileHover={{ scale: 1.03, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            Get In Touch
-          </motion.a>
+          <Magnetic strength={10}>
+            <motion.a
+              href="#projects"
+              className="inline-block px-8 py-4 bg-forest-950/5 backdrop-blur-md border border-forest-950/20 text-forest-950 font-semibold rounded-full hover:bg-forest-950/10 transition-all duration-300"
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              Explore My Journey
+            </motion.a>
+          </Magnetic>
+          <Magnetic strength={10}>
+            <motion.a
+              href="#contact"
+              className="inline-block px-8 py-4 bg-forest-800 text-white font-semibold rounded-full hover:bg-forest-700 transition-all duration-300 shadow-lg shadow-forest-900/10"
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              Get In Touch
+            </motion.a>
+          </Magnetic>
         </motion.div>
 
         {/* Quick, screenable summary — no downloadable file, just an on-site one-pager */}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { skills, hobbies } from "@/data/portfolio";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { Skill, type SkillCategory } from "@/types";
 
 /* ──────────────────────────────────────────────────────────
@@ -29,7 +30,9 @@ const SkillBar = ({ skill, index }: { skill: Skill; index: number }) => (
   >
     <div className="flex justify-between items-center">
       <span className="text-sm font-medium text-meadow-900">{skill.name}</span>
-      <span className="text-xs text-meadow-700/60 font-mono">{skill.level}%</span>
+      <span className="text-xs text-meadow-700/60 font-mono">
+        <AnimatedNumber value={`${skill.level}%`} />
+      </span>
     </div>
     <div className="h-2.5 bg-meadow-900/10 rounded-full overflow-hidden">
       <motion.div

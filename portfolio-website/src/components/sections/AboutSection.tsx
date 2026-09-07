@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Briefcase, Compass, Code2, Microscope, Database, TreePine } from "lucide-react";
 import { aboutStats, experienceTimeline, personalProfile } from "@/data/portfolio";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 
 /* ──────────────────────────────────────────────────────────
    AboutSection – "Chapter 2: The Forest Path"
@@ -140,7 +141,7 @@ export const AboutSection = () => {
               className="text-center p-6 glass-nature rounded-2xl"
             >
               <div className="text-2xl md:text-3xl font-bold text-forest-300 mb-2">
-                {stat.value}
+                <AnimatedNumber value={stat.value} />
               </div>
               <div className="text-sm text-forest-200/50">{stat.label}</div>
             </motion.div>
