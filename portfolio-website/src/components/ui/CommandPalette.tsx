@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ArrowRight, Command } from "lucide-react";
 import { navigationItems, projects, blogPosts } from "@/data/portfolio";
+import { scrollTo } from "@/lib/lenis";
 
 /* ──────────────────────────────────────────────────────────
    CommandPalette – Cmd/Ctrl+K quick-jump. Mounted once in the
@@ -32,7 +33,8 @@ export const CommandPalette = () => {
   const goToSection = useCallback(
     (id: string) => {
       if (pathname === "/") {
-        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+        const el = document.getElementById(id);
+        if (el) scrollTo(el);
       } else {
         router.push(`/#${id}`);
       }
@@ -211,7 +213,7 @@ export const CommandPalette = () => {
                 </kbd>
               </div>
 
-              <div className="max-h-[50vh] overflow-y-auto py-2">
+              <div data-lenis-prevent className="max-h-[50vh] overflow-y-auto py-2">
                 {filtered.length === 0 && (
                   <p className="px-5 py-6 text-sm text-white/40 text-center">No matches found.</p>
                 )}

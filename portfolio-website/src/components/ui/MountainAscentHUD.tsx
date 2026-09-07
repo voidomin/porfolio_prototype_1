@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollProgress } from "@/hooks/useIntersectionObserver";
 import { cn } from "@/lib/utils";
+import { scrollTo } from "@/lib/lenis";
 
 /* ──────────────────────────────────────────────────────────
    MountainAscentHUD – Floating Hiking Trail Scroll Navigator.
@@ -61,7 +62,7 @@ export const MountainAscentHUD = () => {
   const handleScrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+      scrollTo(el);
     }
   };
 

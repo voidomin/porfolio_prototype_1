@@ -16,6 +16,7 @@ import { projects } from "@/data/portfolio";
 import { Project, type ProjectCategory } from "@/types";
 import { cn } from "@/lib/utils";
 import { focusReveal } from "@/lib/revealVariants";
+import { scrollTo } from "@/lib/lenis";
 
 /* ──────────────────────────────────────────────────────────
    ProjectsSection – "Chapter 4: Stepping Stones"
@@ -148,7 +149,10 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                 </div>
 
                 {project.subProjects ? (
-                  <div className="flex items-end gap-0.5 px-2 overflow-x-auto scrollbar-none max-w-[80%] -mb-[1px]">
+                  <div
+                    data-lenis-prevent
+                    className="flex items-end gap-0.5 px-2 overflow-x-auto scrollbar-none max-w-[80%] -mb-[1px]"
+                  >
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -840,7 +844,7 @@ export const ProjectsSection = () => {
     const absoluteTop = window.scrollY + rect.top;
     const ti = Math.max(0, Math.min(filteredProjects.length - 1, index));
     const fraction = ti / (filteredProjects.length - 1 || 1);
-    window.scrollTo({ top: absoluteTop + fraction * scrollRange, behavior: "smooth" });
+    scrollTo(absoluteTop + fraction * scrollRange);
   };
 
   return (

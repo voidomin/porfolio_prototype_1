@@ -156,7 +156,7 @@ function PendingQueue({
     );
   }
   return (
-    <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+    <div data-lenis-prevent className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
       {pendingFiles.map((file) => {
         const isSelected = selectedFile === file;
         return (
@@ -963,7 +963,7 @@ function ProjectsQueue({
         New Project
       </button>
 
-      <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+      <div data-lenis-prevent className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
         {projects.map((project) => {
           const isSelected = selectedId === project.id;
           return (
@@ -1548,7 +1548,7 @@ function PublishedQueue({
     );
   }
   return (
-    <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+    <div data-lenis-prevent className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
       {photos.map((photo) => {
         const isSelected = selectedId === photo.id;
         return (
@@ -3416,7 +3416,7 @@ function ExperiencesQueue({
         New Experience
       </button>
 
-      <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+      <div data-lenis-prevent className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
         {experiences.map((exp) => {
           const isSelected = selectedId === exp.id;
           return (

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Compass, ArrowUp, Mail, Github, Linkedin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { socialLinks } from "@/data/portfolio";
+import { scrollTo } from "@/lib/lenis";
 
 /* ──────────────────────────────────────────────────────────
    FloatingActionButton – Compass rose themed.
@@ -33,12 +34,12 @@ export const FloatingActionButton = () => {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollTo(0);
     setIsOpen(false);
   };
 
   const scrollToContact = () => {
-    document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
+    scrollTo("#contact");
     setIsOpen(false);
   };
 

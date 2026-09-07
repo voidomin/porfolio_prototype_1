@@ -285,6 +285,7 @@ export const PhotographySection = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/95 backdrop-blur-xl"
+            data-lenis-prevent
             role="dialog"
             aria-modal="true"
           >
@@ -330,6 +331,7 @@ export const PhotographySection = () => {
                 {/* ── Info panel ── */}
                 <div
                   className="lg:w-72 xl:w-80 shrink-0 flex flex-col bg-stone-950/95 backdrop-blur-xl border-t lg:border-t-0 lg:border-l border-white/8 overflow-y-auto"
+                  data-lenis-prevent
                   style={{ maxHeight: "90vh" }}
                 >
                   {/* Close button inside panel */}

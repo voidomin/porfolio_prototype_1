@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { navigationItems, personalProfile } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 import { useScrollDirection } from "@/hooks/useIntersectionObserver";
+import { scrollTo } from "@/lib/lenis";
 
 /* ──────────────────────────────────────────────────────────
    Navbar – transparent at top, gains frosted glass on scroll.
@@ -269,8 +270,7 @@ export const Navbar = () => {
   const handleLinkClick = (href: string) => {
     setIsOpen(false);
     if (href.startsWith("#")) {
-      const element = document.querySelector(href);
-      element?.scrollIntoView({ behavior: "smooth" });
+      scrollTo(href);
     }
   };
 

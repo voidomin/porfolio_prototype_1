@@ -582,6 +582,7 @@ export default function PhotographyGalleryPage() {
             {/* Scroll Track */}
             <div
               ref={filmstripContainerRef}
+              data-lenis-prevent
               className="flex overflow-x-auto overflow-y-hidden whitespace-nowrap h-[68vh] w-full snap-x snap-mandatory scrollbar-thin scrollbar-thumb-stone-800 scrollbar-track-stone-950 py-4 select-none scroll-smooth"
             >
               {filteredPhotos.map((photo, index) => (
