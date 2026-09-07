@@ -6,7 +6,6 @@ import { ArrowDown, MapPin, CircleDot } from "lucide-react";
 import { personalProfile } from "@/data/portfolio";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { PerspectiveTilt } from "@/components/ui/PerspectiveTilt";
-import { TrailHiker } from "@/components/animations/TrailHiker";
 
 /* ──────────────────────────────────────────────────────────
    HeroSection – "Chapter 1: Dawn"
@@ -49,10 +48,6 @@ export const HeroSection = () => {
     >
       {/* Dawn glow overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-dawn-200/20 via-transparent to-transparent pointer-events-none z-[1]" />
-
-      {/* Interactive vector illustration — a hiker on the ridge, tucked into
-          the corner so it never competes with the name/headline for attention */}
-      <TrailHiker />
 
       {/* Central content — subtle cursor-tracked 3D tilt gives the hero real
           depth instead of sitting flat on one plane; same transform math as
