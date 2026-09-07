@@ -419,7 +419,6 @@ export default function PhotographyGalleryPage() {
         }
       } catch {
         // Canvas extraction failed (e.g. CORS); fallback color already set
-        console.debug("Dominant color extraction skipped — using category fallback.");
       }
     };
   }, [selectedPhoto]);

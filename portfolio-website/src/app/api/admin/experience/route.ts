@@ -22,7 +22,7 @@ export async function GET() {
       const fileData = fs.readFileSync(dbPath, "utf-8");
       try {
         experiences = JSON.parse(fileData);
-      } catch (e) {
+      } catch {
         experiences = [];
       }
     }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       const fileData = fs.readFileSync(dbPath, "utf-8");
       try {
         experiences = JSON.parse(fileData);
-      } catch (e) {
+      } catch {
         experiences = [];
       }
     }
@@ -94,7 +94,7 @@ export async function PUT(request: NextRequest) {
     let experiences: ExperienceItem[] = [];
     try {
       experiences = JSON.parse(fileData);
-    } catch (e) {
+    } catch {
       return NextResponse.json({ error: "Corrupted database" }, { status: 500 });
     }
 
@@ -141,7 +141,7 @@ export async function DELETE(request: NextRequest) {
     let experiences: ExperienceItem[] = [];
     try {
       experiences = JSON.parse(fileData);
-    } catch (e) {
+    } catch {
       return NextResponse.json({ error: "Corrupted database" }, { status: 500 });
     }
 

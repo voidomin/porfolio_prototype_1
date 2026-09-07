@@ -39,7 +39,7 @@ export async function GET() {
       const fileData = fs.readFileSync(dbPath, "utf-8");
       try {
         gallery = JSON.parse(fileData);
-      } catch (e) {
+      } catch {
         gallery = [];
       }
     }
@@ -69,7 +69,7 @@ export async function PUT(request: NextRequest) {
     let gallery: GalleryItem[] = [];
     try {
       gallery = JSON.parse(fileData);
-    } catch (e) {
+    } catch {
       return NextResponse.json({ error: "Corrupted gallery database" }, { status: 500 });
     }
 
@@ -136,7 +136,7 @@ export async function DELETE(request: NextRequest) {
     let gallery: GalleryItem[] = [];
     try {
       gallery = JSON.parse(fileData);
-    } catch (e) {
+    } catch {
       return NextResponse.json({ error: "Corrupted gallery database" }, { status: 500 });
     }
 
