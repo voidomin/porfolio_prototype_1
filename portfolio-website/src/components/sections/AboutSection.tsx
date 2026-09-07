@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Briefcase, Compass, Code2, Microscope, Database, TreePine } from "lucide-react";
 import { aboutStats, experienceTimeline, personalProfile } from "@/data/portfolio";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { mistReveal } from "@/lib/revealVariants";
 
 /* ──────────────────────────────────────────────────────────
    AboutSection – "Chapter 2: The Forest Path"
@@ -48,12 +49,12 @@ export const AboutSection = () => {
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        {/* Section header */}
+        {/* Section header — resolves out of mist, matching the forest theme */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          variants={mistReveal}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
           className="text-center mb-20"
         >
           <p className="text-forest-300/60 text-sm tracking-[0.3em] uppercase mb-4">Chapter Two</p>

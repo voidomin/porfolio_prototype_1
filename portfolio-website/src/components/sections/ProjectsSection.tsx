@@ -15,6 +15,7 @@ import { ExternalLink, Github, Feather } from "lucide-react";
 import { projects } from "@/data/portfolio";
 import { Project, type ProjectCategory } from "@/types";
 import { cn } from "@/lib/utils";
+import { focusReveal } from "@/lib/revealVariants";
 
 /* ──────────────────────────────────────────────────────────
    ProjectsSection – "Chapter 4: Stepping Stones"
@@ -740,7 +741,14 @@ function MobileLayout({
 }: MobileLayoutProps) {
   return (
     <div className="relative z-10 max-w-7xl mx-auto px-6">
-      <div className="text-center mb-12">
+      {/* Content comes into focus, like a ripple settling on the river */}
+      <motion.div
+        variants={focusReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="text-center mb-12"
+      >
         <p className="text-river-600/50 text-sm tracking-[0.3em] uppercase mb-4">Chapter Four</p>
         <h2 className="text-3xl font-bold text-stone-900 mb-4">
           Stepping <span className="text-river-600">Stones</span>
@@ -748,7 +756,7 @@ function MobileLayout({
         <p className="text-stone-600/70 max-w-xl mx-auto text-sm">
           Products and experiments — stepping stones across the river of practice.
         </p>
-      </div>
+      </motion.div>
       <div className="flex flex-wrap justify-center gap-2 mb-8">
         {categories.map((cat) => (
           <button

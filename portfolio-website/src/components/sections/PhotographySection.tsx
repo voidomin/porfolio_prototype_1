@@ -17,6 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { galleryImages } from "@/data/portfolio";
 import { GalleryImage } from "@/types";
+import { glowBloomReveal } from "@/lib/revealVariants";
 /* ──────────────────────────────────────────────────────────
    PhotographySection – "Chapter 6: Golden Hour"
    A highly elegant, premium photography portfolio.
@@ -143,19 +144,25 @@ export const PhotographySection = () => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
-        {/* Section header */}
+        {/* Section header — a warm glow blooms in, matching golden hour light */}
         <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          className="relative text-center mb-16"
+          variants={glowBloomReveal}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          transition={{ duration: 1, ease: "easeOut" }}
         >
-          <p className="text-dawn-700/50 text-sm tracking-[0.3em] uppercase mb-4">Chapter Six</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4 font-sans">
+          <div
+            aria-hidden
+            className="absolute inset-x-0 -top-10 h-40 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(240,180,41,0.25),transparent_65%)]"
+          />
+          <p className="relative z-10 text-dawn-700/50 text-sm tracking-[0.3em] uppercase mb-4">
+            Chapter Six
+          </p>
+          <h2 className="relative z-10 text-4xl md:text-5xl font-bold text-stone-900 mb-4 font-sans">
             Golden <span className="text-dawn-600">Hour</span>
           </h2>
-          <p className="text-stone-600/60 max-w-lg mx-auto text-sm leading-relaxed">
+          <p className="relative z-10 text-stone-600/60 max-w-lg mx-auto text-sm leading-relaxed">
             Moments captured in transit. Stored with camera exposure profiles (EXIF) to preserve the
             exact light and setting of each memory.
           </p>

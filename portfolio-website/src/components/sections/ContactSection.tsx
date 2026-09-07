@@ -16,6 +16,7 @@ import {
 import { socialLinks, contactInfo } from "@/data/portfolio";
 import { ContactFormData } from "@/types";
 import { cn } from "@/lib/utils";
+import { glowBloomReveal } from "@/lib/revealVariants";
 
 /* ──────────────────────────────────────────────────────────
    ContactSection – "Chapter 7: Campfire at Dusk"
@@ -394,19 +395,25 @@ export const ContactSection = () => {
       )}
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        {/* Section header */}
+        {/* Section header — warm ember glow blooms in as the fire settles */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          className="relative text-center mb-16"
+          variants={glowBloomReveal}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-16"
         >
-          <p className="text-dusk-300/50 text-sm tracking-[0.3em] uppercase mb-4">Chapter Seven</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <div
+            aria-hidden
+            className="absolute inset-x-0 -top-10 h-40 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(240,84,30,0.2),transparent_65%)]"
+          />
+          <p className="relative z-10 text-dusk-300/50 text-sm tracking-[0.3em] uppercase mb-4">
+            Chapter Seven
+          </p>
+          <h2 className="relative z-10 text-4xl md:text-5xl font-bold text-white mb-4">
             Campfire at <span className="text-dawn-300">Dusk</span>
           </h2>
-          <p className="text-dusk-200/50 max-w-xl mx-auto">
+          <p className="relative z-10 text-dusk-200/50 max-w-xl mx-auto">
             Open to roles, collaborations, and thoughtful product work.
           </p>
         </motion.div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { skills, hobbies } from "@/data/portfolio";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { AccentLineReveal } from "@/components/ui/AccentLineReveal";
 import { Skill, type SkillCategory } from "@/types";
 
 /* ──────────────────────────────────────────────────────────
@@ -187,7 +188,7 @@ export const SkillsSection = () => {
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        {/* Section header */}
+        {/* Section header — a line of sunlight wipes in before the title */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -195,6 +196,7 @@ export const SkillsSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
+          <AccentLineReveal className="bg-meadow-500" />
           <p className="text-meadow-600/60 text-sm tracking-[0.3em] uppercase mb-4">
             Chapter Three
           </p>

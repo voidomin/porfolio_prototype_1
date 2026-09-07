@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { blogPosts } from "@/data/portfolio";
+import { paperSettleReveal } from "@/lib/revealVariants";
 
 /* ──────────────────────────────────────────────────────────
    WritingSection – homepage preview for the /blog writing
@@ -22,11 +23,12 @@ export const WritingSection = () => {
   return (
     <section id="writing" className="relative py-24 md:py-32 overflow-hidden">
       <div className="relative z-10 max-w-6xl mx-auto px-6">
+        {/* Settles in with a slight paper-like tilt correction */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          variants={paperSettleReveal}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">

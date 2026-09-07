@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ExternalLink, FlaskConical, BookOpen } from "lucide-react";
 import { publications } from "@/data/portfolio";
+import { AccentLineReveal } from "@/components/ui/AccentLineReveal";
 
 /* ──────────────────────────────────────────────────────────
    PublicationsSection – "Chapter 5: The Clearing"
@@ -36,6 +37,7 @@ export const PublicationsSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
+          <AccentLineReveal className="bg-dawn-500" />
           <p className="text-dawn-600/50 text-sm tracking-[0.3em] uppercase mb-4">Chapter Five</p>
           <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
             The <span className="text-dawn-600">Clearing</span>
