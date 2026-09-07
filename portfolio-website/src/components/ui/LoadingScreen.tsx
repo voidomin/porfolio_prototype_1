@@ -9,11 +9,27 @@ export const LoadingScreen = () => {
   useEffect(() => {
     if (sessionStorage.getItem("intro-seen")) return;
     setVisible(true);
-    const t = setTimeout(() => {
+
+    const dismiss = () => {
       setVisible(false);
       sessionStorage.setItem("intro-seen", "1");
-    }, 2800);
-    return () => clearTimeout(t);
+    };
+
+    // Auto-dismiss after the branded moment plays out — this is a full-viewport
+    // opaque overlay, so every millisecond it's up directly delays the page's
+    // actual Largest Contentful Paint (measured at ~3.5s before this fix).
+    const t = setTimeout(dismiss, 1400);
+
+    // Let an impatient visitor skip it immediately with any interaction.
+    const handleSkip = () => dismiss();
+    window.addEventListener("pointerdown", handleSkip, { once: true });
+    window.addEventListener("keydown", handleSkip, { once: true });
+
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("pointerdown", handleSkip);
+      window.removeEventListener("keydown", handleSkip);
+    };
   }, []);
 
   return (
@@ -21,7 +37,7 @@ export const LoadingScreen = () => {
       {visible && (
         <motion.div
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.9, ease: "easeInOut" } }}
+          exit={{ opacity: 0, transition: { duration: 0.5, ease: "easeInOut" } }}
           className="fixed inset-0 z-[999] flex flex-col items-center justify-center overflow-hidden select-none"
           style={{
             background:
@@ -91,7 +107,7 @@ export const LoadingScreen = () => {
               className="h-full bg-forest-800/35 rounded-full"
               initial={{ width: "0%" }}
               animate={{ width: "100%" }}
-              transition={{ duration: 2.4, ease: "easeInOut" }}
+              transition={{ duration: 1.3, ease: "easeInOut" }}
             />
           </div>
         </motion.div>

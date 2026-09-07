@@ -21,8 +21,8 @@ export const HeroSection = () => {
       opacity: 1,
       filter: "blur(0px)",
       transition: {
-        delay: 0.5 + i * 0.06,
-        duration: 0.8,
+        delay: 0.2 + i * 0.04,
+        duration: 0.7,
         ease: [0.22, 1, 0.36, 1],
       },
     }),
@@ -52,7 +52,7 @@ export const HeroSection = () => {
         {/* Location & availability badges */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
           <motion.div
-            custom={0.3}
+            custom={0.1}
             variants={fadeUpVariants}
             initial="hidden"
             animate="visible"
@@ -64,7 +64,7 @@ export const HeroSection = () => {
 
           {personalProfile.openToWork && (
             <motion.div
-              custom={0.4}
+              custom={0.18}
               variants={fadeUpVariants}
               initial="hidden"
               animate="visible"
@@ -108,7 +108,7 @@ export const HeroSection = () => {
           {personalProfile.headline.split(" ").map((word, i) => (
             <motion.span
               key={i}
-              custom={1.0 + i * 0.1}
+              custom={0.5 + i * 0.06}
               variants={fadeUpVariants}
               initial="hidden"
               animate="visible"
@@ -121,7 +121,7 @@ export const HeroSection = () => {
 
         {/* Intro */}
         <motion.p
-          custom={1.5}
+          custom={0.85}
           variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
@@ -132,7 +132,7 @@ export const HeroSection = () => {
 
         {/* CTA Buttons */}
         <motion.div
-          custom={1.8}
+          custom={1.05}
           variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
@@ -158,7 +158,7 @@ export const HeroSection = () => {
 
         {/* Quick, screenable summary — no downloadable file, just an on-site one-pager */}
         <motion.div
-          custom={2.0}
+          custom={1.15}
           variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
@@ -174,7 +174,7 @@ export const HeroSection = () => {
 
         {/* Floating tags */}
         <motion.div
-          custom={2.2}
+          custom={1.25}
           variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
@@ -197,7 +197,7 @@ export const HeroSection = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2.5, duration: 0.6 }}
+        transition={{ delay: 1.5, duration: 0.6 }}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10"
       >
         <motion.a
