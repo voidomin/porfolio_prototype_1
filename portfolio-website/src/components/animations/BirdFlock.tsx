@@ -100,14 +100,39 @@ export const BirdFlock = () => {
       });
     };
 
-    // Initial flock after a short delay
-    const initialTimeout = setTimeout(spawnFlock, 3000);
+    let initialTimeout: ReturnType<typeof setTimeout> | null = null;
+    let interval: ReturnType<typeof setInterval> | null = null;
 
-    const interval = setInterval(spawnFlock, 15000 + Math.random() * 8000);
+    const startSpawning = () => {
+      initialTimeout = setTimeout(spawnFlock, 3000);
+      interval = setInterval(spawnFlock, 15000 + Math.random() * 8000);
+    };
+
+    const stopSpawning = () => {
+      if (initialTimeout) clearTimeout(initialTimeout);
+      if (interval) clearInterval(interval);
+      initialTimeout = null;
+      interval = null;
+    };
+
+    // Stop spawning while the tab is hidden and clear any in-flight flocks —
+    // a background tab left open for days would otherwise keep queuing spawns
+    // (throttled but not zero) and pile up motion state that never got to finish.
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopSpawning();
+        setFlocks([]);
+      } else {
+        startSpawning();
+      }
+    };
+
+    if (!document.hidden) startSpawning();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
+      stopSpawning();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 

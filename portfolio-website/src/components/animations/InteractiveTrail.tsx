@@ -315,7 +315,7 @@ export const InteractiveTrail = () => {
     globalThis.addEventListener("nature-campfire-stoke", handleCampfireStoke);
 
     // Animation canvas loop
-    let animationId: number;
+    let animationId: number | null = null;
     let time = 0;
 
     const drawParticles = () => {
@@ -408,7 +408,26 @@ export const InteractiveTrail = () => {
       }
     };
 
-    drawParticles();
+    // Pause the loop entirely while the tab is hidden — rAF is throttled by the
+    // browser anyway, but explicitly stopping (and dropping stale particles)
+    // avoids a burst of catch-up work and a large stale array after the tab
+    // has sat backgrounded for a long time (hours/days).
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (animationId !== null) {
+          cancelAnimationFrame(animationId);
+          animationId = null;
+        }
+        particles.current = [];
+      } else if (animationId === null) {
+        drawParticles();
+      }
+    };
+
+    if (!document.hidden) {
+      drawParticles();
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       globalThis.removeEventListener("resize", resizeCanvas);
@@ -418,7 +437,8 @@ export const InteractiveTrail = () => {
       globalThis.removeEventListener("touchmove", handleTouchMove);
       globalThis.removeEventListener("nature-wind-gust", handleWindGust);
       globalThis.removeEventListener("nature-campfire-stoke", handleCampfireStoke);
-      cancelAnimationFrame(animationId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      if (animationId !== null) cancelAnimationFrame(animationId);
     };
   }, [isMobile]);
 

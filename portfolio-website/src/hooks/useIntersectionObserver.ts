@@ -15,8 +15,10 @@ export const useIntersectionObserver = ({
   triggerOnce = true,
 }: UseIntersectionObserverProps = {}) => {
   const [isIntersecting, setIsIntersecting] = useState(false);
-  const [hasTriggered, setHasTriggered] = useState(false);
   const elementRef = useRef<HTMLElement>(null);
+  // Ref, not state — reading/writing it must never re-run this effect and
+  // recreate the observer on every trigger.
+  const hasTriggeredRef = useRef(false);
 
   useEffect(() => {
     const element = elementRef.current;
@@ -26,10 +28,10 @@ export const useIntersectionObserver = ({
       ([entry]) => {
         const isElementIntersecting = entry.isIntersecting;
 
-        if (isElementIntersecting && !hasTriggered) {
+        if (isElementIntersecting && !hasTriggeredRef.current) {
           setIsIntersecting(true);
           if (triggerOnce) {
-            setHasTriggered(true);
+            hasTriggeredRef.current = true;
           }
         } else if (!triggerOnce) {
           setIsIntersecting(isElementIntersecting);
@@ -43,7 +45,7 @@ export const useIntersectionObserver = ({
     return () => {
       observer.unobserve(element);
     };
-  }, [threshold, rootMargin, triggerOnce, hasTriggered]);
+  }, [threshold, rootMargin, triggerOnce]);
 
   return { elementRef, isIntersecting };
 };

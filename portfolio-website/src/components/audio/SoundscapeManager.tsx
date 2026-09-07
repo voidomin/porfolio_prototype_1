@@ -31,6 +31,10 @@ export const SoundscapeManager = () => {
 
   // Active timers for insect/fire scheduling loops
   const schedulerTimersRef = useRef<number[]>([]);
+  // Function refs so the visibility handler can restart the scheduling chains
+  // without recreating startSoundscape's closures
+  const scheduleCricketsRef = useRef<(() => void) | null>(null);
+  const scheduleCampfireRef = useRef<(() => void) | null>(null);
 
   // Adjust volume levels dynamically based on scroll — direct listener, no state re-renders
   useEffect(() => {
@@ -69,7 +73,9 @@ export const SoundscapeManager = () => {
     try {
       windSourceRef.current?.stop();
       windLFORef.current?.stop();
-    } catch (e) {}
+    } catch {
+      // Already stopped/closed — safe to ignore.
+    }
 
     windSourceRef.current = null;
     windLFORef.current = null;
@@ -79,7 +85,9 @@ export const SoundscapeManager = () => {
       if (audioCtxRef.current && audioCtxRef.current.state !== "closed") {
         audioCtxRef.current.close();
       }
-    } catch (e) {}
+    } catch {
+      // Already stopped/closed — safe to ignore.
+    }
     audioCtxRef.current = null;
     masterGainRef.current = null;
   }, []);
@@ -193,6 +201,7 @@ export const SoundscapeManager = () => {
         const timerId = window.setTimeout(scheduleCrickets, interval);
         schedulerTimersRef.current.push(timerId);
       };
+      scheduleCricketsRef.current = scheduleCrickets;
 
       // 5. SYNTHESIZE COZY CAMPFIRE CRACKLES
       const scheduleCampfire = () => {
@@ -239,6 +248,7 @@ export const SoundscapeManager = () => {
         const timerId = window.setTimeout(scheduleCampfire, interval);
         schedulerTimersRef.current.push(timerId);
       };
+      scheduleCampfireRef.current = scheduleCampfire;
 
       // Set active playing triggers
       isPlayingRef.current = true;
@@ -328,11 +338,32 @@ export const SoundscapeManager = () => {
       }
     };
 
+    // The cricket/campfire loops reschedule themselves via setTimeout forever
+    // while sound is on, spawning new oscillator nodes on every tick — inaudible
+    // but not free. If the tab sits hidden for hours/days, suspend the audio
+    // context and halt the scheduling chains entirely, then pick back up
+    // cleanly when the tab is visible again.
+    const handleVisibilityChange = () => {
+      if (!isPlayingRef.current) return;
+
+      if (document.hidden) {
+        schedulerTimersRef.current.forEach((t) => clearTimeout(t));
+        schedulerTimersRef.current = [];
+        audioCtxRef.current?.suspend().catch(() => {});
+      } else {
+        audioCtxRef.current?.resume().catch(() => {});
+        scheduleCricketsRef.current?.();
+        scheduleCampfireRef.current?.();
+      }
+    };
+
     window.addEventListener("nature-sound-toggle", handleToggle);
     globalThis.addEventListener("nature-campfire-crackle", triggerManualCrackle);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       window.removeEventListener("nature-sound-toggle", handleToggle);
       globalThis.removeEventListener("nature-campfire-crackle", triggerManualCrackle);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       cleanupSoundscape();
     };
   }, [startSoundscape, stopSoundscape, cleanupSoundscape, triggerManualCrackle]);
