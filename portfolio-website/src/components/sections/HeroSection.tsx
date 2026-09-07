@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowDown, MapPin, CircleDot } from "lucide-react";
 import { personalProfile } from "@/data/portfolio";
 import { Magnetic } from "@/components/ui/Magnetic";
+import { PerspectiveTilt } from "@/components/ui/PerspectiveTilt";
 
 /* ──────────────────────────────────────────────────────────
    HeroSection – "Chapter 1: Dawn"
@@ -48,8 +49,11 @@ export const HeroSection = () => {
       {/* Dawn glow overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-dawn-200/20 via-transparent to-transparent pointer-events-none z-[1]" />
 
-      {/* Central content */}
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+      {/* Central content — subtle cursor-tracked 3D tilt gives the hero real
+          depth instead of sitting flat on one plane; same transform math as
+          the project-card tilt and magnetic buttons, just applied at hero
+          scale. Degrades to a plain static block under reduced-motion. */}
+      <PerspectiveTilt className="relative z-10 text-center px-6 max-w-5xl mx-auto" maxTilt={4}>
         {/* Location & availability badges */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
           <motion.div
@@ -196,7 +200,7 @@ export const HeroSection = () => {
             </span>
           ))}
         </motion.div>
-      </div>
+      </PerspectiveTilt>
 
       {/* Scroll prompt */}
       <motion.div
