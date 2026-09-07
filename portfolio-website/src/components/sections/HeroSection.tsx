@@ -1,11 +1,20 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowDown, MapPin, CircleDot } from "lucide-react";
 import { personalProfile } from "@/data/portfolio";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { PerspectiveTilt } from "@/components/ui/PerspectiveTilt";
+
+// Real three.js + react-three-fiber scene — dynamically imported with
+// ssr:false (Canvas needs real WebGL/browser APIs that break Next's
+// server-render pass) and only rendered on desktop, non-reduced-motion
+// below. Mobile and reduced-motion visitors never fetch this chunk at
+// all — the check gates the import, not just the render.
+const HeroScene = dynamic(() => import("@/components/three/HeroScene"), { ssr: false });
 
 /* ──────────────────────────────────────────────────────────
    HeroSection – "Chapter 1: Dawn"
@@ -16,6 +25,16 @@ import { PerspectiveTilt } from "@/components/ui/PerspectiveTilt";
    ────────────────────────────────────────────────────────── */
 
 export const HeroSection = () => {
+  const prefersReducedMotion = useReducedMotion();
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   const letterVariants = {
     hidden: { y: 80, opacity: 0, filter: "blur(8px)" },
     visible: (i: number) => ({
@@ -48,6 +67,17 @@ export const HeroSection = () => {
     >
       {/* Dawn glow overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-dawn-200/20 via-transparent to-transparent pointer-events-none z-[1]" />
+
+      {/* Real 3D mountain scene — replaces the flat NatureScene backdrop for
+          just this section. Desktop + non-reduced-motion only; the chunk is
+          never fetched otherwise. Sits behind the text (z-10) but above the
+          dawn glow, and scrolls away normally with the rest of the hero —
+          no pinning/fixed-position tricks. */}
+      {isDesktop && !prefersReducedMotion && (
+        <div className="absolute inset-0 z-[2]">
+          <HeroScene />
+        </div>
+      )}
 
       {/* Central content — subtle cursor-tracked 3D tilt gives the hero real
           depth instead of sitting flat on one plane; same transform math as
