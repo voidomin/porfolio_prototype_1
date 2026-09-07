@@ -434,6 +434,18 @@ function useHorizontalScroll(
   // zero React re-renders happen during animation. currentIndex (arrow buttons)
   // updates via React state but only every 12 frames (~5fps) — far below the
   // threshold where card re-renders would be noticeable.
+  //
+  // The catch-up uses deltaTime-based exponential smoothing rather than a
+  // fixed fraction-per-frame. A fixed-per-frame lerp (the old `diff * 0.2`)
+  // has unbounded lag under fast, continuous scrolling — if the target moves
+  // faster than the lerp converges, the visible track perpetually trails
+  // behind it. Since the pin/unpin state (fixed vs absolute, in the sibling
+  // effect above) is computed instantly and exactly from the same scroll
+  // position with no smoothing at all, a big enough lag let the section
+  // visually un-pin before the track had caught up — exactly the "stuck"
+  // desync at fast scroll speeds. Exponential smoothing with a real-time
+  // half-life bounds the maximum lag to a constant (~120ms) regardless of
+  // scroll speed or frame rate, so it can never fall meaningfully behind.
   useEffect(() => {
     if (!isDesktop) return;
 
@@ -445,11 +457,19 @@ function useHorizontalScroll(
 
     let rafId: number;
     let frame = 0;
+    let lastTime = performance.now();
+    const CATCH_UP_RATE = 22; // higher = snappier, bounded lag ~= 1/CATCH_UP_RATE seconds
 
-    const loop = () => {
+    const loop = (now: number) => {
+      const dt = Math.min(0.1, Math.max(0, (now - lastTime) / 1000));
+      lastTime = now;
+
       const diff = targetProgress.current - animatedProgress.current;
+      const catchUp = 1 - Math.exp(-CATCH_UP_RATE * dt);
       animatedProgress.current =
-        Math.abs(diff) > 0.0002 ? animatedProgress.current + diff * 0.2 : targetProgress.current;
+        Math.abs(diff) > 0.0002
+          ? animatedProgress.current + diff * catchUp
+          : targetProgress.current;
 
       const p = animatedProgress.current;
       const range = scrollRangeRef.current;

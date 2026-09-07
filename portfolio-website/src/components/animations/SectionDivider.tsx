@@ -1,10 +1,19 @@
 "use client";
 
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+
 /* ──────────────────────────────────────────────────────────
    SectionDivider – organic SVG terrain dividers between
    sections. Each variant creates a different landscape
    profile (mountain ridge, rolling hills, river bank,
    forest treeline, etc.)
+
+   Each divider tracks its own scroll progress via a scoped
+   useScroll({ target }) — not the shared page-wide scrollY —
+   so it can give the terrain a subtle rise/settle parallax as
+   it crosses the viewport, without adding another consumer of
+   the global scroll listener or any hand-rolled scroll math.
    ────────────────────────────────────────────────────────── */
 
 type DividerVariant =
@@ -43,8 +52,18 @@ export const SectionDivider = ({
   className = "",
   flip = false,
 }: SectionDividerProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+
+  // Terrain gently rises as it enters, settles at rest, eases back as it
+  // leaves — a soft parallax "lift" instead of a flat, static cut between
+  // chapters. Pure transform + opacity, GPU-composited.
+  const y = useTransform(scrollYProgress, [0, 0.5, 1], [16, 0, -16]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.5, 1, 1, 0.5]);
+
   return (
     <div
+      ref={ref}
       className={`relative w-full overflow-hidden pointer-events-none ${className}`}
       style={{
         height: "80px",
@@ -52,14 +71,15 @@ export const SectionDivider = ({
         transform: flip ? "scaleY(-1)" : undefined,
       }}
     >
-      <svg
+      <motion.svg
         viewBox="0 0 1440 100"
         preserveAspectRatio="none"
         className="absolute bottom-0 w-full h-full"
+        style={{ y, opacity }}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path d={paths[variant]} fill={fillColor} />
-      </svg>
+      </motion.svg>
     </div>
   );
 };
