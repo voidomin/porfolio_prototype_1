@@ -363,23 +363,36 @@ function useHorizontalScroll(
     filteredCountRef.current = filteredProjects.length;
   }, [filteredProjects]);
 
-  // Recalculate pixel-based translation boundaries on mount/resize/filter
+  // Recalculate pixel-based translation boundaries whenever the track's
+  // actual rendered width changes — mount, category-filter switch, font/image
+  // layout shifts, or a window resize. A ResizeObserver (rather than a fixed
+  // setTimeout) means this is always correct regardless of how long the
+  // filter crossfade animation takes to settle, since trackRef now lives on
+  // a stable wrapper that's never unmounted by the filter transition.
   useEffect(() => {
+    if (!isDesktop) return;
+    const node = trackRef.current;
+    if (!node) return;
+
     const recalculate = () => {
-      if (isDesktop && trackRef.current) {
-        const range = Math.max(0, trackRef.current.scrollWidth - window.innerWidth);
-        setScrollRange(range);
-        scrollRangeRef.current = range;
-        setContainerHeight(window.innerHeight + range);
-      }
+      if (!trackRef.current) return;
+      const range = Math.max(0, trackRef.current.scrollWidth - window.innerWidth);
+      setScrollRange(range);
+      scrollRangeRef.current = range;
+      setContainerHeight(window.innerHeight + range);
     };
-    const timer = setTimeout(recalculate, 100);
+
+    recalculate();
+
+    const resizeObserver = new ResizeObserver(recalculate);
+    resizeObserver.observe(node);
     globalThis.addEventListener("resize", recalculate);
+
     return () => {
-      clearTimeout(timer);
+      resizeObserver.disconnect();
       globalThis.removeEventListener("resize", recalculate);
     };
-  }, [filteredProjects, isDesktop, trackRef]);
+  }, [isDesktop, trackRef]);
 
   // Scroll listener — only writes to refs, zero React state changes.
   useEffect(() => {
@@ -617,15 +630,23 @@ function DesktopLayout({
           </motion.button>
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.4 }}
-          >
-            <div ref={trackRef} className="flex gap-8 px-12 md:px-24 w-max py-4">
+        {/* trackRef lives on this stable wrapper, never on the AnimatePresence
+            child below — the child fully unmounts/remounts on every category
+            switch, which previously left the horizontal-scroll math measuring
+            a stale or detached node until the next window resize. A
+            ResizeObserver on this stable node (see useHorizontalScroll)
+            recalculates the instant the real content settles, regardless of
+            how long the crossfade animation takes. */}
+        <div ref={trackRef} className="w-max">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeCategory}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.4 }}
+              className="flex gap-8 px-12 md:px-24 w-max py-4"
+            >
               {filteredProjects.map((project, index) => (
                 <div key={project.id} className="w-[380px] shrink-0">
                   <ProjectCard project={project} index={index} />
@@ -636,9 +657,9 @@ function DesktopLayout({
                   <p className="text-stone-500">No projects found in this category.</p>
                 </div>
               )}
-            </div>
-          </motion.div>
-        </AnimatePresence>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-12 md:px-24 mt-6 flex flex-col gap-4 select-none shrink-0">
