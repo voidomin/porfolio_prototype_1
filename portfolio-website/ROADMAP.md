@@ -2,7 +2,7 @@
 
 ## v1 Checklist — Must complete before launch
 
-- [ ] Add profile photo — drop photo as `public/images/avatar.jpg`
+- [x] Add profile photo — `public/images/avatar.png` present, matches `personalProfile.avatar`
 - [🚩] Add photography images — **flagged/deferred by request.** Waiting on a planned rework of the upload/edit pipeline (admin CMS) before adding real photos, not just dropping files in `public/images/photography/`.
 - [ ] Test contact form end-to-end — needs a real send against the live site (requires `RESEND_API_KEY`, which only exists in Vercel's env, and lands in your real inbox) — can't be faithfully done from this sandbox. Code-level checks done: validation paths (missing fields, bad email format) and the graceful-failure path all verified locally, see fix below.
 - [x] Run Lighthouse audit — ran against a local production build. Scores: **Performance 90, Accessibility 96, Best Practices 96, SEO 100.** Fixed the two real findings: (1) project/social icon-only links had no accessible name for screen readers — added `aria-label`/`title` in `ProjectsSection.tsx` and `ContactSection.tsx`; (2) a console 404 for `/_vercel/insights/script.js` is expected locally (Vercel Analytics only serves that script when deployed on Vercel) — not a bug. Remaining perf flags (LCP ~2.5s, main-thread work) are typical for a heavy animated hero and not critical; revisit if real users report slowness.
