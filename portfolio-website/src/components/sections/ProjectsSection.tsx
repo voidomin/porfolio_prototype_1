@@ -16,6 +16,7 @@ import { projects } from "@/data/portfolio";
 import { Project, type ProjectCategory } from "@/types";
 import { cn } from "@/lib/utils";
 import { focusReveal } from "@/lib/revealVariants";
+import { ChapterMarker } from "@/components/ui/ChapterMarker";
 import { scrollTo } from "@/lib/lenis";
 
 /* ──────────────────────────────────────────────────────────
@@ -586,6 +587,7 @@ function DesktopLayout({
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-12 md:px-24 mb-6 flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0 select-none">
         <div>
+          <ChapterMarker color="#257bea" className="mx-0" />
           <p className="text-river-600/50 text-xs tracking-[0.3em] uppercase mb-2">Chapter Four</p>
           <h2 className="text-4xl font-bold text-stone-900">
             Stepping <span className="text-river-600">Stones</span>
@@ -753,6 +755,7 @@ function MobileLayout({
         viewport={{ once: true }}
         className="text-center mb-12"
       >
+        <ChapterMarker color="#257bea" />
         <p className="text-river-600/50 text-sm tracking-[0.3em] uppercase mb-4">Chapter Four</p>
         <h2 className="text-3xl font-bold text-stone-900 mb-4">
           Stepping <span className="text-river-600">Stones</span>

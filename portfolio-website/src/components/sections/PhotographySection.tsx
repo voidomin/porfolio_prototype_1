@@ -18,6 +18,7 @@ import Image from "next/image";
 import { galleryImages } from "@/data/portfolio";
 import { GalleryImage } from "@/types";
 import { glowBloomReveal } from "@/lib/revealVariants";
+import { ChapterMarker } from "@/components/ui/ChapterMarker";
 /* ──────────────────────────────────────────────────────────
    PhotographySection – "Chapter 6: Golden Hour"
    A highly elegant, premium photography portfolio.
@@ -156,6 +157,7 @@ export const PhotographySection = () => {
             aria-hidden
             className="absolute inset-x-0 -top-10 h-40 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(240,180,41,0.25),transparent_65%)]"
           />
+          <ChapterMarker color="#d9951b" className="relative z-10" />
           <p className="relative z-10 text-dawn-700/50 text-sm tracking-[0.3em] uppercase mb-4">
             Chapter Six
           </p>

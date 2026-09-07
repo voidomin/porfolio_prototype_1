@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { blogPosts } from "@/data/portfolio";
 import { paperSettleReveal } from "@/lib/revealVariants";
+import { ChapterMarker } from "@/components/ui/ChapterMarker";
 
 /* ──────────────────────────────────────────────────────────
    WritingSection – homepage preview for the /blog writing
@@ -31,6 +32,7 @@ export const WritingSection = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
+          <ChapterMarker color="#d9951b" />
           <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
             Field <span className="text-dawn-600">Notes</span>
           </h2>

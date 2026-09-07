@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ExternalLink, FlaskConical, BookOpen, PenLine, ArrowRight } from "lucide-react";
 import { publications, blogPosts } from "@/data/portfolio";
 import { AccentLineReveal } from "@/components/ui/AccentLineReveal";
+import { ChapterMarker } from "@/components/ui/ChapterMarker";
 
 // The research write-up has a narrative companion piece in Writing — surfacing
 // it here gives the section a real second element instead of one lone card,
@@ -45,6 +46,7 @@ export const PublicationsSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
+          <ChapterMarker color="#f0b429" />
           <AccentLineReveal className="bg-dawn-500" />
           <p className="text-dawn-600/50 text-sm tracking-[0.3em] uppercase mb-4">Chapter Five</p>
           <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">

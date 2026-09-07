@@ -7,6 +7,7 @@ import { Briefcase, Compass, Code2, Microscope, Database, TreePine } from "lucid
 import { aboutStats, experienceTimeline, personalProfile } from "@/data/portfolio";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { mistReveal } from "@/lib/revealVariants";
+import { ChapterMarker } from "@/components/ui/ChapterMarker";
 
 /* ──────────────────────────────────────────────────────────
    AboutSection – "Chapter 2: The Forest Path"
@@ -57,6 +58,7 @@ export const AboutSection = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
+          <ChapterMarker color="#5aaf5a" />
           <p className="text-forest-300/60 text-sm tracking-[0.3em] uppercase mb-4">Chapter Two</p>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             The Forest <span className="text-forest-300">Path</span>

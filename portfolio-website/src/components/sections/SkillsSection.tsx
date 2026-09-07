@@ -6,6 +6,7 @@ import { Leaf, Camera, Music, Mountain, type LucideIcon } from "lucide-react";
 import { skills, hobbies } from "@/data/portfolio";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { AccentLineReveal } from "@/components/ui/AccentLineReveal";
+import { ChapterMarker } from "@/components/ui/ChapterMarker";
 import { Skill, type SkillCategory } from "@/types";
 
 // Keyword match against the hobbies list — same "map a small fixed list to an
@@ -220,6 +221,7 @@ export const SkillsSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
+          <ChapterMarker color="#7db523" />
           <AccentLineReveal className="bg-meadow-500" />
           <p className="text-meadow-600/60 text-sm tracking-[0.3em] uppercase mb-4">
             Chapter Three

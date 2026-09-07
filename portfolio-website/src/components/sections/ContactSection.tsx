@@ -17,6 +17,7 @@ import { socialLinks, contactInfo } from "@/data/portfolio";
 import { ContactFormData } from "@/types";
 import { cn } from "@/lib/utils";
 import { glowBloomReveal } from "@/lib/revealVariants";
+import { ChapterMarker } from "@/components/ui/ChapterMarker";
 
 /* ──────────────────────────────────────────────────────────
    ContactSection – "Chapter 7: Campfire at Dusk"
@@ -407,6 +408,7 @@ export const ContactSection = () => {
             aria-hidden
             className="absolute inset-x-0 -top-10 h-40 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(240,84,30,0.2),transparent_65%)]"
           />
+          <ChapterMarker color="#fbdf85" className="relative z-10" />
           <p className="relative z-10 text-dusk-300/50 text-sm tracking-[0.3em] uppercase mb-4">
             Chapter Seven
           </p>
