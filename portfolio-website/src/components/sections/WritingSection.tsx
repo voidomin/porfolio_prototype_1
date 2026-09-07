@@ -78,7 +78,7 @@ export const WritingSection = () => {
         <div className="flex justify-center mt-16">
           <Link
             href="/blog"
-            className="group inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl bg-stone-900 text-white border border-stone-800 hover:bg-stone-850 hover:border-stone-700 text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-lg shadow-stone-900/10 hover:shadow-stone-900/25"
+            className="group inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-stone-900 text-white border border-stone-800 hover:bg-stone-850 hover:border-stone-700 text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-lg shadow-stone-900/10 hover:shadow-stone-900/25"
           >
             View All Writing
             <ArrowRight className="w-4 h-4 text-dawn-500 group-hover:translate-x-1 transition-transform duration-300" />

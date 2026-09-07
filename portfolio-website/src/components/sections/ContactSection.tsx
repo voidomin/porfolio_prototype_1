@@ -714,7 +714,7 @@ export const ContactSection = () => {
                 type="submit"
                 disabled={formState.status === "loading"}
                 className={cn(
-                  "w-full px-8 py-4 font-semibold rounded-xl transition-all duration-300",
+                  "w-full px-8 py-4 font-semibold rounded-full transition-all duration-300",
                   "bg-gradient-to-r from-dawn-500 to-dawn-600 text-white",
                   "hover:from-dawn-400 hover:to-dawn-500",
                   "shadow-lg shadow-dawn-500/20",
