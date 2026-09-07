@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Leaf, Camera, Music, Mountain, type LucideIcon } from "lucide-react";
 import { skills, hobbies } from "@/data/portfolio";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
@@ -185,6 +185,14 @@ const StatCard = ({
 };
 
 export const SkillsSection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const glowNearY = useTransform(scrollYProgress, [0, 1], [-35, 35]);
+  const glowFarY = useTransform(scrollYProgress, [0, 1], [-15, 15]);
+
   const groupedSkills = skills.reduce(
     (acc, skill) => {
       const category = skill.category as SkillCategory;
@@ -200,16 +208,24 @@ export const SkillsSection = () => {
   return (
     <section
       id="skills"
+      ref={sectionRef}
       className="relative py-24 md:py-32 overflow-hidden"
       style={{
         background:
           "linear-gradient(180deg, rgba(34, 73, 34, 0.2) 0%, rgba(232, 245, 204, 0.2) 10%, rgba(245, 251, 232, 0.15) 30%, rgba(245, 251, 232, 0.15) 70%, rgba(232, 245, 204, 0.2) 90%, rgba(211, 237, 158, 0.2) 100%)",
       }}
     >
-      {/* Meadow atmosphere */}
+      {/* Meadow atmosphere — two light-glow layers drifting at different
+          depths as you scroll, instead of sitting perfectly still */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(240,180,41,0.1),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_80%,rgba(125,181,35,0.08),transparent_50%)]" />
+        <motion.div
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(240,180,41,0.1),transparent_50%)]"
+          style={{ y: glowNearY }}
+        />
+        <motion.div
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_80%,rgba(125,181,35,0.08),transparent_50%)]"
+          style={{ y: glowFarY }}
+        />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">

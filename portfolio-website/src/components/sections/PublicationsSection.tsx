@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import Link from "next/link";
 import { ExternalLink, FlaskConical, BookOpen, PenLine, ArrowRight } from "lucide-react";
 import { publications, blogPosts } from "@/data/portfolio";
@@ -19,6 +20,13 @@ const RELATED_POST_SLUG = "trusting-a-single-signal";
    ────────────────────────────────────────────────────────── */
 
 export const PublicationsSection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const glowY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
+
   if (publications.length === 0) return null;
 
   const relatedPost = blogPosts.find((post) => post.slug === RELATED_POST_SLUG);
@@ -26,15 +34,19 @@ export const PublicationsSection = () => {
   return (
     <section
       id="publications"
+      ref={sectionRef}
       className="relative py-24 md:py-32 overflow-hidden"
       style={{
         background:
           "linear-gradient(180deg, rgba(191, 227, 254, 0.2) 0%, rgba(232, 245, 204, 0.15) 10%, rgba(245, 251, 232, 0.15) 30%, rgba(245, 251, 232, 0.15) 70%, rgba(232, 245, 204, 0.15) 90%, rgba(252, 232, 230, 0.25) 100%)",
       }}
     >
-      {/* Afternoon warmth */}
+      {/* Afternoon warmth — drifts subtly with scroll depth */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_30%,rgba(240,180,41,0.12),transparent_60%)]" />
+        <motion.div
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_30%,rgba(240,180,41,0.12),transparent_60%)]"
+          style={{ y: glowY }}
+        />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6">

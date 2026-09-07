@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useState } from "react";
 import { Briefcase, Compass, Code2, Microscope, Database, TreePine } from "lucide-react";
 import { aboutStats, experienceTimeline, personalProfile } from "@/data/portfolio";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
@@ -24,10 +24,22 @@ const trailIconsById: Record<string, typeof Database> = {
 
 export const AboutSection = () => {
   const [avatarError, setAvatarError] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Depth parallax on the two decorative trees — the larger, ostensibly
+  // "nearer" tree drifts further than the smaller, "further back" one, the
+  // same near-things-move-more-than-far-things cue as real parallax.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const nearTreeY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
+  const farTreeY = useTransform(scrollYProgress, [0, 1], [-20, 20]);
 
   return (
     <section
       id="about"
+      ref={sectionRef}
       className="relative py-24 md:py-32 overflow-hidden"
       style={{
         background:
@@ -41,13 +53,19 @@ export const AboutSection = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_30%,rgba(219,240,219,0.06),transparent_50%)]" />
       </div>
 
-      {/* Decorative trees */}
-      <div className="absolute left-4 top-20 opacity-10 pointer-events-none">
+      {/* Decorative trees — depth-parallax on scroll, not just static decoration */}
+      <motion.div
+        className="absolute left-4 top-20 opacity-10 pointer-events-none"
+        style={{ y: nearTreeY }}
+      >
         <TreePine className="w-20 h-20 text-forest-300" />
-      </div>
-      <div className="absolute right-8 top-40 opacity-8 pointer-events-none">
+      </motion.div>
+      <motion.div
+        className="absolute right-8 top-40 opacity-8 pointer-events-none"
+        style={{ y: farTreeY }}
+      >
         <TreePine className="w-16 h-16 text-forest-300" />
-      </div>
+      </motion.div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Section header — resolves out of mist, matching the forest theme */}

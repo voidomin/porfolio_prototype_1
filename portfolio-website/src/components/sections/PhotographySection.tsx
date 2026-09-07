@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   Camera,
   MapPin,
@@ -36,6 +36,14 @@ export const PhotographySection = () => {
   const carouselContainerRef = useRef<HTMLDivElement>(null);
   const carouselTrackRef = useRef<HTMLDivElement>(null);
   const [dragConstraintsLeft, setDragConstraintsLeft] = useState(0);
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const glowNearY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
+  const glowFarY = useTransform(scrollYProgress, [0, 1], [-15, 15]);
 
   // Memoized — only recomputes when the active category filter changes
   const filteredPhotos = useMemo(
@@ -132,16 +140,23 @@ export const PhotographySection = () => {
   return (
     <section
       id="photography"
+      ref={sectionRef}
       className="relative py-24 md:py-32 overflow-hidden"
       style={{
         background:
           "linear-gradient(180deg, rgba(252, 232, 230, 0.2) 0%, rgba(253, 237, 183, 0.25) 15%, rgba(251, 223, 133, 0.2) 50%, rgba(253, 237, 183, 0.25) 85%, rgba(252, 232, 230, 0.2) 100%)",
       }}
     >
-      {/* Golden hour glowing atmosphere */}
+      {/* Golden hour glowing atmosphere — depth-parallax drift */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(240,180,41,0.18),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_70%,rgba(251,223,133,0.12),transparent_50%)]" />
+        <motion.div
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(240,180,41,0.18),transparent_60%)]"
+          style={{ y: glowNearY }}
+        />
+        <motion.div
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_70%,rgba(251,223,133,0.12),transparent_50%)]"
+          style={{ y: glowFarY }}
+        />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
