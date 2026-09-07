@@ -3,34 +3,34 @@
 ## v1 Checklist — Must complete before launch
 
 - [ ] Add profile photo — drop photo as `public/images/avatar.jpg`
-- [ ] Add photography images — add photos to `public/images/photography/` and update `src/data/gallery.json`
-- [ ] Test contact form end-to-end — submit form on live site, verify email arrives in inbox
-- [ ] Run Lighthouse audit and fix any critical issues (performance, accessibility, SEO)
-- [ ] Cross-browser test — check on Firefox and Safari / mobile
+- [🚩] Add photography images — **flagged/deferred by request.** Waiting on a planned rework of the upload/edit pipeline (admin CMS) before adding real photos, not just dropping files in `public/images/photography/`.
+- [ ] Test contact form end-to-end — needs a real send against the live site (requires `RESEND_API_KEY`, which only exists in Vercel's env, and lands in your real inbox) — can't be faithfully done from this sandbox. Code-level checks done: validation paths (missing fields, bad email format) and the graceful-failure path all verified locally, see fix below.
+- [x] Run Lighthouse audit — ran against a local production build. Scores: **Performance 90, Accessibility 96, Best Practices 96, SEO 100.** Fixed the two real findings: (1) project/social icon-only links had no accessible name for screen readers — added `aria-label`/`title` in `ProjectsSection.tsx` and `ContactSection.tsx`; (2) a console 404 for `/_vercel/insights/script.js` is expected locally (Vercel Analytics only serves that script when deployed on Vercel) — not a bug. Remaining perf flags (LCP ~2.5s, main-thread work) are typical for a heavy animated hero and not critical; revisit if real users report slowness.
+- [ ] Cross-browser test — check on Firefox and Safari / mobile (needs real browsers/devices, not available in this environment)
 
 ---
 
 ## Existing Feature Improvements
 
-- [ ] Photography section — carousel is empty until real images are added
+- [🚩] Photography section — carousel is empty until real images are added; deferred alongside the photography-images item above
 - [x] Skills section — hobbies moved to a plain "Beyond the Screen" tag strip (no fake percentages); "Other Skills" renamed to "Research & Computer Science"
-- [ ] About timeline — icons (Tent, Compass, Flame) don't match actual job roles; replace with relevant ones
-- [ ] MountainAscentHUD — checkpoint labels ("Sunny Meadow") don't match section titles ("The Meadow"); sync them
+- [x] About timeline — icons now map per role (Database/ParentOf, Compass/Freelance, Code2/Merck, Microscope/IISc) instead of cycling a generic Tent/Compass/Flame set
+- [x] MountainAscentHUD — checkpoint labels synced to actual section titles (The Forest Path, The Meadow, Campfire at Dusk); added missing "Field Notes" checkpoint for the Writing section
 - [x] Navbar — active section highlighting as user scrolls (already implemented via IntersectionObserver in `Navbar.tsx`)
-- [ ] Hero intro — paragraph is slightly long for a first impression; tighten the copy
+- [x] Hero intro — tightened from ~27 to ~21 words, cut repetitive "clarity, reliability, and useful detail" close
 
 ---
 
 ## New Features
 
-- [x] Resume / CV download button — added to hero CTA row, links to `/resume.pdf`. **Action needed: add the actual `public/resume.pdf` file** — the link 404s until it's there.
+- [🚫] Resume / CV download button — **removed by request.** Decided against a public resume download link; don't want it scraped/downloaded by random visitors. The CTA has been removed from `HeroSection.tsx`; no `resume.pdf` will be added.
 - [x] Project detail pages — `/projects/[slug]` with case study layout (Overview → Approach → Outcome → Tech Stack). Content is auto-derived from existing `description`/`longDescription` fields as a starting draft — worth a human pass to sharpen the writing.
-- [ ] Testimonials / recommendations section — shell is built (`TestimonialsSection.tsx`, renders nothing while `testimonials` in `src/data/portfolio.ts` is empty). **Action needed:** add 2-3 real quotes to `testimonials`, and add `{ label: "Testimonials", href: "#testimonials" }` to `navigationItems` at the same time.
+- [ ] Testimonials / recommendations section — shell is built (`TestimonialsSection.tsx`, renders nothing while `testimonials` in `src/data/portfolio.ts` is empty). **Blocked on you:** need 2-3 real quotes (who said it, their role, the quote itself) before this can go live — nothing left to build until then.
 - [x] Availability badge — "Open to work" pill added to hero, driven by `personalProfile.openToWork` in `src/data/portfolio.ts` (flip to `false` to hide it)
 - [x] Blog / writing section — first real post published ("What a Hundred Mutations Taught Me About Trusting a Single Answer"), "Writing" added to `navigationItems` (→ `/blog`), `/blog` + post slugs added to `sitemap.ts`. Cover image is a generated SVG-style illustration via `src/app/images/blog/protein-research/route.tsx` (same `ImageResponse` technique as the favicon) since no real photo was available. More posts can be added the same way — see the two other topics already scoped (career pivot, building this site).
 - [x] Mobile touch ripple — `MobileTouchRipple.tsx`, tap-to-ripple feedback on screens under 768px, mounted alongside the desktop-only `InteractiveTrail`
 - [x] PWA support — `manifest.ts` + generated icons (`/icon-192`, `/icon-512`) + `sw.js`/`offline.html` for a basic offline fallback page
-- [ ] Copy-email-to-clipboard button — next to email address in contact section
+- [x] Copy-email-to-clipboard button — next to email address in contact section (`ContactSection.tsx`, `handleCopyEmail`)
 - [x] Animated page transitions — `src/app/template.tsx` fades/slides in on every route change (home ↔ photography ↔ project/blog pages)
 
 ---
@@ -73,3 +73,4 @@
 - [x] JSON-LD structured data — Person + WebSite schema added to root layout
 - [x] `/photography` metadata — own title/description/OG instead of inheriting the homepage's
 - [x] Fixed a long-standing ESLint crash on `SkillsSection.tsx` (a `TSMappedType` parser bug in this typescript-eslint version) that was silently aborting lint before it ever reached later files — this had been masking real `prefer-const` compile errors in `InteractiveTrail.tsx` that `next build`'s lint step would otherwise fail on. Both are fixed; `npm run build` now lints cleanly (warnings only, no errors).
+- [x] Contact form API robustness — `new Resend(...)` was instantiated before request validation and outside the `try/catch` in `route.ts`; a missing/invalid `RESEND_API_KEY` crashed the whole route with an unhandled 500 instead of the frontend's expected JSON error. Moved the Resend instantiation inside the try block, after validation. Verified locally: missing fields → 400 JSON, invalid email → 400 JSON, missing API key → graceful 500 JSON.

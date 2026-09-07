@@ -16,7 +16,7 @@ export const personalProfile: PersonalProfile = {
   headline: "Full-Stack & Data Science Engineer",
   location: "Bangalore, India",
   intro:
-    "I build practical digital products at the intersection of software engineering, data science, and computational biology, with a quiet preference for clarity, reliability, and useful detail.",
+    "I build practical digital products where software engineering meets data science and computational biology — with a quiet preference for clarity and reliability.",
   about:
     "I began in biotechnology and moved into software through research, product building, analytics, and engineering delivery. During my time as a research fellow at IISc Bangalore, I worked on high-performance clustered computers using structural modeling tools like Rosetta and AlphaFold to predict protein dynamics, leading to a co-authored journal publication. That path taught me to think deeply about data, structural algorithms, and reliability, which now shapes how I build products across frontend, backend, and cloud workflows.",
   aboutExtended:

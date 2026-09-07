@@ -5,10 +5,6 @@ const TO_EMAIL = "akashkbhat2001@gmail.com";
 const FROM_EMAIL = "onboarding@resend.dev";
 
 export async function POST(req: NextRequest) {
-  // Instantiated inside the handler so it only runs at request time,
-  // not at build time when the env var isn't available.
-  const resend = new Resend(process.env.RESEND_API_KEY);
-
   try {
     const { name, email, subject, message } = await req.json();
 
@@ -23,6 +19,10 @@ export async function POST(req: NextRequest) {
     if (!emailRegex.test(email)) {
       return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
     }
+
+    // Instantiated inside the handler (and after validation) so a missing/invalid
+    // key surfaces as the same graceful JSON error as any other send failure.
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
       from: FROM_EMAIL,

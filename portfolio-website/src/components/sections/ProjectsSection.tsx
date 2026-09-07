@@ -220,6 +220,8 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                       href={displayDemoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`Open live demo of ${displayTitle}`}
+                      title={`Open live demo of ${displayTitle}`}
                       className="p-3 bg-white/20 hover:bg-white/35 backdrop-blur-md rounded-full text-white transition-colors border border-white/20"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
@@ -232,6 +234,8 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                       href={project.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`View source code for ${displayTitle} on GitHub`}
+                      title={`View source code for ${displayTitle} on GitHub`}
                       className="p-3 bg-white/20 hover:bg-white/35 backdrop-blur-md rounded-full text-white transition-colors border border-white/20"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}

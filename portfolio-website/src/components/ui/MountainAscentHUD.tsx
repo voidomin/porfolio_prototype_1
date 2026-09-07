@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollProgress } from "@/hooks/useIntersectionObserver";
 import { cn } from "@/lib/utils";
@@ -17,12 +17,13 @@ import { cn } from "@/lib/utils";
 
 const hudItems = [
   { id: "home", label: "Dawn Summit", icon: "🌅" },
-  { id: "about", label: "Pine Forest", icon: "🌲" },
-  { id: "skills", label: "Sunny Meadow", icon: "🌿" },
+  { id: "about", label: "The Forest Path", icon: "🌲" },
+  { id: "skills", label: "The Meadow", icon: "🌿" },
   { id: "projects", label: "Stepping Stones", icon: "🪨" },
   { id: "publications", label: "The Clearing", icon: "📖" },
   { id: "photography", label: "Golden Hour", icon: "📷" },
-  { id: "contact", label: "Campfire Camp", icon: "🔥" },
+  { id: "writing", label: "Field Notes", icon: "📝" },
+  { id: "contact", label: "Campfire at Dusk", icon: "🔥" },
 ];
 
 export const MountainAscentHUD = () => {
@@ -86,7 +87,7 @@ export const MountainAscentHUD = () => {
 
         {/* Trail Checkpoints - Tightened gap-4 */}
         <div className="flex flex-col gap-4 relative z-10">
-          {hudItems.map((item, index) => {
+          {hudItems.map((item) => {
             const isActive = activeSection === item.id;
             const isHovered = hoveredItem === item.id;
             // The green glow should follow the hovered item, or fall back to the active section

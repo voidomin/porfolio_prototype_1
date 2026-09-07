@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Briefcase, Compass, Tent, Flame, TreePine } from "lucide-react";
+import { Briefcase, Compass, Code2, Microscope, Database, TreePine } from "lucide-react";
 import { aboutStats, experienceTimeline, personalProfile } from "@/data/portfolio";
 
 /* ──────────────────────────────────────────────────────────
@@ -12,7 +12,12 @@ import { aboutStats, experienceTimeline, personalProfile } from "@/data/portfoli
    experience timeline, and organic framing.
    ────────────────────────────────────────────────────────── */
 
-const trailIcons = [Tent, Compass, Flame];
+const trailIconsById: Record<string, typeof Database> = {
+  "exp-parentof": Database,
+  "exp-freelance": Compass,
+  "exp-merck": Code2,
+  "exp-iisc": Microscope,
+};
 
 export const AboutSection = () => {
   const [avatarError, setAvatarError] = useState(false);
@@ -157,7 +162,7 @@ export const AboutSection = () => {
 
             <div className="space-y-12">
               {experienceTimeline.map((item, index) => {
-                const Icon = trailIcons[index % trailIcons.length];
+                const Icon = trailIconsById[item.id] ?? TreePine;
                 return (
                   <motion.div
                     key={item.id}

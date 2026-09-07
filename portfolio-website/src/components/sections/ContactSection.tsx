@@ -487,6 +487,8 @@ export const ContactSection = () => {
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={social.platform}
+                      title={social.platform}
                       className="w-11 h-11 bg-white/10 border border-white/15 rounded-full flex items-center justify-center text-white/70 hover:bg-dawn-500/80 hover:text-white hover:border-dawn-500/50 transition-all duration-300"
                       whileHover={{ scale: 1.1, y: -3 }}
                       whileTap={{ scale: 0.95 }}
