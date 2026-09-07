@@ -1,4 +1,5 @@
 import { HeroSection } from "@/components/sections/HeroSection";
+import { TechStackStrip } from "@/components/sections/TechStackStrip";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { SkillsSection } from "@/components/sections/SkillsSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
@@ -58,6 +59,12 @@ export default function Home() {
       {/* Chapter 1: Dawn */}
       <SectionErrorBoundary name="hero">
         <HeroSection />
+      </SectionErrorBoundary>
+
+      {/* Built-with tech strip — surfaces real technical signal right at
+          the fold instead of waiting until the Meadow chapter */}
+      <SectionErrorBoundary name="tech-stack-strip">
+        <TechStackStrip />
       </SectionErrorBoundary>
 
       {/* Terrain: mountain ridge → forest */}
