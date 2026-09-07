@@ -32,6 +32,8 @@
 - [x] PWA support — `manifest.ts` + generated icons (`/icon-192`, `/icon-512`) + `sw.js`/`offline.html` for a basic offline fallback page
 - [x] Copy-email-to-clipboard button — next to email address in contact section (`ContactSection.tsx`, `handleCopyEmail`)
 - [x] Animated page transitions — `src/app/template.tsx` fades/slides in on every route change (home ↔ photography ↔ project/blog pages)
+- [x] Cmd/Ctrl+K command palette — `CommandPalette.tsx`, mounted globally; jumps to any section, project, or blog post. Doubles as the only navigation on sub-pages (blog posts, project case studies, photography), which previously had none.
+- [x] Quick Overview page (`/overview`) — print-friendly, on-site one-page summary (experience, skills, selected projects, contact) so a recruiter can screen in ~30 seconds or save their own PDF via the browser's print dialog. Noindexed. Linked from the hero and the command palette.
 
 ---
 
@@ -44,7 +46,7 @@
 
 ### To explore
 - [ ] **Snyk** — scans npm dependencies for known CVEs; free tier, 2-min GitHub connect
-- [ ] **GitHub CodeQL** — free on public repos, runs in GitHub Actions, catches security bugs (XSS, injection) in your own code; zero maintenance once set up
+- [x] **GitHub CodeQL** — `.github/workflows/codeql.yml` runs on push/PR to main plus a weekly schedule
 - [ ] **DeepScan** — TypeScript-specific static analysis, catches subtle runtime bugs ESLint misses; free for public repos
 - [ ] **Codacy** — full quality dashboard (grades, trends, PR comments), closest alternative to SonarCloud; free for public repos
 - [ ] **Code Climate** — maintainability scores and test coverage trends over time; free for open source
@@ -74,3 +76,6 @@
 - [x] `/photography` metadata — own title/description/OG instead of inheriting the homepage's
 - [x] Fixed a long-standing ESLint crash on `SkillsSection.tsx` (a `TSMappedType` parser bug in this typescript-eslint version) that was silently aborting lint before it ever reached later files — this had been masking real `prefer-const` compile errors in `InteractiveTrail.tsx` that `next build`'s lint step would otherwise fail on. Both are fixed; `npm run build` now lints cleanly (warnings only, no errors).
 - [x] Contact form API robustness — `new Resend(...)` was instantiated before request validation and outside the `try/catch` in `route.ts`; a missing/invalid `RESEND_API_KEY` crashed the whole route with an unhandled 500 instead of the frontend's expected JSON error. Moved the Resend instantiation inside the try block, after validation. Verified locally: missing fields → 400 JSON, invalid email → 400 JSON, missing API key → graceful 500 JSON.
+- [x] Multi-day-idle-tab lag — `InteractiveTrail`'s canvas loop, `BirdFlock`'s spawn timer, and `SoundscapeManager`'s audio scheduler ran continuously with no regard for tab visibility. Added Page Visibility handling to all three so they fully pause when hidden and cleanly resume when foregrounded, instead of grinding for days unattended. Also fixed `useIntersectionObserver` recreating its observer on every trigger due to a dependency-array bug.
+- [x] Hero load delay — Lighthouse traced the LCP element (hero intro paragraph) to a ~3.5s render delay despite a 9ms TTFB. Root cause: the full-viewport `LoadingScreen` overlay stayed up ~3.7s (2.8s + 0.9s fade) sitting on top of already-rendered content. Cut to ~1.9s, made skippable by any interaction, and tightened the hero's own staggered reveal by ~35-40%.
+- [x] CTA shape consistency — Contact's submit button and the Writing/Photography "view all" CTAs used `rounded-xl` while Hero/Publications used `rounded-full`; unified all primary CTAs to `rounded-full`.
