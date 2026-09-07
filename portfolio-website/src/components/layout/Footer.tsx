@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Github, Linkedin, Star } from "lucide-react";
-import { socialLinks, personalProfile } from "@/data/portfolio";
+import { socialLinks, personalProfile, navigationItems } from "@/data/portfolio";
 
 /* ──────────────────────────────────────────────────────────
    Footer – "Night Falls"
@@ -106,6 +106,23 @@ export const Footer = () => {
             </span>
           </div>
 
+          {/* Quick links — real navigation for anyone who scrolls this far
+              without discovering the Cmd+K command palette */}
+          <nav
+            aria-label="Footer"
+            className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-8 text-sm"
+          >
+            {navigationItems.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="text-night-300/60 hover:text-white transition-colors duration-300"
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
           {/* Social links as constellation */}
           <div className="flex justify-center gap-4 mb-8">
             {socialLinks.map((link) => {
@@ -140,6 +157,9 @@ export const Footer = () => {
           <p className="text-sm text-night-300/40">
             © {currentYear} {personalProfile.name}. Built with calm focus and care under starlit
             skies.
+          </p>
+          <p className="mt-2 text-xs text-night-400/30 font-mono">
+            Next.js · TypeScript · Tailwind CSS · Framer Motion
           </p>
         </motion.div>
       </div>

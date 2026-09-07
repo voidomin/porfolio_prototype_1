@@ -1,9 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ExternalLink, FlaskConical, BookOpen } from "lucide-react";
-import { publications } from "@/data/portfolio";
+import Link from "next/link";
+import { ExternalLink, FlaskConical, BookOpen, PenLine, ArrowRight } from "lucide-react";
+import { publications, blogPosts } from "@/data/portfolio";
 import { AccentLineReveal } from "@/components/ui/AccentLineReveal";
+
+// The research write-up has a narrative companion piece in Writing — surfacing
+// it here gives the section a real second element instead of one lone card,
+// and shows the site's sections are actually connected to each other.
+const RELATED_POST_SLUG = "trusting-a-single-signal";
 
 /* ──────────────────────────────────────────────────────────
    PublicationsSection – "Chapter 5: The Clearing"
@@ -13,6 +19,8 @@ import { AccentLineReveal } from "@/components/ui/AccentLineReveal";
 
 export const PublicationsSection = () => {
   if (publications.length === 0) return null;
+
+  const relatedPost = blogPosts.find((post) => post.slug === RELATED_POST_SLUG);
 
   return (
     <section
@@ -121,6 +129,31 @@ export const PublicationsSection = () => {
             </motion.article>
           ))}
         </div>
+
+        {relatedPost && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <Link
+              href={`/blog/${relatedPost.slug}`}
+              className="group mt-6 flex items-center gap-4 rounded-2xl bg-white/60 backdrop-blur-sm border border-dawn-200/40 p-5 transition-all duration-300 hover:bg-white/80 hover:border-dawn-300/60 hover:shadow-md"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-dawn-100 text-dawn-700">
+                <PenLine className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs uppercase tracking-[0.2em] text-stone-500">
+                  The story behind this research
+                </p>
+                <p className="truncate text-sm font-medium text-stone-800">{relatedPost.title}</p>
+              </div>
+              <ArrowRight className="h-4 w-4 shrink-0 text-dawn-600 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </motion.div>
+        )}
       </div>
     </section>
   );

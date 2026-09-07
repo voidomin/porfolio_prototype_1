@@ -2,10 +2,26 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Leaf, Camera, Music, Mountain, type LucideIcon } from "lucide-react";
 import { skills, hobbies } from "@/data/portfolio";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { AccentLineReveal } from "@/components/ui/AccentLineReveal";
 import { Skill, type SkillCategory } from "@/types";
+
+// Keyword match against the hobbies list — same "map a small fixed list to an
+// icon" approach as AboutSection's per-role timeline icons.
+const HOBBY_ICONS: { match: string; icon: LucideIcon }[] = [
+  { match: "photography", icon: Camera },
+  { match: "guitar", icon: Music },
+  { match: "music", icon: Music },
+  { match: "hiking", icon: Mountain },
+  { match: "trek", icon: Mountain },
+];
+
+const getHobbyIcon = (hobby: string): LucideIcon => {
+  const lower = hobby.toLowerCase();
+  return HOBBY_ICONS.find(({ match }) => lower.includes(match))?.icon ?? Leaf;
+};
 
 /* ──────────────────────────────────────────────────────────
    SkillsSection – "Chapter 3: The Meadow"
@@ -52,8 +68,16 @@ const SkillBar = ({ skill, index }: { skill: Skill; index: number }) => (
             : "linear-gradient(90deg, #7db523, #9bcf3a)",
         }}
       >
-        {/* Vine tip glow */}
-        <div className="absolute right-0 top-0 bottom-0 w-2 rounded-full bg-white/30" />
+        {/* Vine tip — a leaf sprouts once the vine finishes growing */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.4 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: index * 0.06 + 1.1, duration: 0.35, ease: "backOut" }}
+          className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center"
+        >
+          <Leaf className="w-3 h-3 text-white drop-shadow-sm rotate-45" fill="currentColor" />
+        </motion.div>
       </motion.div>
     </div>
   </motion.div>
@@ -268,14 +292,18 @@ export const SkillsSection = () => {
               Beyond the Screen
             </p>
             <div className="flex flex-wrap justify-center gap-2.5">
-              {hobbies.map((hobby) => (
-                <span
-                  key={hobby}
-                  className="px-4 py-1.5 rounded-full bg-white/60 border border-meadow-300/40 text-sm text-meadow-800 backdrop-blur-sm"
-                >
-                  {hobby}
-                </span>
-              ))}
+              {hobbies.map((hobby) => {
+                const HobbyIcon = getHobbyIcon(hobby);
+                return (
+                  <span
+                    key={hobby}
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/60 border border-meadow-300/40 text-sm text-meadow-800 backdrop-blur-sm"
+                  >
+                    <HobbyIcon className="w-3.5 h-3.5 text-meadow-600" />
+                    {hobby}
+                  </span>
+                );
+              })}
             </div>
           </motion.div>
         )}
