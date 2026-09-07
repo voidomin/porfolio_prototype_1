@@ -67,6 +67,12 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: personalProfile.name,
   },
+  other: {
+    // Next.js's `appleWebApp.capable` only emits the (now deprecated,
+    // Chromium-flagged) apple-mobile-web-app-capable tag. The standard
+    // replacement isn't auto-generated, so it's added explicitly here.
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {

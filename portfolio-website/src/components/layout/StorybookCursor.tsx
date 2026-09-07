@@ -218,7 +218,7 @@ export const StorybookCursor = () => {
         }}
       >
         <motion.div
-          className="-translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] shadow-lg backdrop-blur-[2px] whitespace-nowrap"
+          className="rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] shadow-lg backdrop-blur-[2px] whitespace-nowrap"
           style={{
             color: cursorColor,
             backgroundColor: "rgba(15, 13, 46, 0.85)",
@@ -226,6 +226,7 @@ export const StorybookCursor = () => {
           }}
           initial={false}
           animate={{
+            x: "-50%",
             opacity: isHovering && !isTextInput && !isClicked ? 0.95 : 0,
             y: isHovering ? -42 : -20,
             scale: isHovering ? 1 : 0.8,

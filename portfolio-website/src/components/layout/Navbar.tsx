@@ -87,14 +87,19 @@ const NavLink = ({ href, label, hasScrolled, isActive, onClick }: NavLinkProps) 
     >
       {label}
       {isActive && (
-        <motion.span
-          layoutId="nav-active-dot"
-          className={cn(
-            "absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full",
-            hasScrolled ? "bg-forest-400" : "bg-forest-700"
-          )}
-          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-        />
+        // Plain wrapper owns the centering transform — layoutId's own FLIP
+        // animation writes the transform inline style directly, which would
+        // otherwise silently overwrite Tailwind's -translate-x-1/2 here.
+        <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2">
+          <motion.span
+            layoutId="nav-active-dot"
+            className={cn(
+              "block w-1 h-1 rounded-full",
+              hasScrolled ? "bg-forest-400" : "bg-forest-700"
+            )}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+          />
+        </span>
       )}
     </motion.a>
   );
