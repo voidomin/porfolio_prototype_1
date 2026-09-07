@@ -47,7 +47,7 @@ export const ScrollProgress: React.FC = () => {
     <>
       {/* Progress bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-[3px] origin-left z-[60]"
+        className="fixed top-0 left-0 right-0 h-[3px] origin-left z-[60] print:hidden"
         style={{
           scaleX: smoothProgress,
           background: barBackground,
@@ -56,7 +56,7 @@ export const ScrollProgress: React.FC = () => {
 
       {/* Sun/Moon dot at the leading edge */}
       <motion.div
-        className="fixed top-0 z-[61] pointer-events-none"
+        className="fixed top-0 z-[61] pointer-events-none print:hidden"
         style={{
           left: useTransform(smoothProgress, (v) => `${v * 100}%`),
           x: "-50%",

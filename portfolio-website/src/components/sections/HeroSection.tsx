@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { ArrowDown, MapPin, CircleDot } from "lucide-react";
 import { personalProfile } from "@/data/portfolio";
 
@@ -153,6 +154,22 @@ export const HeroSection = () => {
           >
             Get In Touch
           </motion.a>
+        </motion.div>
+
+        {/* Quick, screenable summary — no downloadable file, just an on-site one-pager */}
+        <motion.div
+          custom={2.0}
+          variants={fadeUpVariants}
+          initial="hidden"
+          animate="visible"
+          className="mt-5"
+        >
+          <Link
+            href="/overview"
+            className="text-sm text-forest-900/50 hover:text-forest-900/80 underline underline-offset-4 transition-colors"
+          >
+            Quick Overview →
+          </Link>
         </motion.div>
 
         {/* Floating tags */}

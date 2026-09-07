@@ -6,6 +6,7 @@ import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { StorybookCursor } from "@/components/layout/StorybookCursor";
 import { ScrollProvider } from "@/contexts/ScrollContext";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { CommandPalette } from "@/components/ui/CommandPalette";
 import { Analytics } from "@vercel/analytics/react";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { personalProfile, socialLinks, contactInfo } from "@/data/portfolio";
@@ -130,6 +131,7 @@ export default function RootLayout({
             <div className="relative min-h-screen">{children}</div>
           </SmoothScroll>
         </ScrollProvider>
+        <CommandPalette />
         <Analytics />
         <ServiceWorkerRegister />
       </body>

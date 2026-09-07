@@ -131,7 +131,7 @@ export const StorybookCursor = () => {
     <>
       {/* ─── Lagging Concentric Outer Rings ─── */}
       <motion.div
-        className="pointer-events-none fixed left-0 top-0 z-[10000] flex items-center justify-center"
+        className="pointer-events-none fixed left-0 top-0 z-[10000] flex items-center justify-center print:hidden"
         style={{
           x: ringSpringX,
           y: ringSpringY,
@@ -187,7 +187,7 @@ export const StorybookCursor = () => {
 
       {/* ─── Snappy Central Core Dot ─── */}
       <motion.div
-        className="pointer-events-none fixed left-0 top-0 z-[10001] flex items-center justify-center"
+        className="pointer-events-none fixed left-0 top-0 z-[10001] flex items-center justify-center print:hidden"
         style={{
           x: dotSpringX,
           y: dotSpringY,
@@ -211,7 +211,7 @@ export const StorybookCursor = () => {
 
       {/* ─── Isolated Snappy Floating Tooltip ─── */}
       <motion.div
-        className="pointer-events-none fixed left-0 top-0 z-[9998]"
+        className="pointer-events-none fixed left-0 top-0 z-[9998] print:hidden"
         style={{
           x: dotSpringX,
           y: dotSpringY,
