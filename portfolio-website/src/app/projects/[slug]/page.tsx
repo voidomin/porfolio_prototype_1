@@ -82,7 +82,7 @@ export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
         <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-stone-200 shadow-lg mb-10">
           <Image
             src={project.image}
-            alt={project.title}
+            alt={project.imageAlt ?? project.title}
             fill
             sizes="(max-width: 768px) 100vw, 800px"
             className="object-cover"

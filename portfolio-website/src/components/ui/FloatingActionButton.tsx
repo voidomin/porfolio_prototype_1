@@ -6,6 +6,7 @@ import { Compass, ArrowUp, Mail, Github, Linkedin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { socialLinks } from "@/data/portfolio";
 import { scrollTo } from "@/lib/lenis";
+import { useSafeReducedMotion } from "@/hooks/useSafeReducedMotion";
 
 /* ──────────────────────────────────────────────────────────
    FloatingActionButton – Compass rose themed.
@@ -23,6 +24,7 @@ interface FABAction {
 export const FloatingActionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+  const prefersReducedMotion = useSafeReducedMotion();
 
   useEffect(() => {
     const handler = () => {
@@ -164,7 +166,10 @@ export const FloatingActionButton = () => {
             "text-white flex items-center justify-center",
             "hover:shadow-2xl hover:shadow-forest-500/20 transition-shadow duration-300"
           )}
-          animate={{ rotate: isOpen ? 135 : 0, scale: isOpen ? 1.05 : 1 }}
+          animate={{
+            rotate: prefersReducedMotion ? 0 : isOpen ? 135 : 0,
+            scale: isOpen ? 1.05 : 1,
+          }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >

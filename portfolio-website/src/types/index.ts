@@ -14,6 +14,9 @@ export interface Project {
   description: string;
   longDescription?: string;
   image: string;
+  /** Real description of what's shown in `image`, for the <img> alt text —
+   * distinct from `title`, which names the project, not the screenshot. */
+  imageAlt?: string;
   images?: string[];
   technologies: string[];
   category: string;

@@ -6,6 +6,7 @@
     "description": "A curated ecosystem of React + Vite builds demonstrating polished UI, modular architecture, and focused product craft.",
     "longDescription": "A portfolio umbrella showcasing multiple shipped applications with cohesive design language and practical functionality.",
     "image": "/images/projects/projects_studio.png",
+    "imageAlt": "Screenshot of the React Projects Studio landing page, showing studio metrics (9 live builds, 12+ core modules) above a grid of app cards including Vocab Mastery, Todo Manager, and Pokedex Explorer.",
     "technologies": [
       "React",
       "Vite",
@@ -86,6 +87,7 @@
     "description": "Biotechnology pipeline for protein structure alignment with advanced structural analysis.",
     "longDescription": "A Python-driven scientific workflow focused on protein alignment and RMSD analysis, deployed for practical use.",
     "image": "/images/projects/mustang.png",
+    "imageAlt": "Screenshot of the Mustang Pipeline app showing superimposed protein structure models rendered in cartoon, spacefill, stick, and backbone-trace styles.",
     "technologies": [
       "Python",
       "Bioinformatics",
@@ -104,6 +106,7 @@
     "description": "Production website for a travel company with immersive storytelling and conversion-focused sections.",
     "longDescription": "Built as a freelance engagement during a transition period, with strong focus on visual flow and deployment readiness.",
     "image": "/images/projects/param_adventures.png",
+    "imageAlt": "Screenshot of the Param Adventures travel website homepage, featuring a Western Ghats expedition hero banner over a misty forest cliff photo.",
     "technologies": [
       "Frontend",
       "Responsive Design",
@@ -122,6 +125,7 @@
     "description": "AI-powered resume optimizer with parsing, tailoring, and real-time feedback.",
     "longDescription": "An intelligent platform that analyzes resumes against job descriptions, suggesting targeted improvements and keywords to pass ATS filters.",
     "image": "/images/projects/resume.png",
+    "imageAlt": "Screenshot of the Smart Resume AI dashboard, showing the Master Profile, AI resume generation, and resume list panels.",
     "technologies": [
       "React",
       "TailwindCSS",
@@ -141,6 +145,7 @@
     "description": "Clean, visual calorie tracker and meal logging platform with smart food search.",
     "longDescription": "A product-minded nutrition app with a focus on quick logging, macro breakdowns, and visual history tracking.",
     "image": "/images/projects/caloriq.png",
+    "imageAlt": "Screenshot of the Caloriq nutrition-tracking app, showing an AI coaching chat alongside daily macro, weight, and sleep tracking panels.",
     "technologies": [
       "React",
       "Vite",

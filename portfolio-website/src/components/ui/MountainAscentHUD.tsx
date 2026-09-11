@@ -98,7 +98,11 @@ export const MountainAscentHUD = () => {
             return (
               <button
                 key={item.id}
-                className="relative flex items-center justify-center cursor-pointer group bg-transparent border-none p-0 focus:outline-none"
+                // before:-inset-3 extends the tappable area to ~44px without
+                // growing the visible dot or the flex gap between checkpoints
+                // (the pseudo-element is absolutely positioned, so it doesn't
+                // participate in layout).
+                className="relative flex items-center justify-center cursor-pointer group bg-transparent border-none p-0 focus:outline-none before:absolute before:-inset-3 before:content-['']"
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onClick={() => handleScrollTo(item.id)}
                 aria-label={`Scroll to ${item.label}`}

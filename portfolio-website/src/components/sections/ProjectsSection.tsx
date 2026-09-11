@@ -43,6 +43,10 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
   const displayTitle = activeSub ? activeSub.title : project.title;
   const displayDescription = activeSub ? activeSub.description : project.description;
   const displayImage = activeSub ? activeSub.image : project.image;
+  // Falls back to the title when a real image description isn't set —
+  // true today for sub-project thumbnails, which are placeholder stock
+  // photos rather than actual screenshots (see ROADMAP.md).
+  const displayImageAlt = activeSub ? activeSub.title : (project.imageAlt ?? project.title);
   const displayDemoUrl = activeSub ? activeSub.demoUrl : project.demoUrl;
   const displayTech = activeSub ? activeSub.technologies : project.technologies;
 
@@ -210,7 +214,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                 >
                   <Image
                     src={displayImage}
-                    alt={displayTitle}
+                    alt={displayImageAlt}
                     fill
                     className="object-cover"
                     sizes="(max-width: 640px) 100vw, 380px"

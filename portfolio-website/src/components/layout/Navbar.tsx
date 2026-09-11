@@ -369,7 +369,10 @@ export const Navbar = () => {
             <motion.button
               onClick={handleSoundToggle}
               className={cn(
-                "relative flex items-center justify-center gap-1.5 p-2 rounded-full border text-[9px] font-bold tracking-wider transition-all duration-300",
+                // before:-inset-2 extends the tappable area to ~44px without
+                // growing the visible pill itself — Apple/Google both
+                // recommend this pattern for compact icon-only controls.
+                "relative flex items-center justify-center gap-1.5 p-2 rounded-full border text-[9px] font-bold tracking-wider transition-all duration-300 before:absolute before:-inset-2 before:content-['']",
                 mobileButtonClass
               )}
               whileTap={{ scale: 0.95 }}
@@ -389,7 +392,7 @@ export const Navbar = () => {
             <motion.button
               onClick={() => setIsOpen(!isOpen)}
               className={cn(
-                "p-2 rounded-full transition-all duration-300",
+                "relative p-2 rounded-full transition-all duration-300 before:absolute before:-inset-0.5 before:content-['']",
                 hasScrolled
                   ? "hover:bg-white/10 text-white/80"
                   : "hover:bg-forest-950/10 text-forest-950"
