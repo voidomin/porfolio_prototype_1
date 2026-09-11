@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useSafeReducedMotion } from "@/hooks/useSafeReducedMotion";
 import { useRef } from "react";
 import Link from "next/link";
 import { ExternalLink, FlaskConical, BookOpen, PenLine, ArrowRight } from "lucide-react";
@@ -21,11 +22,12 @@ const RELATED_POST_SLUG = "trusting-a-single-signal";
 
 export const PublicationsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useSafeReducedMotion();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  const glowY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
+  const glowY = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [-30, 30]);
 
   if (publications.length === 0) return null;
 

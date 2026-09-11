@@ -43,8 +43,10 @@
   }
 }
 
-/* Custom cursor for desktop */
-@media (pointer: fine) {
+/* Custom cursor for desktop — never hide the native cursor for
+   reduced-motion users, since StorybookCursor renders nothing for
+   them and there'd otherwise be no visible pointer at all. */
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
   body {
     cursor: none;
   }
@@ -64,7 +66,14 @@
   }
 }
 
-/* Custom scrollbar — nature themed */
+/* Custom scrollbar — nature themed (Firefox fallback; the gradient thumb
+   above is webkit-only, so Firefox gets a themed solid-color equivalent
+   instead of falling back to its plain default look) */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #5aaf5a #0f0d2e;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -310,6 +319,14 @@ html {
     color: black !important;
     box-shadow: none !important;
     text-shadow: none !important;
+  }
+
+  /* Fixed decorative layers repeat on every printed page otherwise —
+     the other offenders (BirdFlock, FloatingLeaves, etc.) opt out via
+     the print:hidden Tailwind utility directly in their JSX; this one
+     uses its own shared class instead of a component-level className. */
+  .nature-scene {
+    display: none !important;
   }
 }
 /* ─── Premium Mosaic Gallery Grid ─── */

@@ -44,6 +44,8 @@ export const Magnetic = ({ children, className, strength = 14 }: MagneticProps) 
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onTouchEnd={handleMouseLeave}
+      onTouchCancel={handleMouseLeave}
       style={{ x: springX, y: springY, display: "inline-block" }}
       className={className}
     >

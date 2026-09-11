@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "framer-motion";
 import { useScrollContext } from "@/contexts/ScrollContext";
 
 /* ──────────────────────────────────────────────────────────
@@ -35,6 +36,7 @@ export const InteractiveTrail = () => {
   const lastGustTime = useRef(0);
   const lastTouchTime = useRef(0);
   const [isMobile, setIsMobile] = useState(true); // default true = SSR safe
+  const prefersReducedMotion = useReducedMotion();
 
   // Detect mobile on mount
   useEffect(() => {
@@ -53,7 +55,7 @@ export const InteractiveTrail = () => {
 
   useEffect(() => {
     // Canvas trail is desktop-only; mobile scroll is already jank-prone
-    if (isMobile) return;
+    if (isMobile || prefersReducedMotion) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -440,12 +442,12 @@ export const InteractiveTrail = () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       if (animationId !== null) cancelAnimationFrame(animationId);
     };
-  }, [isMobile]);
+  }, [isMobile, prefersReducedMotion]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-[75] block"
+      className="fixed inset-0 pointer-events-none z-[75] block print:hidden"
       style={{ transform: "translate3d(0, 0, 0)" }}
     />
   );

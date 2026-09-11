@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useSafeReducedMotion } from "@/hooks/useSafeReducedMotion";
 
 interface PerspectiveTiltProps {
   children: React.ReactNode;
@@ -28,7 +29,12 @@ export const PerspectiveTilt = ({
   maxTilt = 6,
   depth = 0,
 }: PerspectiveTiltProps) => {
-  const prefersReducedMotion = useReducedMotion();
+  // useSafeReducedMotion, not framer-motion's own useReducedMotion — this
+  // return value changes what DOM structure gets rendered (see below), and
+  // the raw hook reads the real preference synchronously on the client's
+  // very first render, which can differ from the server's default-false
+  // render and produce a genuine hydration mismatch.
+  const prefersReducedMotion = useSafeReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -60,6 +66,8 @@ export const PerspectiveTilt = ({
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onTouchEnd={handleMouseLeave}
+      onTouchCancel={handleMouseLeave}
       className={className}
       style={{ perspective: 1200 }}
     >

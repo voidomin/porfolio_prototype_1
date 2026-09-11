@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, ArrowRight, Command } from "lucide-react";
 import { navigationItems, projects, blogPosts } from "@/data/portfolio";
 import { scrollTo } from "@/lib/lenis";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 /* ──────────────────────────────────────────────────────────
    CommandPalette – Cmd/Ctrl+K quick-jump. Mounted once in the
@@ -27,6 +28,7 @@ export const CommandPalette = () => {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -142,6 +144,8 @@ export const CommandPalette = () => {
     };
   }, [open]);
 
+  useFocusTrap(open, dialogRef);
+
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -164,7 +168,7 @@ export const CommandPalette = () => {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="hidden md:flex print:hidden fixed bottom-6 left-6 z-[90] items-center gap-2 px-3 py-2 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white/60 hover:text-white/90 hover:bg-black/30 transition-colors text-xs"
+        className="flex print:hidden fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-6 z-[90] items-center gap-2 px-3 py-2 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white/60 hover:text-white/90 hover:bg-black/30 transition-colors text-xs"
         aria-label="Open quick navigation (Cmd+K)"
         title="Quick navigation"
       >
@@ -186,6 +190,8 @@ export const CommandPalette = () => {
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={close} />
 
             <motion.div
+              ref={dialogRef}
+              tabIndex={-1}
               role="dialog"
               aria-modal="true"
               aria-label="Quick navigation"
@@ -215,7 +221,7 @@ export const CommandPalette = () => {
 
               <div data-lenis-prevent className="max-h-[50vh] overflow-y-auto py-2">
                 {filtered.length === 0 && (
-                  <p className="px-5 py-6 text-sm text-white/40 text-center">No matches found.</p>
+                  <p className="px-5 py-6 text-sm text-white/60 text-center">No matches found.</p>
                 )}
 
                 {(["Sections", "Pages", "Projects", "Writing"] as const).map((group) => {

@@ -50,7 +50,7 @@ export const MobileTouchRipple = () => {
   if (!isMobile) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[75] overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none z-[75] overflow-hidden print:hidden">
       <AnimatePresence>
         {ripples.map((ripple) => (
           <motion.div

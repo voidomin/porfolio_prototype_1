@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -8,6 +7,9 @@ import { ArrowDown, MapPin, CircleDot } from "lucide-react";
 import { personalProfile } from "@/data/portfolio";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { PerspectiveTilt } from "@/components/ui/PerspectiveTilt";
+import { SectionErrorBoundary } from "@/components/ui/SectionErrorBoundary";
+import { useIsDesktopPointer } from "@/hooks/useIsDesktopPointer";
+import { scrollTo } from "@/lib/lenis";
 
 // Real three.js + react-three-fiber scene — dynamically imported with
 // ssr:false (Canvas needs real WebGL/browser APIs that break Next's
@@ -26,14 +28,7 @@ const HeroScene = dynamic(() => import("@/components/three/HeroScene"), { ssr: f
 
 export const HeroSection = () => {
   const prefersReducedMotion = useReducedMotion();
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsDesktop(window.innerWidth >= 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
+  const isDesktop = useIsDesktopPointer(768);
 
   const letterVariants = {
     hidden: { y: 80, opacity: 0, filter: "blur(8px)" },
@@ -75,7 +70,12 @@ export const HeroSection = () => {
           no pinning/fixed-position tricks. */}
       {isDesktop && !prefersReducedMotion && (
         <div className="absolute inset-0 z-[2]">
-          <HeroScene />
+          {/* Isolated from the rest of the hero — a WebGL context-creation
+              failure (old GPU, WebGL disabled, some in-app browsers) should
+              only lose the 3D graphic, not the headline/CTAs alongside it. */}
+          <SectionErrorBoundary name="hero-3d-scene">
+            <HeroScene />
+          </SectionErrorBoundary>
         </div>
       )}
 
@@ -176,6 +176,10 @@ export const HeroSection = () => {
           <Magnetic strength={10}>
             <motion.a
               href="#projects"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollTo("#projects");
+              }}
               className="inline-block px-8 py-4 bg-forest-950/5 backdrop-blur-md border border-forest-950/20 text-forest-950 font-semibold rounded-full hover:bg-forest-950/10 transition-all duration-300"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
@@ -186,6 +190,10 @@ export const HeroSection = () => {
           <Magnetic strength={10}>
             <motion.a
               href="#contact"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollTo("#contact");
+              }}
               className="inline-block px-8 py-4 bg-forest-800 text-white font-semibold rounded-full hover:bg-forest-700 transition-all duration-300 shadow-lg shadow-forest-900/10"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
@@ -241,6 +249,10 @@ export const HeroSection = () => {
       >
         <motion.a
           href="#about"
+          onClick={(e) => {
+            e.preventDefault();
+            scrollTo("#about");
+          }}
           className="flex flex-col items-center gap-2 text-forest-800/60 hover:text-forest-900 transition-colors"
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}

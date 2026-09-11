@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useSafeReducedMotion } from "@/hooks/useSafeReducedMotion";
 import { useRef, useState } from "react";
 import { Briefcase, Compass, Code2, Microscope, Database, TreePine } from "lucide-react";
 import { aboutStats, experienceTimeline, personalProfile } from "@/data/portfolio";
@@ -29,12 +30,17 @@ export const AboutSection = () => {
   // Depth parallax on the two decorative trees — the larger, ostensibly
   // "nearer" tree drifts further than the smaller, "further back" one, the
   // same near-things-move-more-than-far-things cue as real parallax.
+  const prefersReducedMotion = useSafeReducedMotion();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  const nearTreeY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
-  const farTreeY = useTransform(scrollYProgress, [0, 1], [-20, 20]);
+  const nearTreeY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? [0, 0] : [-50, 50]
+  );
+  const farTreeY = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [-20, 20]);
 
   return (
     <section

@@ -125,7 +125,7 @@ export const ChapterTitleIntro = () => {
   }, [scrollY]);
 
   return (
-    <div className="fixed bottom-6 left-6 z-[80] pointer-events-none select-none max-w-[340px] hidden md:block">
+    <div className="fixed bottom-6 left-6 z-[80] pointer-events-none select-none max-w-[340px] hidden md:block print:hidden">
       <AnimatePresence>
         {show && activeChapter && (
           <motion.div

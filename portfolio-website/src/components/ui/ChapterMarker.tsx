@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface ChapterMarkerProps {
@@ -19,6 +19,8 @@ interface ChapterMarkerProps {
    ────────────────────────────────────────────────────────── */
 
 export const ChapterMarker = ({ color, className = "" }: ChapterMarkerProps) => {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <motion.div
       initial={{ y: -24, opacity: 0 }}
@@ -37,7 +39,7 @@ export const ChapterMarker = ({ color, className = "" }: ChapterMarkerProps) => 
           d="M8,5 L23,9 L8,14 Z"
           fill={color}
           style={{ transformOrigin: "8px 9px" }}
-          animate={{ skewY: [0, 6, 0, -3, 0] }}
+          animate={prefersReducedMotion ? { skewY: 0 } : { skewY: [0, 6, 0, -3, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         />
       </svg>

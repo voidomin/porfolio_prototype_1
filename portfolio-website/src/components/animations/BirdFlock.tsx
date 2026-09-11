@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSafeReducedMotion } from "@/hooks/useSafeReducedMotion";
 
 /* ──────────────────────────────────────────────────────────
    BirdFlock – animated SVG birds that fly across the
@@ -78,7 +79,15 @@ const BirdShape = ({
 );
 
 export const BirdFlock = () => {
-  const prefersReducedMotion = useReducedMotion();
+  // useSafeReducedMotion, not framer-motion's own useReducedMotion — this
+  // return value gates whether the component renders an element at all
+  // (line below), and the raw hook can read the real preference
+  // synchronously on the client's very first render, which can differ from
+  // the server's default-false render and produce a real hydration
+  // mismatch (confirmed via Playwright with reducedMotion:"reduce" — it
+  // shifted every sibling rendered after this one, including
+  // InteractiveTrail's canvas, into a "missing tag" hydration error).
+  const prefersReducedMotion = useSafeReducedMotion();
   const [flocks, setFlocks] = useState<Flock[]>([]);
   const flockIdCounter = useRef(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -139,7 +148,10 @@ export const BirdFlock = () => {
   if (prefersReducedMotion || isMobile) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 5 }}>
+    <div
+      className="fixed inset-0 pointer-events-none overflow-hidden print:hidden"
+      style={{ zIndex: 5 }}
+    >
       <AnimatePresence>
         {flocks.map((flock) => (
           <div key={`flock-${flock.id}`}>

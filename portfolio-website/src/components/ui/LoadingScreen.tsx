@@ -7,12 +7,25 @@ export const LoadingScreen = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem("intro-seen")) return;
+    // sessionStorage can throw synchronously in some browser contexts
+    // (storage-blocking policies, certain private-browsing modes,
+    // sandboxed embeds) — fail open by skipping the intro rather than
+    // letting an unhandled throw here take down the whole app, since
+    // nothing in layout.tsx currently catches errors this high up.
+    try {
+      if (sessionStorage.getItem("intro-seen")) return;
+    } catch {
+      return;
+    }
     setVisible(true);
 
     const dismiss = () => {
       setVisible(false);
-      sessionStorage.setItem("intro-seen", "1");
+      try {
+        sessionStorage.setItem("intro-seen", "1");
+      } catch {
+        // best-effort only — a failed write just means the intro replays
+      }
     };
 
     // Auto-dismiss after the branded moment plays out — this is a full-viewport

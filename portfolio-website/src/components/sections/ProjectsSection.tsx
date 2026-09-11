@@ -10,6 +10,7 @@ import {
   useMotionValue,
   useMotionTemplate,
   useSpring,
+  useReducedMotion,
 } from "framer-motion";
 import { ExternalLink, Github, Feather } from "lucide-react";
 import { projects } from "@/data/portfolio";
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { focusReveal } from "@/lib/revealVariants";
 import { ChapterMarker } from "@/components/ui/ChapterMarker";
 import { scrollTo } from "@/lib/lenis";
+import { useIsDesktopPointer } from "@/hooks/useIsDesktopPointer";
 
 /* ──────────────────────────────────────────────────────────
    ProjectsSection – "Chapter 4: Stepping Stones"
@@ -127,6 +129,8 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
           }}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
+          onTouchEnd={handleMouseLeave}
+          onTouchCancel={handleMouseLeave}
           className="group relative rounded-3xl overflow-hidden border border-stone-200/40 bg-gradient-to-b from-[#efede6] to-[#ddd9cc]"
         >
           {/* Specular sheen reflection overlay */}
@@ -214,13 +218,11 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                   />
                 </motion.div>
 
-                {/* Hover actions panel */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: isHovered ? 1 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 bg-forest-955/60 backdrop-blur-[2px] flex items-center justify-center gap-3 z-30"
-                >
+                {/* Hover actions panel — CSS-driven opacity (group-hover +
+                    group-focus-within) rather than the isHovered React state,
+                    so the demo/GitHub links are actually visible when a
+                    keyboard user tabs to them, not just on mouse hover. */}
+                <div className="absolute inset-0 bg-forest-955/60 backdrop-blur-[2px] flex items-center justify-center gap-3 z-30 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300">
                   {displayDemoUrl && (
                     <motion.a
                       href={displayDemoUrl}
@@ -249,7 +251,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                       <Github className="w-4 h-4" />
                     </motion.a>
                   )}
-                </motion.div>
+                </div>
 
                 {/* Featured banner */}
                 {project.featured && (
@@ -804,16 +806,12 @@ function MobileLayout({
 
 export const ProjectsSection = () => {
   const [activeCategory, setActiveCategory] = useState<ProjectCategory | "all">("all");
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(globalThis.innerWidth >= 1024);
-    };
-    handleResize();
-    globalThis.addEventListener("resize", handleResize);
-    return () => globalThis.removeEventListener("resize", handleResize);
-  }, []);
+  const isDesktopPointer = useIsDesktopPointer(1024);
+  const prefersReducedMotion = useReducedMotion();
+  // The pinned horizontal-scroll-jack layout is a lot of continuous motion —
+  // reduced-motion visitors get the calmer grid (MobileLayout) regardless of
+  // screen width, not just individual animations toned down within it.
+  const isDesktop = isDesktopPointer && !prefersReducedMotion;
 
   const filteredProjects =
     activeCategory === "all" ? projects : projects.filter((p) => p.category === activeCategory);

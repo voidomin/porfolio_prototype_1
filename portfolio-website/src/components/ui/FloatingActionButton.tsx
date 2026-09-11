@@ -90,7 +90,7 @@ export const FloatingActionButton = () => {
 
   return (
     <motion.div
-      className="fixed bottom-6 right-6 z-50"
+      className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-6 z-50 print:hidden"
       initial={{ opacity: 0, scale: 0.7, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.7, y: 20 }}
@@ -138,6 +138,7 @@ export const FloatingActionButton = () => {
 
                 <motion.button
                   onClick={action.action}
+                  aria-label={action.label}
                   className={cn(
                     "w-11 h-11 rounded-full text-white shadow-lg",
                     "flex items-center justify-center transition-colors duration-200",
@@ -155,6 +156,8 @@ export const FloatingActionButton = () => {
         {/* Main compass button */}
         <motion.button
           onClick={() => setIsOpen(!isOpen)}
+          aria-label={isOpen ? "Close quick actions menu" : "Open quick actions menu"}
+          aria-expanded={isOpen}
           className={cn(
             "w-14 h-14 rounded-full shadow-xl",
             "bg-gradient-to-br from-forest-600 to-forest-800",

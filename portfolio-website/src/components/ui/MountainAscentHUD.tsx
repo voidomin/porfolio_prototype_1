@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useScrollProgress } from "@/hooks/useIntersectionObserver";
 import { cn } from "@/lib/utils";
 import { scrollTo } from "@/lib/lenis";
@@ -31,6 +31,7 @@ export const MountainAscentHUD = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const scrollPercentage = useScrollProgress();
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const handleScrollSpy = () => {
@@ -68,7 +69,7 @@ export const MountainAscentHUD = () => {
 
   return (
     <nav
-      className="fixed right-5 lg:right-8 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-center select-none pointer-events-auto"
+      className="fixed right-5 lg:right-8 top-1/2 -translate-y-1/2 z-40 hidden md:flex print:hidden flex-col items-center select-none pointer-events-auto"
       onMouseLeave={() => setHoveredItem(null)} // Returns to scroll-active dot solely when leaving the entire sidebar HUD
       aria-label="Hiking trail section navigator"
     >
@@ -135,7 +136,7 @@ export const MountainAscentHUD = () => {
                     <motion.div
                       layoutId="activeHalo"
                       className="absolute inset-0 rounded-full bg-forest-400/25"
-                      animate={{ scale: [1.0, 1.35, 1.0] }}
+                      animate={prefersReducedMotion ? { scale: 1 } : { scale: [1.0, 1.35, 1.0] }}
                       transition={{
                         scale: { duration: 1.0, repeat: Infinity, ease: "easeInOut" },
                         layout: { type: "spring", stiffness: 380, damping: 25 }, // High stiffness spring snap!

@@ -76,7 +76,10 @@ export const FloatingLeaves = () => {
   if (prefersReducedMotion || isMobile || !mounted) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 4 }}>
+    <div
+      className="fixed inset-0 pointer-events-none overflow-hidden print:hidden"
+      style={{ zIndex: 4 }}
+    >
       {leaves.map((leaf) => (
         <motion.div
           key={leaf.id}

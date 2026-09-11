@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Mail,
   MapPin,
@@ -268,6 +268,7 @@ export const ContactSection = () => {
   >([]);
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const mobile = globalThis.innerWidth < 768;
@@ -332,7 +333,14 @@ export const ContactSection = () => {
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
+      let data: { error?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Non-JSON response (e.g. an upstream proxy/CDN failure page) —
+        // fall through to the generic message below instead of surfacing
+        // a raw parse error to the user.
+      }
 
       if (!res.ok) {
         throw new Error(data.error ?? "Failed to send message.");
@@ -363,7 +371,7 @@ export const ContactSection = () => {
       }}
     >
       {/* Firefly particles */}
-      {mounted && (
+      {mounted && !prefersReducedMotion && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {fireflies.map((ff) => (
             <motion.div
@@ -409,13 +417,13 @@ export const ContactSection = () => {
             className="absolute inset-x-0 -top-10 h-40 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(240,84,30,0.2),transparent_65%)]"
           />
           <ChapterMarker color="#fbdf85" className="relative z-10" />
-          <p className="relative z-10 text-dusk-300/50 text-sm tracking-[0.3em] uppercase mb-4">
+          <p className="relative z-10 text-dusk-200/70 text-sm tracking-[0.3em] uppercase mb-4">
             Chapter Seven
           </p>
           <h2 className="relative z-10 text-4xl md:text-5xl font-bold text-white mb-4">
             Campfire at <span className="text-dawn-300">Dusk</span>
           </h2>
-          <p className="relative z-10 text-dusk-200/50 max-w-xl mx-auto">
+          <p className="relative z-10 text-dusk-100/70 max-w-xl mx-auto">
             Open to roles, collaborations, and thoughtful product work.
           </p>
         </motion.div>
@@ -553,13 +561,15 @@ export const ContactSection = () => {
                     fill="#f0541e"
                     opacity="0.85"
                     animate={
-                      isMobile
-                        ? { scaleY: [0.95, 1.05, 0.95], opacity: [0.75, 0.9, 0.75] }
-                        : {
-                            scaleY: [1, 1.15, 0.95, 1.08, 1],
-                            skewX: [0, -3, 3, -1, 0],
-                            y: [0, -2, 1, -1, 0],
-                          }
+                      prefersReducedMotion
+                        ? undefined
+                        : isMobile
+                          ? { scaleY: [0.95, 1.05, 0.95], opacity: [0.75, 0.9, 0.75] }
+                          : {
+                              scaleY: [1, 1.15, 0.95, 1.08, 1],
+                              skewX: [0, -3, 3, -1, 0],
+                              y: [0, -2, 1, -1, 0],
+                            }
                     }
                     transition={{
                       duration: isMobile ? 1.5 : 2.2,
@@ -575,13 +585,15 @@ export const ContactSection = () => {
                     fill="#ff9800"
                     opacity="0.95"
                     animate={
-                      isMobile
-                        ? { scaleY: [0.96, 1.04, 0.96], opacity: [0.85, 0.98, 0.85] }
-                        : {
-                            scaleY: [1, 0.92, 1.12, 0.97, 1],
-                            skewX: [0, 4, -4, 2, 0],
-                            y: [0, 1, -2, 1, 0],
-                          }
+                      prefersReducedMotion
+                        ? undefined
+                        : isMobile
+                          ? { scaleY: [0.96, 1.04, 0.96], opacity: [0.85, 0.98, 0.85] }
+                          : {
+                              scaleY: [1, 0.92, 1.12, 0.97, 1],
+                              skewX: [0, 4, -4, 2, 0],
+                              y: [0, 1, -2, 1, 0],
+                            }
                     }
                     transition={{
                       duration: isMobile ? 1.2 : 1.8,
@@ -596,12 +608,14 @@ export const ContactSection = () => {
                     d="M50 38C50 38 42 50 42 62C42 69 46 75 50 75C54 75 58 69 58 62C58 50 50 38 50 38Z"
                     fill="#ffeb3b"
                     animate={
-                      isMobile
-                        ? { scaleY: [0.97, 1.03, 0.97] }
-                        : {
-                            scaleY: [1, 1.1, 0.9, 1.05, 1],
-                            skewX: [0, -2, 2, 0, 0],
-                          }
+                      prefersReducedMotion
+                        ? undefined
+                        : isMobile
+                          ? { scaleY: [0.97, 1.03, 0.97] }
+                          : {
+                              scaleY: [1, 1.1, 0.9, 1.05, 1],
+                              skewX: [0, -2, 2, 0, 0],
+                            }
                     }
                     transition={{
                       duration: isMobile ? 1.0 : 1.3,
@@ -715,7 +729,9 @@ export const ContactSection = () => {
                   ) : (
                     <AlertCircle className="w-5 h-5" />
                   )}
-                  <span className="text-sm">{formState.message}</span>
+                  <span className="text-sm" role="alert">
+                    {formState.message}
+                  </span>
                 </motion.div>
               )}
 

@@ -19,11 +19,13 @@ import {
   Pause,
   Copy,
   Check,
+  ImageOff,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { galleryImages } from "@/data/portfolio";
 import { GalleryImage } from "@/types";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 interface OptimizedImageProps {
   src: string;
@@ -47,6 +49,16 @@ const OptimizedImage = ({
   priority = false,
 }: OptimizedImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return (
+      <div className="relative w-full h-full min-h-[140px] overflow-hidden flex flex-col items-center justify-center gap-2 bg-stone-900 text-stone-600">
+        <ImageOff className="w-6 h-6" />
+        <span className="text-[9px] uppercase tracking-wider font-semibold">Image unavailable</span>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative w-full h-full overflow-hidden ${isLoaded ? "" : "pulse-shimmer"}`}>
@@ -60,6 +72,7 @@ const OptimizedImage = ({
         sizes={sizes}
         quality={90}
         onLoad={() => setIsLoaded(true)}
+        onError={() => setHasError(true)}
         className={`transition-opacity duration-700 ease-out ${
           isLoaded ? "opacity-100" : "opacity-0"
         } ${className}`}
@@ -210,6 +223,10 @@ export default function PhotographyGalleryPage() {
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const lightboxRef = useRef<HTMLDivElement>(null);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const markImageFailed = (id: string) =>
+    setFailedImages((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
 
   // Theme, clipboard and touch states
   const [galleryTheme, setGalleryTheme] = useState<"minimal" | "matte">("minimal");
@@ -345,6 +362,8 @@ export default function PhotographyGalleryPage() {
     globalThis.addEventListener("keydown", handleKeyDown);
     return () => globalThis.removeEventListener("keydown", handleKeyDown);
   }, [selectedPhoto, isCinemaMode, nextPhoto, prevPhoto]);
+
+  useFocusTrap(Boolean(selectedPhoto), lightboxRef);
 
   // Body scroll lock when lightbox is open
   useEffect(() => {
@@ -612,14 +631,24 @@ export default function PhotographyGalleryPage() {
 
                   {/* Canvas frame container */}
                   <div className="relative flex-1 bg-black overflow-hidden w-full h-full">
-                    <Image
-                      src={photo.src}
-                      alt={photo.alt}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover/item:scale-103"
-                      draggable="false"
-                    />
+                    {failedImages.has(photo.id) ? (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-stone-600">
+                        <ImageOff className="w-6 h-6" />
+                        <span className="text-[9px] uppercase tracking-wider font-semibold">
+                          Image unavailable
+                        </span>
+                      </div>
+                    ) : (
+                      <Image
+                        src={photo.src}
+                        alt={photo.alt}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        onError={() => markImageFailed(photo.id)}
+                        className="object-cover transition-transform duration-700 ease-out group-hover/item:scale-103"
+                        draggable="false"
+                      />
+                    )}
 
                     {/* Overlay details showing EXIF metadata on hover */}
                     <div className="absolute inset-0 bg-stone-950/85 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-5 text-stone-350 select-none whitespace-normal z-10">
@@ -915,9 +944,12 @@ export default function PhotographyGalleryPage() {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 md:p-8 bg-stone-950/98 backdrop-blur-xl"
+            ref={lightboxRef}
+            tabIndex={-1}
+            className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 md:p-8 bg-stone-950/98 backdrop-blur-xl focus:outline-none"
             role="dialog"
             aria-modal="true"
+            aria-label={`${selectedPhoto.title || "Photo"} — full view`}
           >
             {/* Background close click */}
             <button
@@ -986,14 +1018,24 @@ export default function PhotographyGalleryPage() {
                     backgroundPosition: "center",
                   }}
                 />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={selectedPhoto.src}
-                  alt={selectedPhoto.alt}
-                  className="relative z-10 block max-w-full object-contain select-none"
-                  style={{ maxHeight: "min(72vh, 55vw)" }}
-                  draggable="false"
-                />
+                {failedImages.has(selectedPhoto.id) ? (
+                  <div className="relative z-10 flex flex-col items-center justify-center gap-3 text-stone-600 py-24">
+                    <ImageOff className="w-10 h-10" />
+                    <span className="text-xs uppercase tracking-wider font-semibold">
+                      Image unavailable
+                    </span>
+                  </div>
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={selectedPhoto.src}
+                    alt={selectedPhoto.alt}
+                    onError={() => markImageFailed(selectedPhoto.id)}
+                    className="relative z-10 block max-w-full object-contain select-none"
+                    style={{ maxHeight: "min(72vh, 55vw)" }}
+                    draggable="false"
+                  />
+                )}
 
                 {/* Loupe magnifier circular display */}
                 {showLoupe && (

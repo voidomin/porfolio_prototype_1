@@ -154,11 +154,11 @@ export const Footer = () => {
           </div>
 
           {/* Copyright */}
-          <p className="text-sm text-night-300/40">
+          <p className="text-sm text-night-300/70">
             © {currentYear} {personalProfile.name}. Built with calm focus and care under starlit
             skies.
           </p>
-          <p className="mt-2 text-xs text-night-400/30 font-mono">
+          <p className="mt-2 text-xs text-night-300/60 font-mono">
             Next.js · TypeScript · Tailwind CSS · Framer Motion
           </p>
         </motion.div>

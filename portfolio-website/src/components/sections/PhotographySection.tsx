@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { useSafeReducedMotion } from "@/hooks/useSafeReducedMotion";
 import {
   Camera,
   MapPin,
@@ -12,6 +13,7 @@ import {
   ChevronRight,
   X,
   ArrowRight,
+  ImageOff,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -19,6 +21,7 @@ import { galleryImages } from "@/data/portfolio";
 import { GalleryImage } from "@/types";
 import { glowBloomReveal } from "@/lib/revealVariants";
 import { ChapterMarker } from "@/components/ui/ChapterMarker";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 /* ──────────────────────────────────────────────────────────
    PhotographySection – "Chapter 6: Golden Hour"
    A highly elegant, premium photography portfolio.
@@ -32,18 +35,29 @@ export const PhotographySection = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<GalleryImage | null>(null);
   const [photoIndex, setPhotoIndex] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const markImageFailed = (id: string) =>
+    setFailedImages((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
 
   const carouselContainerRef = useRef<HTMLDivElement>(null);
   const carouselTrackRef = useRef<HTMLDivElement>(null);
+  const lightboxRef = useRef<HTMLDivElement>(null);
   const [dragConstraintsLeft, setDragConstraintsLeft] = useState(0);
 
+  useFocusTrap(Boolean(selectedPhoto), lightboxRef);
+
   const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useSafeReducedMotion();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  const glowNearY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
-  const glowFarY = useTransform(scrollYProgress, [0, 1], [-15, 15]);
+  const glowNearY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? [0, 0] : [-30, 30]
+  );
+  const glowFarY = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [-15, 15]);
 
   // Memoized — only recomputes when the active category filter changes
   const filteredPhotos = useMemo(
@@ -243,14 +257,24 @@ export const PhotographySection = () => {
                           photo.width && photo.height ? `${photo.width}/${photo.height}` : "3/2",
                       }}
                     >
-                      <Image
-                        src={photo.src}
-                        alt={photo.alt}
-                        fill
-                        sizes="(max-width: 640px) 180px, (max-width: 1024px) 240px, 280px"
-                        quality={90}
-                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
-                      />
+                      {failedImages.has(photo.id) ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-stone-100 text-stone-400">
+                          <ImageOff className="w-6 h-6" />
+                          <span className="text-[10px] uppercase tracking-wider font-semibold">
+                            Image unavailable
+                          </span>
+                        </div>
+                      ) : (
+                        <Image
+                          src={photo.src}
+                          alt={photo.alt}
+                          fill
+                          sizes="(max-width: 640px) 180px, (max-width: 1024px) 240px, 280px"
+                          quality={90}
+                          onError={() => markImageFailed(photo.id)}
+                          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                        />
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-between p-4">
                         {photo.exif?.location && (
                           <span className="text-white text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 drop-shadow-sm">
@@ -301,10 +325,13 @@ export const PhotographySection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/95 backdrop-blur-xl"
+            ref={lightboxRef}
+            tabIndex={-1}
+            className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/95 backdrop-blur-xl focus:outline-none"
             data-lenis-prevent
             role="dialog"
             aria-modal="true"
+            aria-label={`${selectedPhoto.title || "Photo"} — full view`}
           >
             {/* Click backdrop to close */}
             <div className="fixed inset-0 cursor-default" onClick={() => setSelectedPhoto(null)} />
@@ -331,13 +358,23 @@ export const PhotographySection = () => {
                       backgroundPosition: "center",
                     }}
                   />
-                  {/* eslint-disable-next-line @next/next/no-img-element -- lightbox needs the image's natural aspect ratio, which next/image's required width/height fights */}
-                  <img
-                    src={selectedPhoto.src}
-                    alt={selectedPhoto.alt}
-                    className="relative z-10 block max-w-full max-h-[90vh] lg:max-h-[90vh] object-contain"
-                    style={{ maxHeight: "min(90vh, 70vw)" }}
-                  />
+                  {failedImages.has(selectedPhoto.id) ? (
+                    <div className="relative z-10 flex flex-col items-center justify-center gap-3 text-stone-500 py-24">
+                      <ImageOff className="w-10 h-10" />
+                      <span className="text-xs uppercase tracking-wider font-semibold">
+                        Image unavailable
+                      </span>
+                    </div>
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element -- lightbox needs the image's natural aspect ratio, which next/image's required width/height fights
+                    <img
+                      src={selectedPhoto.src}
+                      alt={selectedPhoto.alt}
+                      onError={() => markImageFailed(selectedPhoto.id)}
+                      className="relative z-10 block max-w-full max-h-[90vh] lg:max-h-[90vh] object-contain"
+                      style={{ maxHeight: "min(90vh, 70vw)" }}
+                    />
+                  )}
 
                   {/* Photo counter pill */}
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-full bg-stone-950/70 backdrop-blur-sm border border-white/10 text-[10px] font-bold text-stone-400 tabular-nums">

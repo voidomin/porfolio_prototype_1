@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useSafeReducedMotion } from "@/hooks/useSafeReducedMotion";
 import { Leaf, Camera, Music, Mountain, type LucideIcon } from "lucide-react";
 import { skills, hobbies } from "@/data/portfolio";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
@@ -186,12 +187,17 @@ const StatCard = ({
 
 export const SkillsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useSafeReducedMotion();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  const glowNearY = useTransform(scrollYProgress, [0, 1], [-35, 35]);
-  const glowFarY = useTransform(scrollYProgress, [0, 1], [-15, 15]);
+  const glowNearY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? [0, 0] : [-35, 35]
+  );
+  const glowFarY = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [-15, 15]);
 
   const groupedSkills = skills.reduce(
     (acc, skill) => {
