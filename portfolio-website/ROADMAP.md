@@ -29,6 +29,13 @@ What's pending, organized by area. See `CHANGELOG.md` for everything already shi
 - [ ] Admin CMS (`src/app/admin/upload/page.tsx` + `src/app/api/admin/*`) has zero test coverage — confirmed fully wired and functional, but nothing would catch a regression. Good first candidate for a formal development phase.
 - [ ] Real E2E test coverage — the one existing test (`src/app/photography/page.test.tsx`, Jest + RTL) is genuine and passes, but thin. `playwright` was installed with zero config/usage and has now been removed; if E2E testing is wanted, it should be added deliberately with a real `playwright.config.ts`, not left as an unused install.
 
+## Flagged during the Phase 1 hardening pass (2026-09) — need visual/content judgment, not auto-fixed
+
+- [ ] Sub-44px touch targets — the mobile sound toggle in `Navbar.tsx` (~28px) and `MountainAscentHUD.tsx`'s checkpoint buttons (~20px) are both under the 44×44px minimum. A blind CSS bump risks visibly breaking the HUD's tight vertical spacing, and this environment can't re-verify that live on a real mobile browser — needs a pass with actual visual verification, not a drive-by change.
+- [ ] `100vh`/mobile-viewport bug — `ProjectsSection.tsx`'s desktop pinned-scroll height is computed in JS from `window.innerHeight`, not just a CSS unit, so the classic mobile address-bar-resize issue needs its own careful look (both the JS math and `HeroSection.tsx`'s `min-h-screen` scroll-cue positioning) rather than a drive-by `dvh` swap.
+- [ ] Alt text quality — project/blog card images (`ProjectsSection.tsx`, `projects/[slug]/page.tsx`, `blog/[slug]/page.tsx`, `blog/page.tsx`) use the title as `alt` text rather than a real description of the image content. `gallery.json`'s photography entries already do this properly (genuinely descriptive alt text) — this is a content-writing decision for the rest, not a code defect.
+- [ ] `FloatingActionButton.tsx`'s spring/rotate open/close animation doesn't check `prefers-reduced-motion` — lower priority than the fixes already made in this pass since it's a one-shot, interaction-triggered transition, not a continuous loop.
+
 ---
 
 ## Code Quality & Tooling
