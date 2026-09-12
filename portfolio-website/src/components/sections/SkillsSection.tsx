@@ -8,7 +8,6 @@ import { skills, hobbies } from "@/data/portfolio";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { AccentLineReveal } from "@/components/ui/AccentLineReveal";
 import { ChapterMarker } from "@/components/ui/ChapterMarker";
-import { LeafShape } from "@/components/ui/LeafShape";
 import { Skill, type SkillCategory } from "@/types";
 
 // Keyword match against the hobbies list — same "map a small fixed list to an
@@ -71,22 +70,21 @@ const SkillBar = ({ skill, index }: { skill: Skill; index: number }) => (
             : "linear-gradient(90deg, #7db523, #9bcf3a)",
         }}
       >
-        {/* Vine tip — a leaf sprouts once the vine finishes growing.
-            Uses the same hand-drawn LeafShape as FloatingLeaves.tsx rather
-            than lucide-react's outline Leaf icon: that icon's stem is an
-            open (unclosed) path meant to be stroked, not filled — forcing
-            fill="currentColor" on it (as this used to) auto-closes that
-            open path for filling, producing a stray wedge that overlaps
-            the main leaf shape and reads as an indistinct blob at 12px. */}
+        {/* Vine tip — a small glow lights up once the vine finishes growing.
+            Previously a leaf silhouette (LeafShape), but even the corrected
+            shape reads as an indistinct pointed mark rather than a
+            recognizable leaf at this scale — a plain glowing dot in the
+            skill's own accent color reads cleanly at any size instead. */}
         <motion.div
           initial={{ opacity: 0, scale: 0.4 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ delay: index * 0.06 + 1.1, duration: 0.35, ease: "backOut" }}
-          className="absolute right-0 top-1/2 -translate-y-1/2 rotate-45 drop-shadow-sm"
-        >
-          <LeafShape size={9} color="white" />
-        </motion.div>
+          className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white"
+          style={{
+            boxShadow: `0 0 6px 2px ${skill.color ?? "#7db523"}aa, 0 0 2px 1px rgba(255,255,255,0.9)`,
+          }}
+        />
       </motion.div>
     </div>
   </motion.div>
