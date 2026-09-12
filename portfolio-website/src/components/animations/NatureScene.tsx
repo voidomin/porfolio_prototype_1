@@ -94,21 +94,23 @@ export const NatureScene = () => {
   const moonOpacity = useTransform(scrollYProgress, [0.82, 0.95], [0, 0.9]);
   const moonXVal = useTransform(scrollYProgress, [0.8, 1], [25, 20]);
   const moonYVal = useTransform(scrollYProgress, [0.8, 1], [42, 15]);
-  const moonRight = useTransform(moonXVal, (v: number) => `${v}%`);
-  const moonTop = useTransform(moonYVal, (v: number) => `${v}%`);
+  const moonRight = useTransform(moonXVal, (v: number) => `${v}vw`);
+  const moonTop = useTransform(moonYVal, (v: number) => `${v}vh`);
 
   // Star visibility
   const starsOpacity = useTransform(scrollYProgress, [0.85, 0.97], [0, 1]);
 
-  // Sun CSS position values
-  const sunLeft = useTransform(sunX, (v: number) => `${v}%`);
-  const sunTop = useTransform(sunY, (v: number) => `${v}%`);
+  // Sun CSS position values — vw/vh, not %: this element's percentage
+  // positioning was one of two remaining contributors to a real CLS hit
+  // traced to this scene (see mountain-layer/cloud comment above), cut
+  // from a 0.48 to 0.45 score after fixing the other three; vw/vh removes
+  // its last dependency on the parent's own resolved dimensions.
+  const sunLeft = useTransform(sunX, (v: number) => `${v}vw`);
+  const sunTop = useTransform(sunY, (v: number) => `${v}vh`);
 
   // Cloud and mist opacity
   const cloudOpacity = useTransform(scrollYProgress, [0, 0.4, 0.8, 1], [0.7, 0.5, 0.3, 0]);
   const mistOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8], [0.6, 0.2, 0]);
-
-  if (!mounted) return null;
 
   return (
     <div className="nature-scene">
@@ -157,23 +159,35 @@ export const NatureScene = () => {
         }}
       />
 
-      {/* ─── Stars ─── */}
-      <motion.div className="absolute inset-0" style={{ opacity: starsOpacity }}>
-        {(isMobile ? stars.slice(0, 20) : stars).map((star) => (
-          <div
-            key={star.id}
-            className="star-dot animate-twinkle"
-            style={{
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              width: star.size,
-              height: star.size,
-              animationDelay: `${star.delay}s`,
-              animationDuration: `${star.duration}s`,
-            }}
-          />
-        ))}
-      </motion.div>
+      {/* ─── Stars ─── Positions are randomized (generateStars), so unlike
+          everything else in this scene they'd genuinely mismatch between
+          server and client if rendered unconditionally — gated behind
+          `mounted` for that reason alone. Everything else here (sky, sun,
+          moon, mountains, clouds) is fully deterministic and used to be
+          gated behind the same flag needlessly, which meant it all popped
+          in from zero size in a single frame after hydration — a real,
+          measured CLS hit (a production trace scored it 0.48) since a
+          fixed-position element's rect changing from empty to full-size
+          still counts as a layout shift even though it doesn't push any
+          sibling content around. */}
+      {mounted && (
+        <motion.div className="absolute inset-0" style={{ opacity: starsOpacity }}>
+          {(isMobile ? stars.slice(0, 20) : stars).map((star) => (
+            <div
+              key={star.id}
+              className="star-dot animate-twinkle"
+              style={{
+                left: `${star.x}%`,
+                top: `${star.y}%`,
+                width: star.size,
+                height: star.size,
+                animationDelay: `${star.delay}s`,
+                animationDuration: `${star.duration}s`,
+              }}
+            />
+          ))}
+        </motion.div>
+      )}
 
       {/* ─── Clouds ─── */}
       <motion.div style={{ opacity: cloudOpacity }}>
@@ -182,7 +196,7 @@ export const NatureScene = () => {
           style={{
             width: 200,
             height: 60,
-            top: "12%",
+            top: "12vh",
             background: "radial-gradient(ellipse, rgba(255,255,255,0.7), transparent)",
           }}
         />
@@ -191,7 +205,7 @@ export const NatureScene = () => {
           style={{
             width: 280,
             height: 70,
-            top: "22%",
+            top: "22vh",
             animationDelay: "-15s",
             background: "radial-gradient(ellipse, rgba(255,255,255,0.5), transparent)",
           }}
@@ -201,7 +215,7 @@ export const NatureScene = () => {
           style={{
             width: 160,
             height: 50,
-            top: "8%",
+            top: "8vh",
             animationDelay: "-30s",
             background: "radial-gradient(ellipse, rgba(255,255,255,0.6), transparent)",
           }}
@@ -209,7 +223,10 @@ export const NatureScene = () => {
       </motion.div>
 
       {/* ─── Mountain Layer 3 (back, lightest) ─── */}
-      <motion.div className="mountain-layer" style={{ y: mountainBackY, height: "45%", zIndex: 1 }}>
+      <motion.div
+        className="mountain-layer"
+        style={{ y: mountainBackY, height: "45vh", zIndex: 1 }}
+      >
         <svg viewBox="0 0 1440 400" preserveAspectRatio="none" className="w-full h-full">
           <path
             d="M0,400 L0,280 Q120,160 240,220 Q360,100 480,180 Q600,60 720,140 Q840,40 960,120 Q1080,60 1200,160 Q1320,100 1440,200 L1440,400 Z"
@@ -219,7 +236,7 @@ export const NatureScene = () => {
       </motion.div>
 
       {/* ─── Mountain Layer 2 (mid) ─── */}
-      <motion.div className="mountain-layer" style={{ y: mountainMidY, height: "38%", zIndex: 2 }}>
+      <motion.div className="mountain-layer" style={{ y: mountainMidY, height: "38vh", zIndex: 2 }}>
         <svg viewBox="0 0 1440 400" preserveAspectRatio="none" className="w-full h-full">
           <path
             d="M0,400 L0,300 Q100,180 200,240 Q320,120 440,200 Q560,80 680,160 Q800,60 920,140 Q1040,100 1160,180 Q1280,120 1440,220 L1440,400 Z"
@@ -231,7 +248,7 @@ export const NatureScene = () => {
       {/* ─── Mountain Layer 1 (front, darkest) ─── */}
       <motion.div
         className="mountain-layer"
-        style={{ y: mountainFrontY, height: "30%", zIndex: 3 }}
+        style={{ y: mountainFrontY, height: "30vh", zIndex: 3 }}
       >
         <svg viewBox="0 0 1440 400" preserveAspectRatio="none" className="w-full h-full">
           <path

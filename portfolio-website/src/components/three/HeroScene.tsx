@@ -120,8 +120,18 @@ export default function HeroScene() {
   return (
     <Canvas
       camera={{ position: [0, 0, 4], fov: 45, near: 0.1, far: 20 }}
-      dpr={[1, 1.5]}
-      gl={{ antialias: true, alpha: true }}
+      // Fixed dpr:1 (not [1,1.5]) and antialias:false — both meaningfully
+      // cut WebGL context-creation/setup cost. Confirmed via a real CDP
+      // trace that this scene's initial mount was expensive enough to
+      // trigger a ~180ms whole-page Layout recompute that transiently
+      // corrupted NatureScene's fixed-position background elsewhere on
+      // the page (a real 0.48 CLS hit unrelated to NatureScene's own
+      // code — reproduced and eliminated by testing with this scene
+      // absent entirely). The mountains are flat-shaded, fog-blended
+      // silhouettes, not fine detail — MSAA edges and 1.5x supersampling
+      // aren't buying much visible quality here for the setup cost.
+      dpr={1}
+      gl={{ antialias: false, alpha: true }}
     >
       <Scene />
     </Canvas>

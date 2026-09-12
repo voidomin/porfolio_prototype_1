@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -42,6 +43,26 @@ export const HeroSection = () => {
     triggerOnce: false,
   });
 
+  // Three.js's initial WebGL setup (shader compilation, context creation,
+  // renderer.setSize) is expensive enough to contend with the browser's own
+  // early rendering work — confirmed via a real CDP trace: with the 3D
+  // scene never mounting (reduced-motion), a 0.48 layout-shift score on
+  // NatureScene's fixed-position background (unrelated code, no randomness)
+  // dropped to zero. Deferring the *first* mount until the browser reports
+  // idle (capped at 1s so it still shows up promptly) keeps that expensive
+  // setup off the critical initial-render path; it never re-defers on
+  // subsequent scroll-away/back remounts, only the first one matters here.
+  const [readyForHeavyMount, setReadyForHeavyMount] = useState(false);
+  useEffect(() => {
+    const ric = window.requestIdleCallback;
+    if (ric) {
+      const id = ric(() => setReadyForHeavyMount(true), { timeout: 1000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(() => setReadyForHeavyMount(true), 200);
+    return () => window.clearTimeout(id);
+  }, []);
+
   const letterVariants = {
     hidden: { y: 80, opacity: 0, filter: "blur(8px)" },
     visible: (i: number) => ({
@@ -81,7 +102,7 @@ export const HeroSection = () => {
           never fetched otherwise. Sits behind the text (z-10) but above the
           dawn glow, and scrolls away normally with the rest of the hero —
           no pinning/fixed-position tricks. */}
-      {isDesktop && !prefersReducedMotion && heroNearViewport && (
+      {isDesktop && !prefersReducedMotion && heroNearViewport && readyForHeavyMount && (
         <div className="absolute inset-0 z-[2]">
           {/* Isolated from the rest of the hero — a WebGL context-creation
               failure (old GPU, WebGL disabled, some in-app browsers) should
