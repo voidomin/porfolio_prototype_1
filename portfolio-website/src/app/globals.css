@@ -88,8 +88,26 @@ html {
   background: linear-gradient(180deg, #f8cc4d, #5aaf5a, #8180f9);
 }
 
+/* Deliberately NOT smooth — Lenis (SmoothScroll.tsx) already provides all
+   intentional smooth scrolling, writing `scrollTop` directly on this
+   element on every animation frame. With `scroll-behavior: smooth` set
+   here, each of those per-frame writes restarted the browser's own native
+   smooth-scroll animation before the previous one could make any real
+   progress, so under sustained high-frequency input (a real two-finger
+   trackpad gesture, not a discrete mouse-wheel click) the page's actual
+   scroll position barely moved at all, even though Lenis's own internal
+   state advanced correctly — confirmed directly: Lenis's targetScroll
+   climbed into the thousands while window.scrollY sat at 0 the entire
+   time. Reported as "scrolling gets stuck/locks up on trackpad, but
+   keyboard arrows and mobile touch scroll fine" — keyboard scrolling
+   isn't Lenis-driven at all, and touch scrolling bypasses Lenis's
+   scrollTop writes entirely (syncTouch is off), so neither was affected.
+   Anchor-jump navigation still animates smoothly regardless — every
+   internal link goes through scrollTo() (src/lib/lenis.ts), whose native
+   fallback passes behavior:"smooth" as a JS API option, which overrides
+   this CSS property for that call regardless of this value. */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 /* ─── Nature Scene Layers ─── */
