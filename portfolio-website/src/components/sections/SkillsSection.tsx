@@ -74,17 +74,27 @@ const SkillBar = ({ skill, index }: { skill: Skill; index: number }) => (
             Previously a leaf silhouette (LeafShape), but even the corrected
             shape reads as an indistinct pointed mark rather than a
             recognizable leaf at this scale — a plain glowing dot in the
-            skill's own accent color reads cleanly at any size instead. */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.4 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: index * 0.06 + 1.1, duration: 0.35, ease: "backOut" }}
-          className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white"
-          style={{
-            boxShadow: `0 0 6px 2px ${skill.color ?? "#7db523"}aa, 0 0 2px 1px rgba(255,255,255,0.9)`,
-          }}
-        />
+            skill's own accent color reads cleanly at any size instead.
+            Centering lives on this plain, non-animated wrapper — framer
+            motion's own scale animation on the inner element writes its
+            own inline `transform`, which would otherwise silently
+            overwrite Tailwind's -translate-y-1/2 on the same element (the
+            exact bug already fixed once this session for the Navbar's
+            active-section dot, the hero scroll prompt, and
+            StorybookCursor's tooltip — reintroduced here, now fixed the
+            same way). */}
+        <span className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.4 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.06 + 1.1, duration: 0.35, ease: "backOut" }}
+            className="w-2.5 h-2.5 rounded-full bg-white"
+            style={{
+              boxShadow: `0 0 6px 2px ${skill.color ?? "#7db523"}aa, 0 0 2px 1px rgba(255,255,255,0.9)`,
+            }}
+          />
+        </span>
       </motion.div>
     </div>
   </motion.div>
