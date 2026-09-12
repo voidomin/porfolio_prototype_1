@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -20,6 +20,7 @@ import { focusReveal } from "@/lib/revealVariants";
 import { ChapterMarker } from "@/components/ui/ChapterMarker";
 import { scrollTo } from "@/lib/lenis";
 import { useIsDesktopPointer } from "@/hooks/useIsDesktopPointer";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
 /* ──────────────────────────────────────────────────────────
    ProjectsSection – "Chapter 4: Stepping Stones"
@@ -537,6 +538,12 @@ interface DesktopLayoutProps {
   readonly canScrollRight: boolean;
   readonly handleCategoryChange: (cat: ProjectCategory | "all") => void;
   readonly scrollToProject: (index: number) => void;
+  /** The river-flow background SVG's stroke-dashoffset keyframe animations
+   * run forever once started (they're plain CSS classes) — only apply them
+   * while the section is actually near the viewport, confirmed via a real
+   * production trace flagging this exact svg.w-full.h-full element for
+   * continuous non-composited animation cost. */
+  readonly riverAnimationActive: boolean;
 }
 
 function DesktopLayout({
@@ -552,6 +559,7 @@ function DesktopLayout({
   canScrollRight,
   handleCategoryChange,
   scrollToProject,
+  riverAnimationActive,
 }: DesktopLayoutProps) {
   return (
     <div
@@ -570,7 +578,7 @@ function DesktopLayout({
             stroke="currentColor"
             strokeWidth="2"
             strokeDasharray="10,12"
-            className="animate-river-flow-1"
+            className={riverAnimationActive ? "animate-river-flow-1" : undefined}
           />
           <path
             d="M 100,450 Q 500,400 900,450 T 1700,450 T 2500,450 T 3300,450"
@@ -578,7 +586,7 @@ function DesktopLayout({
             stroke="currentColor"
             strokeWidth="1.5"
             strokeDasharray="6,8"
-            className="animate-river-flow-2"
+            className={riverAnimationActive ? "animate-river-flow-2" : undefined}
           />
           <path
             d="M 50,700 Q 450,780 850,700 T 1650,700 T 2450,700 T 3250,700"
@@ -586,7 +594,7 @@ function DesktopLayout({
             stroke="currentColor"
             strokeWidth="2"
             strokeDasharray="14,14"
-            className="animate-river-flow-3"
+            className={riverAnimationActive ? "animate-river-flow-3" : undefined}
           />
         </svg>
       </div>
@@ -824,10 +832,22 @@ export const ProjectsSection = () => {
     setActiveCategory(category);
   };
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
+
+  // Purely additive — observes the same section without touching any of
+  // the existing pin/scroll math above.
+  const { elementRef: nearViewportRef, isIntersecting: riverAnimationActive } =
+    useIntersectionObserver({ rootMargin: "50% 0px 50% 0px", triggerOnce: false });
+  const setSectionRef = useCallback(
+    (el: HTMLElement | null) => {
+      nearViewportRef.current = el;
+      containerRef.current = isDesktop ? (el as HTMLDivElement | null) : null;
+    },
+    [isDesktop, nearViewportRef]
+  );
 
   const progressBarRef = useRef<HTMLDivElement>(null);
   const progressTextRef = useRef<HTMLSpanElement>(null);
@@ -855,7 +875,7 @@ export const ProjectsSection = () => {
   return (
     <section
       id="projects"
-      ref={isDesktop ? containerRef : undefined}
+      ref={setSectionRef}
       className={cn(
         "relative",
         isDesktop ? "py-0 overflow-visible" : "overflow-hidden py-24 md:py-32"
@@ -887,6 +907,7 @@ export const ProjectsSection = () => {
           canScrollRight={currentIndex < filteredProjects.length - 1}
           handleCategoryChange={handleCategoryChange}
           scrollToProject={scrollToProject}
+          riverAnimationActive={riverAnimationActive}
         />
       ) : (
         <MobileLayout

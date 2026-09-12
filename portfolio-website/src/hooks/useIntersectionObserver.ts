@@ -15,7 +15,7 @@ export const useIntersectionObserver = ({
   triggerOnce = true,
 }: UseIntersectionObserverProps = {}) => {
   const [isIntersecting, setIsIntersecting] = useState(false);
-  const elementRef = useRef<HTMLElement>(null);
+  const elementRef = useRef<HTMLElement | null>(null);
   // Ref, not state — reading/writing it must never re-run this effect and
   // recreate the observer on every trigger.
   const hasTriggeredRef = useRef(false);

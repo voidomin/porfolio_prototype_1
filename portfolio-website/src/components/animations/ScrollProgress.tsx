@@ -54,12 +54,18 @@ export const ScrollProgress: React.FC = () => {
         }}
       />
 
-      {/* Sun/Moon dot at the leading edge */}
+      {/* Sun/Moon dot at the leading edge — positioned via transform only
+          (never `left`), which is a layout-triggering property: animating
+          it forces a synchronous reflow on every scroll-driven update and
+          registers as continuous layout shift, exactly what a real
+          production CLS trace (0.54, "Poor") flagged against this
+          div.fixed.top-0.z-[61] element. `calc(Nvw - 50%)` does both jobs
+          — travel across the viewport width and self-centering — in one
+          compositor-only transform. */}
       <motion.div
-        className="fixed top-0 z-[61] pointer-events-none print:hidden"
+        className="fixed top-0 left-0 z-[61] pointer-events-none print:hidden"
         style={{
-          left: useTransform(smoothProgress, (v) => `${v * 100}%`),
-          x: "-50%",
+          x: useTransform(smoothProgress, (v) => `calc(${v * 100}vw - 50%)`),
         }}
       >
         <motion.div

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { LeafShape } from "@/components/ui/LeafShape";
 
 /* ──────────────────────────────────────────────────────────
    FloatingLeaves – CSS-driven leaf particles that drift
@@ -44,21 +45,6 @@ function generateLeaves(count: number): Leaf[] {
     color: LEAF_COLORS[Math.floor(Math.random() * LEAF_COLORS.length)],
   }));
 }
-
-const LeafSVG = ({ size, color }: { size: number; color: string }) => (
-  <svg
-    width={size}
-    height={size * 1.3}
-    viewBox="0 0 20 26"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M10,1 Q18,8 16,18 Q14,24 10,25 Q6,24 4,18 Q2,8 10,1 Z" fill={color} />
-    <path d="M10,4 L10,22" stroke="rgba(255,255,255,0.3)" strokeWidth={0.5} />
-    <path d="M10,10 Q7,8 5,10" stroke="rgba(255,255,255,0.2)" strokeWidth={0.4} fill="none" />
-    <path d="M10,14 Q13,12 15,14" stroke="rgba(255,255,255,0.2)" strokeWidth={0.4} fill="none" />
-  </svg>
-);
 
 export const FloatingLeaves = () => {
   const prefersReducedMotion = useReducedMotion();
@@ -103,7 +89,7 @@ export const FloatingLeaves = () => {
             ease: "linear",
           }}
         >
-          <LeafSVG size={leaf.size} color={leaf.color} />
+          <LeafShape size={leaf.size} color={leaf.color} />
         </motion.div>
       ))}
     </div>

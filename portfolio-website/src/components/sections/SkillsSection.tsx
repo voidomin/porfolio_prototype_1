@@ -8,6 +8,7 @@ import { skills, hobbies } from "@/data/portfolio";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { AccentLineReveal } from "@/components/ui/AccentLineReveal";
 import { ChapterMarker } from "@/components/ui/ChapterMarker";
+import { LeafShape } from "@/components/ui/LeafShape";
 import { Skill, type SkillCategory } from "@/types";
 
 // Keyword match against the hobbies list — same "map a small fixed list to an
@@ -70,15 +71,21 @@ const SkillBar = ({ skill, index }: { skill: Skill; index: number }) => (
             : "linear-gradient(90deg, #7db523, #9bcf3a)",
         }}
       >
-        {/* Vine tip — a leaf sprouts once the vine finishes growing */}
+        {/* Vine tip — a leaf sprouts once the vine finishes growing.
+            Uses the same hand-drawn LeafShape as FloatingLeaves.tsx rather
+            than lucide-react's outline Leaf icon: that icon's stem is an
+            open (unclosed) path meant to be stroked, not filled — forcing
+            fill="currentColor" on it (as this used to) auto-closes that
+            open path for filling, producing a stray wedge that overlaps
+            the main leaf shape and reads as an indistinct blob at 12px. */}
         <motion.div
           initial={{ opacity: 0, scale: 0.4 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ delay: index * 0.06 + 1.1, duration: 0.35, ease: "backOut" }}
-          className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center"
+          className="absolute right-0 top-1/2 -translate-y-1/2 rotate-45 drop-shadow-sm"
         >
-          <Leaf className="w-3 h-3 text-white drop-shadow-sm rotate-45" fill="currentColor" />
+          <LeafShape size={9} color="white" />
         </motion.div>
       </motion.div>
     </div>

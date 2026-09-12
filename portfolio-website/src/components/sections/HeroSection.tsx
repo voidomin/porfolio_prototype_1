@@ -9,6 +9,7 @@ import { Magnetic } from "@/components/ui/Magnetic";
 import { PerspectiveTilt } from "@/components/ui/PerspectiveTilt";
 import { SectionErrorBoundary } from "@/components/ui/SectionErrorBoundary";
 import { useIsDesktopPointer } from "@/hooks/useIsDesktopPointer";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { scrollTo } from "@/lib/lenis";
 
 // Real three.js + react-three-fiber scene — dynamically imported with
@@ -29,6 +30,17 @@ const HeroScene = dynamic(() => import("@/components/three/HeroScene"), { ssr: f
 export const HeroSection = () => {
   const prefersReducedMotion = useReducedMotion();
   const isDesktop = useIsDesktopPointer(768);
+  // The 3D scene's WebGL render loop runs every frame for as long as it's
+  // mounted, regardless of visibility — confirmed via a real production
+  // performance trace showing it still actively rendering (Three.js
+  // setSize / long main-thread tasks) thousands of pixels scrolled past it.
+  // Unmount it once genuinely far away; rootMargin keeps it mounted for a
+  // full viewport height on either side so it preloads before scrolling in
+  // and doesn't pop in/out abruptly right at the boundary.
+  const { elementRef: heroRef, isIntersecting: heroNearViewport } = useIntersectionObserver({
+    rootMargin: "100% 0px 100% 0px",
+    triggerOnce: false,
+  });
 
   const letterVariants = {
     hidden: { y: 80, opacity: 0, filter: "blur(8px)" },
@@ -58,6 +70,7 @@ export const HeroSection = () => {
   return (
     <section
       id="home"
+      ref={heroRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-0"
     >
       {/* Dawn glow overlay */}
@@ -68,7 +81,7 @@ export const HeroSection = () => {
           never fetched otherwise. Sits behind the text (z-10) but above the
           dawn glow, and scrolls away normally with the rest of the hero —
           no pinning/fixed-position tricks. */}
-      {isDesktop && !prefersReducedMotion && (
+      {isDesktop && !prefersReducedMotion && heroNearViewport && (
         <div className="absolute inset-0 z-[2]">
           {/* Isolated from the rest of the hero — a WebGL context-creation
               failure (old GPU, WebGL disabled, some in-app browsers) should
