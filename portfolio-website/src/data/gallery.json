@@ -21,16 +21,7 @@
     "width": 1920,
     "height": 1280,
     "featured": true,
-    "createdAt": "2026-04-10",
-    "exif": {
-      "camera": "Sony Alpha 7R V",
-      "lens": "FE 24-70mm F2.8 GM II",
-      "focalLength": "35mm",
-      "aperture": "f/8.0",
-      "shutterSpeed": "1/125s",
-      "iso": "100",
-      "location": "Himachal Pradesh, India"
-    }
+    "createdAt": "2026-04-10"
   },
   {
     "id": "gal-2",
@@ -42,16 +33,7 @@
     "width": 1920,
     "height": 1280,
     "featured": true,
-    "createdAt": "2026-04-12",
-    "exif": {
-      "camera": "Fujifilm X-T5",
-      "lens": "XF 16-55mm F2.8 R LM WR",
-      "focalLength": "18mm",
-      "aperture": "f/5.6",
-      "shutterSpeed": "1/60s",
-      "iso": "250",
-      "location": "Western Ghats, Karnataka"
-    }
+    "createdAt": "2026-04-12"
   },
   {
     "id": "gal-3",
@@ -63,16 +45,7 @@
     "width": 1920,
     "height": 1280,
     "featured": true,
-    "createdAt": "2026-04-15",
-    "exif": {
-      "camera": "Canon EOS R5",
-      "lens": "RF 15-35mm F2.8 L IS USM",
-      "focalLength": "24mm",
-      "aperture": "f/11",
-      "shutterSpeed": "1/15s",
-      "iso": "100",
-      "location": "Yosemite, California"
-    }
+    "createdAt": "2026-04-15"
   },
   {
     "id": "gal-4",
@@ -84,16 +57,7 @@
     "width": 1920,
     "height": 1280,
     "featured": false,
-    "createdAt": "2026-04-18",
-    "exif": {
-      "camera": "Sony Alpha 7R V",
-      "lens": "FE 24-70mm F2.8 GM II",
-      "focalLength": "50mm",
-      "aperture": "f/7.1",
-      "shutterSpeed": "1/200s",
-      "iso": "100",
-      "location": "Kashmir Great Lakes"
-    }
+    "createdAt": "2026-04-18"
   },
   {
     "id": "gal-5",
@@ -105,16 +69,7 @@
     "width": 1920,
     "height": 1280,
     "featured": false,
-    "createdAt": "2026-04-22",
-    "exif": {
-      "camera": "Fujifilm X-T5",
-      "lens": "XF 10-24mm F4 R OIS WR",
-      "focalLength": "12mm",
-      "aperture": "f/16",
-      "shutterSpeed": "1.5s",
-      "iso": "80",
-      "location": "Coorg, India"
-    }
+    "createdAt": "2026-04-22"
   },
   {
     "id": "gal-6",
@@ -126,16 +81,7 @@
     "width": 1920,
     "height": 1280,
     "featured": true,
-    "createdAt": "2026-04-26",
-    "exif": {
-      "camera": "Sony Alpha 7S III",
-      "lens": "FE 20mm F1.8 G",
-      "focalLength": "20mm",
-      "aperture": "f/1.8",
-      "shutterSpeed": "15s",
-      "iso": "3200",
-      "location": "Spiti Valley, Himalayas"
-    }
+    "createdAt": "2026-04-26"
   },
   {
     "id": "gal-7",
@@ -147,16 +93,7 @@
     "width": 1000,
     "height": 1500,
     "featured": true,
-    "createdAt": "2026-05-02",
-    "exif": {
-      "camera": "Fujifilm X-T5",
-      "lens": "XF 16-55mm F2.8 R LM WR",
-      "focalLength": "35mm",
-      "aperture": "f/4.0",
-      "shutterSpeed": "1/160s",
-      "iso": "400",
-      "location": "Black Forest, Germany"
-    }
+    "createdAt": "2026-05-02"
   },
   {
     "id": "gal-8",
@@ -168,16 +105,7 @@
     "width": 1080,
     "height": 1920,
     "featured": true,
-    "createdAt": "2026-05-05",
-    "exif": {
-      "camera": "Sony Alpha 7R V",
-      "lens": "FE 24-70mm F2.8 GM II",
-      "focalLength": "24mm",
-      "aperture": "f/5.6",
-      "shutterSpeed": "1/80s",
-      "iso": "100",
-      "location": "Seljalandsfoss, Iceland"
-    }
+    "createdAt": "2026-05-05"
   },
   {
     "id": "gal-9",
@@ -189,16 +117,7 @@
     "width": 1200,
     "height": 1200,
     "featured": false,
-    "createdAt": "2026-05-09",
-    "exif": {
-      "camera": "Canon EOS R5",
-      "lens": "RF 24-70mm F2.8 L IS USM",
-      "focalLength": "28mm",
-      "aperture": "f/2.8",
-      "shutterSpeed": "1/60s",
-      "iso": "800",
-      "location": "Yosemite Backcountry"
-    }
+    "createdAt": "2026-05-09"
   },
   {
     "id": "gal-11",
@@ -210,16 +129,7 @@
     "width": 1000,
     "height": 1500,
     "featured": true,
-    "createdAt": "2026-05-18",
-    "exif": {
-      "camera": "Leica M11",
-      "lens": "Summilux-M 35mm f/1.4 ASPH",
-      "focalLength": "35mm",
-      "aperture": "f/1.4",
-      "shutterSpeed": "1/125s",
-      "iso": "1600",
-      "location": "Shinjuku, Tokyo"
-    }
+    "createdAt": "2026-05-18"
   },
   {
     "id": "gal-12",
@@ -231,16 +141,7 @@
     "width": 1000,
     "height": 1500,
     "featured": true,
-    "createdAt": "2026-05-19",
-    "exif": {
-      "camera": "Hasselblad X2D 100C",
-      "lens": "XCD 21mm F4",
-      "focalLength": "21mm",
-      "aperture": "f/8.0",
-      "shutterSpeed": "1/30s",
-      "iso": "64",
-      "location": "Copenhagen, Denmark"
-    }
+    "createdAt": "2026-05-19"
   },
   {
     "id": "gal-13",
@@ -252,16 +153,7 @@
     "width": 1800,
     "height": 900,
     "featured": true,
-    "createdAt": "2026-05-20",
-    "exif": {
-      "camera": "Sony Alpha 7R V",
-      "lens": "FE 35mm F1.4 GM",
-      "focalLength": "35mm",
-      "aperture": "f/4.0",
-      "shutterSpeed": "1/250s",
-      "iso": "100",
-      "location": "Marrakesh, Morocco"
-    }
+    "createdAt": "2026-05-20"
   },
   {
     "id": "gal-14",
@@ -273,16 +165,7 @@
     "width": 1200,
     "height": 1600,
     "featured": false,
-    "createdAt": "2026-05-21",
-    "exif": {
-      "camera": "Fujifilm GFX 100S",
-      "lens": "GF 23mm F4 R LM WR",
-      "focalLength": "18mm",
-      "aperture": "f/11",
-      "shutterSpeed": "1/4s",
-      "iso": "100",
-      "location": "Berlin, Germany"
-    }
+    "createdAt": "2026-05-21"
   },
   {
     "id": "gal-15",
@@ -294,16 +177,7 @@
     "width": 1000,
     "height": 1333,
     "featured": true,
-    "createdAt": "2026-05-22",
-    "exif": {
-      "camera": "Canon EOS R5",
-      "lens": "RF 85mm F1.2 L USM",
-      "focalLength": "85mm",
-      "aperture": "f/1.2",
-      "shutterSpeed": "1/500s",
-      "iso": "100",
-      "location": "Studio, Mumbai"
-    }
+    "createdAt": "2026-05-22"
   },
   {
     "id": "gal-16",
@@ -315,16 +189,7 @@
     "width": 1000,
     "height": 1500,
     "featured": true,
-    "createdAt": "2026-05-23",
-    "exif": {
-      "camera": "Sony Alpha 7R V",
-      "lens": "FE 50mm F1.2 GM",
-      "focalLength": "50mm",
-      "aperture": "f/1.2",
-      "shutterSpeed": "1/160s",
-      "iso": "400",
-      "location": "Brooklyn, New York"
-    }
+    "createdAt": "2026-05-23"
   },
   {
     "id": "gal-17",
@@ -336,16 +201,7 @@
     "width": 1200,
     "height": 1200,
     "featured": false,
-    "createdAt": "2026-05-24",
-    "exif": {
-      "camera": "Leica M11",
-      "lens": "Noctilux-M 50mm f/0.95 ASPH",
-      "focalLength": "50mm",
-      "aperture": "f/0.95",
-      "shutterSpeed": "1/1000s",
-      "iso": "64",
-      "location": "Paris, France"
-    }
+    "createdAt": "2026-05-24"
   },
   {
     "id": "gal-18",
@@ -357,16 +213,7 @@
     "width": 1920,
     "height": 1080,
     "featured": true,
-    "createdAt": "2026-05-25",
-    "exif": {
-      "camera": "Leica Q3",
-      "lens": "Summilux 28mm f/1.7 ASPH",
-      "focalLength": "28mm",
-      "aperture": "f/1.7",
-      "shutterSpeed": "1/80s",
-      "iso": "800",
-      "location": "Akihabara, Tokyo"
-    }
+    "createdAt": "2026-05-25"
   },
   {
     "id": "gal-19",
@@ -378,16 +225,7 @@
     "width": 1000,
     "height": 1500,
     "featured": false,
-    "createdAt": "2026-05-26",
-    "exif": {
-      "camera": "Fujifilm X-T5",
-      "lens": "XF 27mm F2.8 R WR",
-      "focalLength": "27mm",
-      "aperture": "f/8.0",
-      "shutterSpeed": "1/500s",
-      "iso": "200",
-      "location": "Jaipur, India"
-    }
+    "createdAt": "2026-05-26"
   },
   {
     "id": "gal-20",
@@ -399,15 +237,6 @@
     "width": 1200,
     "height": 800,
     "featured": true,
-    "createdAt": "2026-05-27",
-    "exif": {
-      "camera": "Sony Alpha 7R V",
-      "lens": "FE 90mm F2.8 Macro G OSS",
-      "focalLength": "90mm",
-      "aperture": "f/2.8",
-      "shutterSpeed": "1/60s",
-      "iso": "320",
-      "location": "Macro Studio"
-    }
+    "createdAt": "2026-05-27"
   }
 ]
