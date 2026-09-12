@@ -16,14 +16,18 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 4000);
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=10`,
-      {
-        headers: { "User-Agent": "akash-portfolio-admin-cms/1.0 (photo geotagging)" },
-        signal: controller.signal,
-      }
-    );
-    clearTimeout(timeout);
+    let res: Response;
+    try {
+      res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=10`,
+        {
+          headers: { "User-Agent": "akash-portfolio-admin-cms/1.0 (photo geotagging)" },
+          signal: controller.signal,
+        }
+      );
+    } finally {
+      clearTimeout(timeout);
+    }
     if (!res.ok) return "";
 
     const data = await res.json();
@@ -48,7 +52,11 @@ export async function GET(request: NextRequest) {
     }
 
     const dirPath = path.join(process.cwd(), "images-to-process");
-    const filePath = path.join(dirPath, filename);
+    const filePath = path.resolve(path.join(dirPath, filename));
+
+    if (!filePath.startsWith(dirPath)) {
+      return NextResponse.json({ error: "Unauthorized access path" }, { status: 403 });
+    }
 
     if (!fs.existsSync(filePath)) {
       return NextResponse.json({ error: "File not found" }, { status: 404 });

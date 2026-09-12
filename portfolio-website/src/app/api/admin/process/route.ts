@@ -74,6 +74,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // `id` becomes the output filename (`${id}.webp`) and the gallery lookup key,
+    // so it must be restricted to a safe, unambiguous character set — otherwise a
+    // crafted id containing path separators could write outside the intended
+    // output directory.
+    if (!/^[a-zA-Z0-9_-]+$/.test(id)) {
+      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+    }
+
     const pendingDir = path.join(process.cwd(), "images-to-process");
     const importedDir = path.join(pendingDir, "imported");
     let inputPath = path.join(pendingDir, filename);
