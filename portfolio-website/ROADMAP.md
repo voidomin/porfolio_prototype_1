@@ -19,7 +19,6 @@ What's pending, organized by area. See `CHANGELOG.md` for everything already shi
 ## New Features
 
 - [ ] Testimonials / recommendations section — shell is built (`TestimonialsSection.tsx`, renders nothing while `testimonials` in `src/data/portfolio.ts` is empty). **Blocked on you:** need 2-3 real quotes (who said it, their role, the quote itself) before this can go live — nothing left to build until then.
-- [ ] GitHub activity trail — fully built (`src/app/api/github-activity/route.ts`, `GitHubActivityTrail.tsx` in the About section), renders nothing until it has a token. **Blocked on you:** create a classic GitHub personal access token (no special scopes needed) and add it as `GITHUB_TOKEN` in Vercel's env vars, then redeploy.
 
 ---
 
