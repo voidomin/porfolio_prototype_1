@@ -23,10 +23,19 @@ interface PaletteItem {
   action: () => void;
 }
 
+const PALETTE_DISCOVERED_KEY = "palette-discovered";
+
 export const CommandPalette = () => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
+  // Defaults to "already discovered" so the very first paint (server and
+  // client) never shows the nudge — it only appears once an effect confirms,
+  // after mount, that this visitor genuinely hasn't opened the palette
+  // before. Mirrors LoadingScreen.tsx's fail-open try/catch shape, but with
+  // localStorage (persists across sessions) instead of sessionStorage, since
+  // this is a "seen it once, ever" nudge, not a "once per visit" one.
+  const [hasDiscovered, setHasDiscovered] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -114,6 +123,27 @@ export const CommandPalette = () => {
     [close]
   );
 
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(PALETTE_DISCOVERED_KEY)) return; // already seen, no nudge
+    } catch {
+      return; // fail open: skip the nudge rather than risk showing it forever
+    }
+    setHasDiscovered(false);
+  }, []);
+
+  // Covers both ways the palette can be opened (Cmd/Ctrl+K or clicking the
+  // hint pill) with one effect, since both just set `open`.
+  useEffect(() => {
+    if (!open || hasDiscovered) return;
+    setHasDiscovered(true);
+    try {
+      localStorage.setItem(PALETTE_DISCOVERED_KEY, "1");
+    } catch {
+      // best-effort only — a failed write just means the nudge reappears
+    }
+  }, [open, hasDiscovered]);
+
   // Global Cmd/Ctrl+K toggle
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -164,7 +194,9 @@ export const CommandPalette = () => {
 
   return (
     <>
-      {/* Discoverability hint — small, unobtrusive, desktop-only */}
+      {/* Discoverability hint — persistent, unobtrusive pill on every visit;
+          a one-time ping + label nudge on top of it the first time a
+          visitor genuinely hasn't discovered it yet (see hasDiscovered). */}
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -172,10 +204,28 @@ export const CommandPalette = () => {
         aria-label="Open quick navigation (Cmd+K)"
         title="Quick navigation"
       >
+        {!hasDiscovered && (
+          <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-forest-400 opacity-75" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-forest-400" />
+          </span>
+        )}
         <Search className="w-3.5 h-3.5" />
         <span className="flex items-center gap-1">
           <Command className="w-3 h-3" />K
         </span>
+        <AnimatePresence>
+          {!hasDiscovered && (
+            <motion.span
+              initial={{ opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0, transition: { delay: 1.2, duration: 0.3 } }}
+              exit={{ opacity: 0, transition: { duration: 0.15, delay: 0 } }}
+              className="whitespace-nowrap text-white/80"
+            >
+              Press ⌘K to jump anywhere
+            </motion.span>
+          )}
+        </AnimatePresence>
       </button>
 
       <AnimatePresence>

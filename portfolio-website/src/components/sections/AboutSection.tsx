@@ -9,6 +9,7 @@ import { aboutStats, experienceTimeline, personalProfile } from "@/data/portfoli
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { mistReveal } from "@/lib/revealVariants";
 import { ChapterMarker } from "@/components/ui/ChapterMarker";
+import { GitHubActivityTrail } from "@/components/ui/GitHubActivityTrail";
 
 /* ──────────────────────────────────────────────────────────
    AboutSection – "Chapter 2: The Forest Path"
@@ -185,6 +186,8 @@ export const AboutSection = () => {
             </motion.div>
           ))}
         </motion.div>
+
+        <GitHubActivityTrail />
 
         {/* Experience Timeline — Forest Trail */}
         <motion.div

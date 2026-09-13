@@ -129,6 +129,14 @@ export const Footer = () => {
             </a>
           </nav>
 
+          <p className="text-xs text-night-300/60 mb-8 -mt-4">
+            Press{" "}
+            <kbd className="font-mono text-[10px] border border-night-400/20 rounded px-1.5 py-0.5">
+              ⌘K
+            </kbd>{" "}
+            to jump anywhere
+          </p>
+
           {/* Social links as constellation */}
           <div className="flex justify-center gap-4 mb-8">
             {socialLinks.map((link) => {
