@@ -23,6 +23,11 @@ const trailIconsById: Record<string, typeof Database> = {
   "exp-iisc": Microscope,
 };
 
+// Matches short numeric-style stat values ("2+", "9+", "4", "88%") so they can
+// keep the large display size — longer text values (e.g. "Data + Product")
+// get a smaller size instead of wrapping and overflowing their card.
+const NUMERIC_STAT = /^[\d.]+\+?%?$/;
+
 export const AboutSection = () => {
   const [avatarError, setAvatarError] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
@@ -165,9 +170,15 @@ export const AboutSection = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center p-6 glass-nature rounded-2xl"
+              className="flex flex-col items-center justify-center text-center p-6 glass-nature rounded-2xl min-h-[7.5rem]"
             >
-              <div className="text-2xl md:text-3xl font-bold text-forest-300 mb-2">
+              <div
+                className={
+                  NUMERIC_STAT.test(stat.value)
+                    ? "text-2xl md:text-3xl font-bold text-forest-300 mb-2 leading-tight"
+                    : "text-base md:text-xl font-bold text-forest-300 mb-2 leading-tight"
+                }
+              >
                 <AnimatedNumber value={stat.value} />
               </div>
               <div className="text-sm text-forest-200/50">{stat.label}</div>

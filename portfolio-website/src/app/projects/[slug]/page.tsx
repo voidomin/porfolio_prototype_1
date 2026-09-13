@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github } from "lucide-react";
 import { projects } from "@/data/portfolio";
+import { BackLink } from "@/components/ui/BackLink";
+import { ChapterMarker } from "@/components/ui/ChapterMarker";
+import { GlassPanel } from "@/components/ui/GlassPanel";
+import { TechChip } from "@/components/ui/TechChip";
+import { ProjectHero } from "./ProjectHero";
 
 interface ProjectPageProps {
   params: { slug: string };
@@ -39,7 +43,10 @@ export function generateMetadata({ params }: ProjectPageProps): Metadata {
   };
 }
 
-function deriveOutcome(project: NonNullable<ReturnType<typeof getProject>>): string {
+// Used only when a project has no real `outcome` — a generic, honestly-labeled
+// "Status" line derived from what's actually known, rather than claiming an
+// "Outcome" that was never reported.
+function deriveStatus(project: NonNullable<ReturnType<typeof getProject>>): string {
   if (project.demoUrl) {
     return `Deployed and live — try it directly at the link below.`;
   }
@@ -49,6 +56,8 @@ function deriveOutcome(project: NonNullable<ReturnType<typeof getProject>>): str
   return `Completed as a ${project.category} project.`;
 }
 
+const SECTION_HEADING = "text-xs font-bold uppercase tracking-widest text-forest-700 mb-3";
+
 export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
   const project = getProject(params.slug);
   if (!project) {
@@ -56,15 +65,20 @@ export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-stone-50 pt-32 pb-24 px-6">
-      <div className="max-w-4xl mx-auto">
-        <Link
-          href="/#projects"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-forest-700 hover:text-forest-900 transition-colors mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Projects
-        </Link>
+    <main className="relative min-h-screen overflow-hidden bg-stone-50 pt-28 pb-24 md:pt-32">
+      {/* Ambient glow overlays — this page sits off the homepage's scrolling
+          chapter system (see ChapterMarker's own homepage usage), so it can't
+          reuse NatureScene directly; this recreates a lighter version of the
+          same warm/nature tone with two fixed radial-gradient glows instead. */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute top-0 inset-x-0 h-[50vh] bg-[radial-gradient(ellipse_at_50%_0%,rgba(37,123,234,0.10),transparent_70%)]" />
+        <div className="absolute bottom-0 right-0 w-[45vw] h-[45vh] bg-[radial-gradient(circle_at_100%_100%,rgba(125,181,35,0.08),transparent_60%)]" />
+      </div>
+
+      <div className="relative z-10 max-w-4xl mx-auto px-6">
+        <BackLink href="/#projects" label="Back to Projects" variant="glass" className="mb-10" />
+
+        <ChapterMarker color="#257bea" className="mx-0" />
 
         <div className="flex items-center justify-between mb-3">
           <span className="text-[11px] font-bold text-forest-700 uppercase tracking-widest bg-forest-600/10 px-2.5 py-1 rounded-md">
@@ -75,20 +89,16 @@ export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
           </span>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-6">
+        <p className="text-river-600/60 text-xs tracking-[0.3em] uppercase mb-2">Case Study</p>
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-stone-900 mb-6">
           {project.title}
         </h1>
 
-        <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-stone-200 shadow-lg mb-10">
-          <Image
-            src={project.image}
-            alt={project.imageAlt ?? project.title}
-            fill
-            sizes="(max-width: 768px) 100vw, 800px"
-            className="object-cover"
-            priority
-          />
-        </div>
+        <ProjectHero
+          cover={project.image}
+          coverAlt={project.imageAlt ?? project.title}
+          images={project.images}
+        />
 
         <div className="flex flex-wrap gap-4 mb-12">
           {project.demoUrl && (
@@ -107,7 +117,7 @@ export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-stone-300 text-stone-700 font-semibold text-sm hover:bg-stone-100 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-stone-300 bg-white/40 backdrop-blur-sm text-stone-700 font-semibold text-sm hover:bg-stone-100 transition-colors"
             >
               <Github className="w-4 h-4" />
               View Source
@@ -115,44 +125,33 @@ export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
           )}
         </div>
 
-        <section className="mb-10">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-forest-700 mb-3">
-            Overview
-          </h2>
+        <GlassPanel padding="lg" className="mb-6">
+          <h2 className={SECTION_HEADING}>Overview</h2>
           <p className="text-stone-700 leading-relaxed text-base">{project.description}</p>
-        </section>
+        </GlassPanel>
 
         {project.longDescription && (
-          <section className="mb-10">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-forest-700 mb-3">
-              Approach
-            </h2>
+          <GlassPanel padding="lg" className="mb-6">
+            <h2 className={SECTION_HEADING}>Approach</h2>
             <p className="text-stone-700 leading-relaxed text-base">{project.longDescription}</p>
-          </section>
+          </GlassPanel>
         )}
 
-        <section className="mb-10">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-forest-700 mb-3">
-            Outcome
-          </h2>
-          <p className="text-stone-700 leading-relaxed text-base">{deriveOutcome(project)}</p>
-        </section>
+        <GlassPanel padding="lg" className="mb-6">
+          <h2 className={SECTION_HEADING}>{project.outcome ? "Outcome" : "Status"}</h2>
+          <p className="text-stone-700 leading-relaxed text-base">
+            {project.outcome ?? deriveStatus(project)}
+          </p>
+        </GlassPanel>
 
-        <section className="mb-12">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-forest-700 mb-3">
-            Tech Stack
-          </h2>
+        <GlassPanel padding="lg" className="mb-10">
+          <h2 className={SECTION_HEADING}>Tech Stack</h2>
           <div className="flex flex-wrap gap-2">
             {project.technologies.map((tech) => (
-              <span
-                key={tech}
-                className="px-3 py-1 text-xs font-semibold bg-forest-50 text-forest-800 rounded-md border border-forest-200/50"
-              >
-                {tech}
-              </span>
+              <TechChip key={tech} label={tech} />
             ))}
           </div>
-        </section>
+        </GlassPanel>
 
         {project.subProjects && project.subProjects.length > 0 && (
           <section>
@@ -161,10 +160,7 @@ export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {project.subProjects.map((sub) => (
-                <div
-                  key={sub.id}
-                  className="rounded-xl border border-stone-200 bg-white overflow-hidden shadow-sm"
-                >
+                <GlassPanel key={sub.id} padding="none" className="overflow-hidden">
                   <div className="relative w-full aspect-[4/3]">
                     <Image
                       src={sub.image}
@@ -179,12 +175,7 @@ export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
                     <p className="text-xs text-stone-600 leading-relaxed mb-3">{sub.description}</p>
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {sub.technologies.map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-2 py-0.5 text-[9px] font-semibold bg-forest-50 text-forest-800/80 rounded-md border border-forest-200/30"
-                        >
-                          {tech}
-                        </span>
+                        <TechChip key={tech} label={tech} size="xs" />
                       ))}
                     </div>
                     {sub.demoUrl && (
@@ -198,7 +189,7 @@ export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
                       </a>
                     )}
                   </div>
-                </div>
+                </GlassPanel>
               ))}
             </div>
           </section>

@@ -41,7 +41,7 @@ export const WritingSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex flex-wrap justify-center gap-6">
           {previewPosts.map((post, index) => (
             <motion.div
               key={post.slug}
@@ -49,6 +49,7 @@ export const WritingSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="w-full sm:w-[380px]"
             >
               <Link
                 href={`/blog/${post.slug}`}

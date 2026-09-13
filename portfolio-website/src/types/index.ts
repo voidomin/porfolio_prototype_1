@@ -23,6 +23,10 @@ export interface Project {
   featured: boolean;
   demoUrl?: string;
   githubUrl?: string;
+  /** Real, specific result/impact — shown as "Outcome" when present. When
+   * absent, the case-study page falls back to a generic derived "Status"
+   * line instead of fabricating an outcome that was never reported. */
+  outcome?: string;
   createdAt: string;
   updatedAt: string;
   subProjects?: SubProject[];

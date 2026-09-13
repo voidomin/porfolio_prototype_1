@@ -121,6 +121,12 @@ export const Footer = () => {
                 {item.label}
               </a>
             ))}
+            <a
+              href="/feed.xml"
+              className="text-night-300/60 hover:text-white transition-colors duration-300"
+            >
+              RSS
+            </a>
           </nav>
 
           {/* Social links as constellation */}
