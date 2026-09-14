@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   Mail,
@@ -12,6 +12,8 @@ import {
   Linkedin,
   Copy,
   Check,
+  Sparkles,
+  X,
 } from "lucide-react";
 import { socialLinks, contactInfo } from "@/data/portfolio";
 import { ContactFormData } from "@/types";
@@ -34,6 +36,13 @@ interface FormState {
   status: "idle" | "loading" | "success" | "error";
   message: string;
 }
+
+// Campfire Blessing — an Easter egg for anyone who stokes the fire enough.
+// Stoke count itself is in-memory only (resets every page load); whether the
+// visitor has ever SEEN the reward persists in localStorage so it stays a
+// rare, one-time surprise rather than replaying every visit.
+const STOKE_THRESHOLD = 7;
+const BLESSING_SEEN_KEY = "campfire-blessing-seen";
 
 // Firefly particles
 function generateFireflies(count: number) {
@@ -114,6 +123,52 @@ const InputEmberEmitter = ({ active }: { active: boolean }) => {
             repeat: Infinity,
             ease: "easeOut",
           }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// The Campfire Blessing's reward burst — embers rising and cooling from
+// flame-orange into firefly-gold, the same cheap DOM-div-with-glow technique
+// already used for the ambient fireflies above and InputEmberEmitter, so it
+// works identically regardless of device (unlike the canvas ember burst in
+// InteractiveTrail.tsx, which disables itself on mobile/reduced-motion).
+const RisingBlessingEmbers = ({ isMobile }: { isMobile: boolean }) => {
+  const particles = useMemo(() => {
+    const count = isMobile ? 8 : 16;
+    return Array.from({ length: count }, (_, i) => ({
+      id: i,
+      left: 15 + Math.random() * 70,
+      size: 2 + Math.random() * 3,
+      delay: i * 0.08,
+      duration: 2.8 + Math.random() * 1.4,
+      distanceY: -130 - Math.random() * 110,
+      driftX: -30 + Math.random() * 60,
+    }));
+  }, [isMobile]);
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${p.left}%`,
+            bottom: "22%",
+            width: p.size,
+            height: p.size,
+            boxShadow: `0 0 ${p.size * 3}px ${p.size}px rgba(240,180,41,0.5)`,
+          }}
+          initial={{ opacity: 0, y: 0, x: 0, backgroundColor: "#f0541e" }}
+          animate={{
+            opacity: [0, 1, 1, 0],
+            y: [0, p.distanceY],
+            x: [0, p.driftX],
+            backgroundColor: ["#f0541e", "#f0541e", "#f0b429", "#f0b429"],
+          }}
+          transition={{ duration: p.duration, delay: p.delay, ease: "easeOut" }}
         />
       ))}
     </div>
@@ -270,12 +325,43 @@ export const ContactSection = () => {
   const [isMobile, setIsMobile] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
+  // Campfire Blessing state — the stoke count is a ref (nothing needs to
+  // re-render for stokes 1-6), while hasSeenBlessing/showBlessing are the
+  // only two moments that actually need to trigger a render.
+  const stokeCountRef = useRef(0);
+  const hasFiredThisLoadRef = useRef(false);
+  const blessingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Defaults to "already seen" so first paint never assumes a fresh visitor —
+  // same hydration-safe shape as CommandPalette's own discovery flag.
+  const [hasSeenBlessing, setHasSeenBlessing] = useState(true);
+  const [showBlessing, setShowBlessing] = useState(false);
+
   useEffect(() => {
     const mobile = globalThis.innerWidth < 768;
     setIsMobile(mobile);
     setFireflies(generateFireflies(mobile ? 4 : 15));
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(BLESSING_SEEN_KEY)) return; // already seen, never replays
+    } catch {
+      return; // fail open: treat as "already seen" rather than risk it firing forever
+    }
+    setHasSeenBlessing(false);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (blessingTimeoutRef.current) clearTimeout(blessingTimeoutRef.current);
+    };
+  }, []);
+
+  const dismissBlessing = () => {
+    if (blessingTimeoutRef.current) clearTimeout(blessingTimeoutRef.current);
+    setShowBlessing(false);
+  };
 
   const handleCampfireStoke = () => {
     const campfireEl = document.getElementById("campfire-vector");
@@ -297,6 +383,27 @@ export const ContactSection = () => {
 
     // 2. Dispatch event to trigger synthesized crackle sounds
     globalThis.dispatchEvent(new CustomEvent("nature-campfire-crackle"));
+
+    // 3. Campfire Blessing — fires once, the first time a visitor who hasn't
+    // already seen it crosses the stoke threshold this page load.
+    stokeCountRef.current += 1;
+    if (
+      stokeCountRef.current >= STOKE_THRESHOLD &&
+      !hasFiredThisLoadRef.current &&
+      !hasSeenBlessing
+    ) {
+      hasFiredThisLoadRef.current = true;
+      setShowBlessing(true);
+      globalThis.dispatchEvent(new CustomEvent("nature-campfire-blessing"));
+      setHasSeenBlessing(true);
+      try {
+        localStorage.setItem(BLESSING_SEEN_KEY, "1");
+      } catch {
+        // best-effort only — a failed write just means it can fire again later
+      }
+      if (blessingTimeoutRef.current) clearTimeout(blessingTimeoutRef.current);
+      blessingTimeoutRef.current = setTimeout(() => setShowBlessing(false), 7000);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -545,13 +652,15 @@ export const ContactSection = () => {
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  {/* Outer glow */}
+                  {/* Outer glow — a static brightness bump (not a new motion
+                      animation) is the reduced-motion-safe half of the
+                      Campfire Blessing's visual acknowledgment. */}
                   <circle
                     cx="50"
                     cy="50"
                     r="30"
                     fill="url(#fireGlow)"
-                    opacity="0.3"
+                    opacity={showBlessing ? "0.6" : "0.3"}
                     className="animate-pulse"
                   />
 
@@ -658,6 +767,38 @@ export const ContactSection = () => {
                   </defs>
                 </svg>
               </motion.div>
+
+              {/* Campfire Blessing — particles skip entirely under reduced
+                  motion (matching the ambient fireflies' own gate), but the
+                  message still appears (instantly, via initial={false}) and
+                  the sound still plays regardless of motion preference, so a
+                  reduced-motion visitor who reaches the threshold still gets
+                  2 of the 3 reward channels instead of none. */}
+              {showBlessing && !prefersReducedMotion && (
+                <RisingBlessingEmbers isMobile={isMobile} />
+              )}
+              {showBlessing && (
+                <motion.div
+                  initial={prefersReducedMotion ? false : { opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="mt-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-dawn-500/15 border border-dawn-400/20 text-left max-w-xs"
+                >
+                  <Sparkles className="w-4 h-4 shrink-0 mt-0.5 text-dawn-300" />
+                  <p className="flex-1 text-xs text-dawn-100 leading-relaxed">
+                    You kept the fire going. Thanks for spending this much time here — genuinely
+                    glad you stopped by.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={dismissBlessing}
+                    aria-label="Dismiss message"
+                    className="shrink-0 text-dawn-200/60 hover:text-dawn-100 transition-colors cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </motion.div>
+              )}
             </div>
           </motion.div>
 

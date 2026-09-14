@@ -15,6 +15,15 @@ import * as THREE from "three";
    the whole scene is three extruded "ridge" slabs, two lights, and
    fog, which is little enough hand-rolled code that a whole extra
    dependency isn't worth it.
+
+   Reactive layer: the directional light drifts toward the cursor
+   (plain per-frame position/intensity/color lerp — no shader
+   needed, three re-uploads light uniforms every frame regardless),
+   and the fog gets a cheap onBeforeCompile patch so its density
+   "rolls" faster with scroll velocity and drifts gently even at
+   rest. The patch only touches fragment-stage fog blending — never
+   geometry/position — so it can't interact with each ridge's own
+   idle-bob animation below.
    ────────────────────────────────────────────────────────── */
 
 interface RidgeConfig {
@@ -31,6 +40,60 @@ const RIDGES: RidgeConfig[] = [
   { z: -3.5, width: 18, peakiness: 1.6, seed: 5, color: "#5aaf5a", yOffset: -2.2 },
   { z: -1.5, width: 15, peakiness: 1.1, seed: 11, color: "#2d722d", yOffset: -2.8 },
 ];
+
+// Shared, mutated-in-place every frame — one Object.assign per ridge material
+// at compile time wires all three to these same {value} objects, so a single
+// per-frame update in Scene's useFrame drives all three materials at once.
+interface MistUniforms {
+  uTime: { value: number };
+  uMistOffset: { value: number };
+  uMistIntensity: { value: number };
+  uCursor: { value: THREE.Vector2 };
+}
+
+// onBeforeCompile runs BEFORE three.js resolves `#include <chunk>` directives
+// into their real GLSL — shader.fragmentShader at this point still contains
+// the literal, unexpanded `#include <...>` lines, so patches must target
+// those directive strings directly, not the (not-yet-existing) resolved
+// chunk content.
+
+// Appended right after fog_pars_fragment's own include, so fogColor/fogNear/
+// fogFar/vFogDepth (declared inside that chunk) are already in scope.
+const FOG_UNIFORM_DECLARATIONS = `#include <fog_pars_fragment>
+uniform float uTime;
+uniform float uMistOffset;
+uniform float uMistIntensity;
+uniform vec2 uCursor;`;
+
+// Fully replaces the fog_fragment include with an inlined copy of its own
+// logic (both the FOG_EXP2 and linear branches, unchanged) plus one added
+// step: a cheap 3-term sine "noise" sampled from screen-space fragment
+// coordinates (no texture, no hash/fbm — the ridges are flat-shaded
+// silhouettes that don't need real turbulence) perturbs the existing
+// fogFactor before the same mix() call three.js would have generated. Fog
+// color/near/far are never touched, only how much of it blends in.
+const FOG_MIST_PATCH = `#ifdef USE_FOG
+
+	#ifdef FOG_EXP2
+
+		float fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );
+
+	#else
+
+		float fogFactor = smoothstep( fogNear, fogFar, vFogDepth );
+
+	#endif
+
+	float uMist = 0.0;
+	uMist += sin(gl_FragCoord.x * 0.008 + uMistOffset) * 0.5;
+	uMist += sin(gl_FragCoord.x * 0.021 - uMistOffset * 1.3 + uTime * 0.05) * 0.3;
+	uMist += sin(gl_FragCoord.y * 0.015 + uMistOffset * 0.7 + uCursor.x * 2.0) * 0.2;
+	uMist = uMist * 0.5 + 0.5;
+	fogFactor = clamp(fogFactor + (uMist - 0.5) * uMistIntensity, 0.0, 1.0);
+
+	gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+
+#endif`;
 
 function buildRidgeGeometry(width: number, peakiness: number, seed: number) {
   const shape = new THREE.Shape();
@@ -59,13 +122,31 @@ function buildRidgeGeometry(width: number, peakiness: number, seed: number) {
   return geometry;
 }
 
-const Ridge = ({ config }: { config: RidgeConfig }) => {
+const Ridge = ({ config, uniforms }: { config: RidgeConfig; uniforms: MistUniforms }) => {
   const geometry = useMemo(
     () => buildRidgeGeometry(config.width, config.peakiness, config.seed),
     [config.width, config.peakiness, config.seed]
   );
   const meshRef = useRef<THREE.Mesh>(null);
   const phase = useMemo(() => Math.random() * Math.PI * 2, []);
+
+  const handleBeforeCompile = useMemo(
+    () => (shader: THREE.WebGLProgramParametersWithUniforms) => {
+      // Only ever mutate .value on these registered uniforms afterward — never
+      // reassign material.needsUpdate in the per-frame path, which would force
+      // an expensive recompile every frame instead of a cheap value upload.
+      Object.assign(shader.uniforms, uniforms);
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <fog_pars_fragment>",
+        FOG_UNIFORM_DECLARATIONS
+      );
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <fog_fragment>",
+        FOG_MIST_PATCH
+      );
+    },
+    [uniforms]
+  );
 
   // Slow idle drift — replaces what drei's <Float> would give for free.
   useFrame((state) => {
@@ -76,18 +157,46 @@ const Ridge = ({ config }: { config: RidgeConfig }) => {
 
   return (
     <mesh ref={meshRef} geometry={geometry} position={[0, config.yOffset, config.z]}>
-      <meshStandardMaterial color={config.color} roughness={0.9} metalness={0} />
+      <meshStandardMaterial
+        color={config.color}
+        roughness={0.9}
+        metalness={0}
+        onBeforeCompile={handleBeforeCompile}
+      />
     </mesh>
   );
 };
 
+const BASE_LIGHT_POSITION = { x: 4, y: 6 };
+const BASE_LIGHT_INTENSITY = 1.3;
+const MAX_SCROLL_VELOCITY = 2500; // px/s, clamped before it can dominate the mist
+
 const Scene = () => {
   const cameraTarget = useRef({ x: 0, y: 0 });
+  const lightTarget = useRef({ ...BASE_LIGHT_POSITION, intensity: BASE_LIGHT_INTENSITY });
+  const baseLightColor = useMemo(() => new THREE.Color("#f0b429"), []);
+  const flareLightColor = useMemo(() => new THREE.Color("#fff1c9"), []);
+  const lightColorScratch = useMemo(() => new THREE.Color(), []);
+  const lightRef = useRef<THREE.DirectionalLight>(null);
+
+  const lastScrollY = useRef(typeof window !== "undefined" ? window.scrollY : 0);
+  const smoothedScrollVelocity = useRef(0);
+
+  const uniformsRef = useRef<MistUniforms | null>(null);
+  if (!uniformsRef.current) {
+    uniformsRef.current = {
+      uTime: { value: 0 },
+      uMistOffset: { value: 0 },
+      uMistIntensity: { value: 0.05 },
+      uCursor: { value: new THREE.Vector2(0, 0) },
+    };
+  }
+  const uniforms = uniformsRef.current;
 
   useFrame((state, delta) => {
-    // Deltatime-based exponential smoothing — same bounded-lag technique
-    // used to fix the Projects section's scroll desync this session, not
-    // a fixed per-frame lerp that would drift with frame rate.
+    // Camera parallax — deltatime-based exponential smoothing, same bounded-
+    // lag technique used to fix the Projects section's scroll desync this
+    // session, not a fixed per-frame lerp that would drift with frame rate.
     const followSpeed = 4;
     const catchUp = 1 - Math.exp(-followSpeed * delta);
 
@@ -97,19 +206,73 @@ const Scene = () => {
     state.camera.position.x = cameraTarget.current.x;
     state.camera.position.y = cameraTarget.current.y;
     state.camera.lookAt(0, -1, -4);
+
+    // Light drifts toward the cursor — slower than the camera so the two
+    // reactive layers visibly differ instead of moving in lockstep.
+    if (lightRef.current) {
+      const lightFollowSpeed = 2;
+      const lightCatchUp = 1 - Math.exp(-lightFollowSpeed * delta);
+
+      const targetX = BASE_LIGHT_POSITION.x + state.pointer.x * 2;
+      const targetY = BASE_LIGHT_POSITION.y + state.pointer.y * 1.5;
+      lightTarget.current.x += (targetX - lightTarget.current.x) * lightCatchUp;
+      lightTarget.current.y += (targetY - lightTarget.current.y) * lightCatchUp;
+      lightRef.current.position.x = lightTarget.current.x;
+      lightRef.current.position.y = lightTarget.current.y;
+
+      // Cursor toward the edges reads as a subtle warm flare; center is calm.
+      const edgeAmount = THREE.MathUtils.clamp(
+        (Math.abs(state.pointer.x) + Math.abs(state.pointer.y)) / 2,
+        0,
+        1
+      );
+      const targetIntensity = BASE_LIGHT_INTENSITY + edgeAmount * 0.2;
+      lightTarget.current.intensity +=
+        (targetIntensity - lightTarget.current.intensity) * lightCatchUp;
+      lightRef.current.intensity = lightTarget.current.intensity;
+
+      lightColorScratch.copy(baseLightColor).lerp(flareLightColor, edgeAmount);
+      lightRef.current.color.copy(lightColorScratch);
+    }
+
+    // Scroll velocity → rolling mist. Lenis animates the real document
+    // scroll position, so reading window.scrollY here gets Lenis's own
+    // easing for free without importing anything from lib/lenis.
+    const currentScrollY = window.scrollY;
+    const rawVelocity = delta > 0 ? (currentScrollY - lastScrollY.current) / delta : 0;
+    lastScrollY.current = currentScrollY;
+
+    const clampedVelocity = THREE.MathUtils.clamp(Math.abs(rawVelocity), 0, MAX_SCROLL_VELOCITY);
+    const velocityFollowSpeed = 3;
+    const velocityCatchUp = 1 - Math.exp(-velocityFollowSpeed * delta);
+    smoothedScrollVelocity.current +=
+      (clampedVelocity - smoothedScrollVelocity.current) * velocityCatchUp;
+
+    // A small idle drift keeps the mist from ever looking perfectly frozen,
+    // even before any interaction — deliberate, not identical to a static rest state.
+    // Square-root response curve: a moderate scroll speed already reads as a
+    // clear mist pickup instead of needing to approach MAX_SCROLL_VELOCITY
+    // before the effect feels present, without changing the peak intensity.
+    const velocityRatio = Math.min(smoothedScrollVelocity.current / MAX_SCROLL_VELOCITY, 1);
+    const mistResponse = Math.sqrt(velocityRatio);
+
+    uniforms.uTime.value = state.clock.elapsedTime;
+    uniforms.uMistOffset.value += delta * (0.05 + smoothedScrollVelocity.current * 0.0004);
+    uniforms.uMistIntensity.value = 0.05 + mistResponse * 0.45;
+    uniforms.uCursor.value.set(state.pointer.x, state.pointer.y);
   });
 
   return (
     <>
       <fog attach="fog" args={["#fbdf85", 5, 15]} />
       <ambientLight intensity={0.6} color="#fef7e0" />
-      <directionalLight position={[4, 6, 4]} intensity={1.3} color="#f0b429" />
+      <directionalLight ref={lightRef} position={[4, 6, 4]} intensity={1.3} color="#f0b429" />
       {/* Pushed well below center so peaks stay clear of the hero text/CTAs —
           confirmed by screenshot that the default position rose into the
           headline and buttons, hurting legibility exactly where it matters. */}
       <group position={[0, -2.4, 0]}>
         {RIDGES.map((ridge, i) => (
-          <Ridge key={i} config={ridge} />
+          <Ridge key={i} config={ridge} uniforms={uniforms} />
         ))}
       </group>
     </>

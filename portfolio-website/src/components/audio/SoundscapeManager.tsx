@@ -325,6 +325,55 @@ export const SoundscapeManager = () => {
     resonantOsc.stop(now + 0.2);
   }, []);
 
+  // Campfire Blessing reward chime — a gentle rising 4-note tone (C5-E5-G5-C6),
+  // distinct from the crackle's harsh instant clicks. Routed through
+  // masterGainRef, not fireGainRef, since this reads as "something magical
+  // happened" rather than another fire-channel sound effect, but gated by
+  // the exact same mute convention as triggerManualCrackle above.
+  const triggerBlessingChime = useCallback(() => {
+    if (!isPlayingRef.current || !audioCtxRef.current || !masterGainRef.current) return;
+    const ctx = audioCtxRef.current;
+    const destination = masterGainRef.current;
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+
+    notes.forEach((freq, i) => {
+      const startTime = now + i * 0.14;
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0, startTime);
+      env.gain.linearRampToValueAtTime(0.18, startTime + 0.02);
+      env.gain.exponentialRampToValueAtTime(0.001, startTime + 0.75);
+
+      osc.connect(env);
+      env.connect(destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.8);
+    });
+
+    // A quiet high "sparkle" partial under the final note for a twinkling
+    // texture — the audio counterpart to the embers' ember-to-firefly shift.
+    const sparkleStart = now + notes.length * 0.14;
+    const sparkleOsc = ctx.createOscillator();
+    sparkleOsc.type = "triangle";
+    sparkleOsc.frequency.setValueAtTime(2400, sparkleStart);
+
+    const sparkleEnv = ctx.createGain();
+    sparkleEnv.gain.setValueAtTime(0, sparkleStart);
+    sparkleEnv.gain.linearRampToValueAtTime(0.04, sparkleStart + 0.01);
+    sparkleEnv.gain.exponentialRampToValueAtTime(0.001, sparkleStart + 0.4);
+
+    sparkleOsc.connect(sparkleEnv);
+    sparkleEnv.connect(destination);
+
+    sparkleOsc.start(sparkleStart);
+    sparkleOsc.stop(sparkleStart + 0.45);
+  }, []);
+
   // Listen for navbar mute/unmute custom triggers
   useEffect(() => {
     const handleToggle = (e: Event) => {
@@ -359,14 +408,22 @@ export const SoundscapeManager = () => {
 
     window.addEventListener("nature-sound-toggle", handleToggle);
     globalThis.addEventListener("nature-campfire-crackle", triggerManualCrackle);
+    globalThis.addEventListener("nature-campfire-blessing", triggerBlessingChime);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       window.removeEventListener("nature-sound-toggle", handleToggle);
       globalThis.removeEventListener("nature-campfire-crackle", triggerManualCrackle);
+      globalThis.removeEventListener("nature-campfire-blessing", triggerBlessingChime);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       cleanupSoundscape();
     };
-  }, [startSoundscape, stopSoundscape, cleanupSoundscape, triggerManualCrackle]);
+  }, [
+    startSoundscape,
+    stopSoundscape,
+    cleanupSoundscape,
+    triggerManualCrackle,
+    triggerBlessingChime,
+  ]);
 
   return null; // Silent component that acts strictly as the audio canvas controller
 };
