@@ -66,12 +66,15 @@ uniform float uMistIntensity;
 uniform vec2 uCursor;`;
 
 // Fully replaces the fog_fragment include with an inlined copy of its own
-// logic (both the FOG_EXP2 and linear branches, unchanged) plus one added
-// step: a cheap 3-term sine "noise" sampled from screen-space fragment
+// logic (both the FOG_EXP2 and linear branches, unchanged) plus two added
+// steps: a single low-frequency sine wave sampled from screen-space fragment
 // coordinates (no texture, no hash/fbm — the ridges are flat-shaded
-// silhouettes that don't need real turbulence) perturbs the existing
-// fogFactor before the same mix() call three.js would have generated. Fog
-// color/near/far are never touched, only how much of it blends in.
+// silhouettes that don't need real turbulence), shaped with a tight
+// smoothstep into ONE distinct traveling band rather than a busy multi-term
+// ripple (which averaged out to something too subtle to actually notice),
+// blended toward a genuinely paler mist tone — not just a perturbed version
+// of the existing warm fogColor — since a same-hue brightness ripple reads
+// as "slightly different lighting," not "mist," against this dawn palette.
 const FOG_MIST_PATCH = `#ifdef USE_FOG
 
 	#ifdef FOG_EXP2
@@ -84,14 +87,13 @@ const FOG_MIST_PATCH = `#ifdef USE_FOG
 
 	#endif
 
-	float uMist = 0.0;
-	uMist += sin(gl_FragCoord.x * 0.008 + uMistOffset) * 0.5;
-	uMist += sin(gl_FragCoord.x * 0.021 - uMistOffset * 1.3 + uTime * 0.05) * 0.3;
-	uMist += sin(gl_FragCoord.y * 0.015 + uMistOffset * 0.7 + uCursor.x * 2.0) * 0.2;
-	uMist = uMist * 0.5 + 0.5;
-	fogFactor = clamp(fogFactor + (uMist - 0.5) * uMistIntensity, 0.0, 1.0);
+	float uMist = sin(gl_FragCoord.x * 0.003 + uMistOffset) * 0.5 + 0.5;
+	float mistBand = smoothstep(0.5, 0.9, uMist) * uMistIntensity;
+	vec3 mistColor = vec3(1.0, 0.97, 0.88);
+	fogFactor = clamp(fogFactor + mistBand * 0.85, 0.0, 1.0);
+	vec3 blendedFogColor = mix(fogColor, mistColor, mistBand);
 
-	gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+	gl_FragColor.rgb = mix( gl_FragColor.rgb, blendedFogColor, fogFactor );
 
 #endif`;
 
@@ -257,8 +259,8 @@ const Scene = () => {
     const mistResponse = Math.sqrt(velocityRatio);
 
     uniforms.uTime.value = state.clock.elapsedTime;
-    uniforms.uMistOffset.value += delta * (0.05 + smoothedScrollVelocity.current * 0.0004);
-    uniforms.uMistIntensity.value = 0.05 + mistResponse * 0.45;
+    uniforms.uMistOffset.value += delta * (0.08 + smoothedScrollVelocity.current * 0.0006);
+    uniforms.uMistIntensity.value = 0.55 + mistResponse * 0.45;
     uniforms.uCursor.value.set(state.pointer.x, state.pointer.y);
   });
 
