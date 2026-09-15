@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "motion/react";
 import { useSafeReducedMotion } from "@/hooks/useSafeReducedMotion";
 import { useRef, useState } from "react";
 import { Briefcase, Compass, Code2, Microscope, Database, TreePine } from "lucide-react";

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 interface GlassPanelProps {
   tone?: "light" | "dark";
   padding?: "none" | "sm" | "md" | "lg";
-  as?: ElementType;
+  as?: ElementType<{ className?: string; children?: ReactNode }>;
   className?: string;
   children: ReactNode;
 }

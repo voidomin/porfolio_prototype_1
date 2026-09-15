@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { useScroll, MotionValue } from "framer-motion";
+import { useScroll, MotionValue } from "motion/react";
 
 interface ScrollContextType {
   scrollY: MotionValue<number>;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "motion/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowDown, MapPin, CircleDot } from "lucide-react";
@@ -76,7 +76,7 @@ export const HeroSection = () => {
     );
   }, [heroSceneWillMount]);
 
-  const letterVariants = {
+  const letterVariants: Variants = {
     hidden: { y: 80, opacity: 0, filter: "blur(8px)" },
     visible: (i: number) => ({
       y: 0,
@@ -90,7 +90,7 @@ export const HeroSection = () => {
     }),
   };
 
-  const fadeUpVariants = {
+  const fadeUpVariants: Variants = {
     hidden: { opacity: 0, y: 40 },
     visible: (delay: number) => ({
       opacity: 1,

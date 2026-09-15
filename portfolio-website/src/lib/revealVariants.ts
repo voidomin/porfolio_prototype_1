@@ -1,4 +1,4 @@
-import { Variants } from "framer-motion";
+import { Variants } from "motion/react";
 
 /* ──────────────────────────────────────────────────────────
    Shared chapter-entrance variants. Every section previously

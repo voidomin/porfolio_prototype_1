@@ -1,8 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Compass, ArrowUp, Mail, Github, Linkedin } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { Compass, ArrowUp, Mail } from "lucide-react";
+// lucide-react dropped brand/logo icons (Github, Linkedin) in its v1
+// rewrite; react-icons still bundles the same Lucide icon set including
+// these, so pulling just these two from there keeps the identical outline
+// style without adding a visually inconsistent icon set.
+import { LuGithub, LuLinkedin } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 import { socialLinks } from "@/data/portfolio";
 import { scrollTo } from "@/lib/lenis";
@@ -75,14 +80,14 @@ export const FloatingActionButton = () => {
     {
       id: "github",
       label: "GitHub",
-      icon: <Github className="w-5 h-5" />,
+      icon: <LuGithub className="w-5 h-5" />,
       action: openGithub,
       color: "bg-night-800 hover:bg-night-700",
     },
     {
       id: "linkedin",
       label: "LinkedIn",
-      icon: <Linkedin className="w-5 h-5" />,
+      icon: <LuLinkedin className="w-5 h-5" />,
       action: openLinkedIn,
       color: "bg-river-600 hover:bg-river-500",
     },

@@ -55,6 +55,9 @@ export default function Error({
         >
           Try again
         </button>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- deliberate
+            hard navigation, not an oversight: this boundary is the last line of
+            defense, so it must still work if client-side routing itself is broken. */}
         <a
           href="/"
           style={{

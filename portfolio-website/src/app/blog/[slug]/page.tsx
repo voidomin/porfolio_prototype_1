@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { blogPosts } from "@/data/portfolio";
 
 interface BlogPostPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 function getPost(slug: string) {
@@ -17,7 +17,8 @@ export function generateStaticParams() {
   return blogPosts.map((post) => ({ slug: post.slug }));
 }
 
-export function generateMetadata({ params }: BlogPostPageProps): Metadata {
+export async function generateMetadata(props: BlogPostPageProps): Promise<Metadata> {
+  const params = await props.params;
   const post = getPost(params.slug);
   if (!post) {
     return { title: "Post Not Found" };
@@ -34,7 +35,8 @@ export function generateMetadata({ params }: BlogPostPageProps): Metadata {
   };
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function BlogPostPage(props: BlogPostPageProps) {
+  const params = await props.params;
   const post = getPost(params.slug);
   if (!post) {
     notFound();

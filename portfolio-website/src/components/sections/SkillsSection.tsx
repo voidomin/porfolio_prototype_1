@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "motion/react";
 import { useSafeReducedMotion } from "@/hooks/useSafeReducedMotion";
 import { Leaf, Camera, Music, Mountain, type LucideIcon } from "lucide-react";
 import { skills, hobbies } from "@/data/portfolio";

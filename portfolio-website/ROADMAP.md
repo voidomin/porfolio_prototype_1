@@ -43,14 +43,20 @@ What's pending, organized by area. See `CHANGELOG.md` for everything already shi
 ## Code Quality & Tooling
 
 ### Active (set up)
-- [x] ESLint — extended with `prettier`, `no-console` warn, `prefer-const`, unused vars
+- [x] ESLint — flat config (`eslint.config.mjs`, required by `eslint-config-next` 16.x), extended with `prettier`, `no-console` warn, `prefer-const`, unused vars
 - [x] Prettier — auto-format on commit (100 char width, double quotes, LF line endings)
 - [x] Husky + lint-staged — pre-commit hook formats and lints staged files automatically
 - [x] GitHub CodeQL — `.github/workflows/codeql.yml` runs on push/PR to main plus a weekly schedule
 - [x] Playwright E2E suite — `e2e/*.spec.ts`, runs in CI (`.github/workflows/ci.yml`) on every push/PR to main, now across Chromium, Firefox, and WebKit. Scoped to safe-to-automate flows (navigation, Command Palette, contact form with network mocking, the admin security gate, responsive/reduced-motion/keyboard-accessibility smoke checks) — full admin CMS write flows and a live contact-form send are explicitly out of scope, see the v1 checklist above.
-- [🚩] Snyk — `.github/workflows/snyk.yml` added and running on push/PR/weekly schedule, `working-directory: portfolio-website` set correctly (learned that lesson the hard way with `ci.yml`). **Blocked on you:** the scan step itself needs a `SNYK_TOKEN` repo secret, which only you can create — sign up free at snyk.io, connect GitHub, copy the API token from your account settings, then add it at the repo's Settings → Secrets and variables → Actions → New repository secret, named exactly `SNYK_TOKEN`. Until then the step fails on auth (visible as a flagged step in the Actions tab, `continue-on-error: true` so it doesn't block the rest of CI) rather than silently doing nothing.
+- [x] Snyk — `.github/workflows/snyk.yml` running on push/PR/weekly schedule with a real `SNYK_TOKEN`. First real scan flagged ~20 High/Critical CVEs in `next@14.0.4` itself; fixed by the Next.js 16 upgrade, see `CHANGELOG.md`.
 
 ### To explore
 - [ ] **DeepScan** — TypeScript-specific static analysis, catches subtle runtime bugs ESLint misses; free for public repos
 - [ ] **Codacy** — full quality dashboard (grades, trends, PR comments), closest alternative to SonarCloud; free for public repos
 - [ ] **Code Climate** — maintainability scores and test coverage trends over time; free for open source
+
+## Flagged during the Next.js 16 / React 19 upgrade (2026-09) — deliberate, scoped-out follow-ups
+
+- [ ] `eslint-plugin-react-hooks` v6 (bundled by `eslint-config-next` 16.x) ships React Compiler-readiness rules (`purity`, `set-state-in-effect`, `preserve-manual-memoization`, `refs`) as part of its "recommended" config. Disabled all four in `eslint.config.mjs` with a comment — this project doesn't adopt the React Compiler, and the findings were false positives against patterns that are correct here (stable-per-mount `Math.random()` in a `useMemo`/empty-dep-array initializer, `HeroScene.tsx`'s lazy-ref-init, `useSafeReducedMotion`'s matchMedia-syncing effect). Revisit only if this project ever adopts the Compiler.
+- [ ] ESLint is pinned to the latest 9.x line (`^9.39.5`), not 10.x — `eslint-config-next@16.3.5`'s bundled `eslint-plugin-react@7.37.5` peer-requires `eslint@^9.7` and breaks at runtime under ESLint 10 (`contextOrFilename.getFilename is not a function`, a real ESLint 9→10 rule-API change). ESLint 10 was extremely recently released; bump once `eslint-config-next` catches up.
+- [ ] `@react-three/fiber` is pinned to `9.7.0`, and `react`/`react-dom`/`@types/react`/`@types/react-dom` to the `19.2.x` line rather than the newer `19.3.0` — `@react-three/fiber@9.7.0`'s peer range is `>=19 <19.3` (hasn't caught up to React 19.3 yet, which was published very recently). Bump React once a `@react-three/fiber` release widens that range.

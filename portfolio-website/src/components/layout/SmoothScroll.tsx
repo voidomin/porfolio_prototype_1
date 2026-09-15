@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Lenis from "@studio-freight/lenis";
-import { useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "motion/react";
 import { setLenisInstance } from "@/lib/lenis";
 
 /* ──────────────────────────────────────────────────────────

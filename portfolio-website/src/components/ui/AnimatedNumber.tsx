@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useInView } from "framer-motion";
+import { useInView } from "motion/react";
 
 interface AnimatedNumberProps {
   /** e.g. "2+", "9+", "88%", or non-numeric text like "Data + Product" (rendered as-is) */

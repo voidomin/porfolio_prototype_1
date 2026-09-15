@@ -4,10 +4,10 @@ import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import PhotographyGalleryPage from "./page";
 import { galleryImages } from "@/data/portfolio";
 
-// Mock framer-motion to bypass animations and render static components
-jest.mock("framer-motion", () => {
+// Mock motion/react to bypass animations and render static components
+jest.mock("motion/react", () => {
   const MockDiv = React.forwardRef<HTMLDivElement, any>(({ children, ...props }, ref) => {
-    // Remove framer-motion props to avoid React warnings in console
+    // Remove motion props to avoid React warnings in console
     const { initial, animate, exit, transition, ...rest } = props;
     return (
       <div ref={ref} {...rest}>

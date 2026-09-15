@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+// lucide-react dropped brand/logo icons (Github) in its v1 rewrite;
+// react-icons still bundles the same Lucide icon set including it, so
+// pulling just this one from there keeps the identical outline style.
+import { LuGithub } from "react-icons/lu";
 import { projects } from "@/data/portfolio";
 import { BackLink } from "@/components/ui/BackLink";
 import { ChapterMarker } from "@/components/ui/ChapterMarker";
@@ -10,7 +14,7 @@ import { TechChip } from "@/components/ui/TechChip";
 import { ProjectHero } from "./ProjectHero";
 
 interface ProjectPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 function getProject(slug: string) {
@@ -21,7 +25,8 @@ export function generateStaticParams() {
   return projects.map((project) => ({ slug: project.slug }));
 }
 
-export function generateMetadata({ params }: ProjectPageProps): Metadata {
+export async function generateMetadata(props: ProjectPageProps): Promise<Metadata> {
+  const params = await props.params;
   const project = getProject(params.slug);
   if (!project) {
     return { title: "Project Not Found" };
@@ -58,7 +63,8 @@ function deriveStatus(project: NonNullable<ReturnType<typeof getProject>>): stri
 
 const SECTION_HEADING = "text-xs font-bold uppercase tracking-widest text-forest-700 mb-3";
 
-export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
+export default async function ProjectCaseStudyPage(props: ProjectPageProps) {
+  const params = await props.params;
   const project = getProject(params.slug);
   if (!project) {
     notFound();
@@ -119,7 +125,7 @@ export default function ProjectCaseStudyPage({ params }: ProjectPageProps) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-stone-300 bg-white/40 backdrop-blur-sm text-stone-700 font-semibold text-sm hover:bg-stone-100 transition-colors"
             >
-              <Github className="w-4 h-4" />
+              <LuGithub className="w-4 h-4" />
               View Source
             </a>
           )}

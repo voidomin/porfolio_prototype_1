@@ -9,7 +9,6 @@
 // makes `promisify(execFile)` inside the route resolve/reject exactly the way we want here,
 // deterministically, regardless of whether an automock would otherwise preserve it.
 jest.mock("child_process", () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { promisify } = require("util");
   const execFile = jest.fn();
   (execFile as unknown as Record<symbol, unknown>)[promisify.custom] = jest.fn();

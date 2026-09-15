@@ -1,20 +1,23 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "motion/react";
 import {
   Mail,
   MapPin,
   Send,
   CheckCircle,
   AlertCircle,
-  Github,
-  Linkedin,
   Copy,
   Check,
   Sparkles,
   X,
 } from "lucide-react";
+// lucide-react dropped brand/logo icons (Github, Linkedin) in its v1
+// rewrite; react-icons still bundles the same Lucide icon set including
+// these, so pulling just these two from there keeps the identical outline
+// style without adding a visually inconsistent icon set.
+import { LuGithub, LuLinkedin } from "react-icons/lu";
 import { socialLinks, contactInfo } from "@/data/portfolio";
 import { ContactFormData } from "@/types";
 import { cn } from "@/lib/utils";
@@ -28,8 +31,8 @@ import { ChapterMarker } from "@/components/ui/ChapterMarker";
    ────────────────────────────────────────────────────────── */
 
 const socialIcons = {
-  github: Github,
-  linkedin: Linkedin,
+  github: LuGithub,
+  linkedin: LuLinkedin,
 };
 
 interface FormState {

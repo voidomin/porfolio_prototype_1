@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { Search, ArrowRight, Command } from "lucide-react";
 import { navigationItems, projects, blogPosts } from "@/data/portfolio";
 import { scrollTo } from "@/lib/lenis";

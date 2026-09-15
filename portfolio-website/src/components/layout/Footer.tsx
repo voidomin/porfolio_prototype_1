@@ -1,8 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Github, Linkedin, Star } from "lucide-react";
+import { motion } from "motion/react";
+import { Star } from "lucide-react";
+// lucide-react dropped brand/logo icons (Github, Linkedin) in its v1
+// rewrite; react-icons still bundles the same Lucide icon set including
+// these, so pulling just these two from there keeps the identical outline
+// style without adding a visually inconsistent icon set.
+import { LuGithub, LuLinkedin } from "react-icons/lu";
 import { socialLinks, personalProfile, navigationItems } from "@/data/portfolio";
 
 /* ──────────────────────────────────────────────────────────
@@ -12,8 +17,8 @@ import { socialLinks, personalProfile, navigationItems } from "@/data/portfolio"
    ────────────────────────────────────────────────────────── */
 
 const iconMap = {
-  github: Github,
-  linkedin: Linkedin,
+  github: LuGithub,
+  linkedin: LuLinkedin,
 };
 
 function generateFooterStars(count: number) {

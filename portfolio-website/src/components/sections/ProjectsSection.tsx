@@ -11,8 +11,12 @@ import {
   useMotionTemplate,
   useSpring,
   useReducedMotion,
-} from "framer-motion";
-import { ExternalLink, Github, Feather } from "lucide-react";
+} from "motion/react";
+import { ExternalLink, Feather } from "lucide-react";
+// lucide-react dropped brand/logo icons (Github) in its v1 rewrite;
+// react-icons still bundles the same Lucide icon set including it, so
+// pulling just this one from there keeps the identical outline style.
+import { LuGithub } from "react-icons/lu";
 import { projects } from "@/data/portfolio";
 import { Project, type ProjectCategory } from "@/types";
 import { cn } from "@/lib/utils";
@@ -253,7 +257,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <Github className="w-4 h-4" />
+                      <LuGithub className="w-4 h-4" />
                     </motion.a>
                   )}
                 </div>

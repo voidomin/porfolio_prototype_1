@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { useScrollProgress } from "@/hooks/useIntersectionObserver";
 import { cn } from "@/lib/utils";
 import { scrollTo } from "@/lib/lenis";

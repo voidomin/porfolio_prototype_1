@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useTransform, useMotionValue, useSpring } from "motion/react";
 import { useScrollContext } from "@/contexts/ScrollContext";
 import { useIsDesktopPointer } from "@/hooks/useIsDesktopPointer";
 
