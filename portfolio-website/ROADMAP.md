@@ -52,9 +52,9 @@ What's pending, organized by area. See `CHANGELOG.md` for everything already shi
 - [x] Husky + lint-staged — pre-commit hook formats and lints staged files automatically
 - [x] GitHub CodeQL — `.github/workflows/codeql.yml` runs on push/PR to main plus a weekly schedule
 - [x] Playwright E2E suite — `e2e/*.spec.ts`, runs in CI (`.github/workflows/ci.yml`) on every push/PR to main, now across Chromium, Firefox, and WebKit. Scoped to safe-to-automate flows (navigation, Command Palette, contact form with network mocking, the admin security gate, responsive/reduced-motion/keyboard-accessibility smoke checks) — full admin CMS write flows and a live contact-form send are explicitly out of scope, see the v1 checklist above.
+- [🚩] Snyk — `.github/workflows/snyk.yml` added and running on push/PR/weekly schedule, `working-directory: portfolio-website` set correctly (learned that lesson the hard way with `ci.yml`). **Blocked on you:** the scan step itself needs a `SNYK_TOKEN` repo secret, which only you can create — sign up free at snyk.io, connect GitHub, copy the API token from your account settings, then add it at the repo's Settings → Secrets and variables → Actions → New repository secret, named exactly `SNYK_TOKEN`. Until then the step fails on auth (visible as a flagged step in the Actions tab, `continue-on-error: true` so it doesn't block the rest of CI) rather than silently doing nothing.
 
 ### To explore
-- [ ] **Snyk** — scans npm dependencies for known CVEs; free tier, 2-min GitHub connect
 - [ ] **DeepScan** — TypeScript-specific static analysis, catches subtle runtime bugs ESLint misses; free for public repos
 - [ ] **Codacy** — full quality dashboard (grades, trends, PR comments), closest alternative to SonarCloud; free for public repos
 - [ ] **Code Climate** — maintainability scores and test coverage trends over time; free for open source
