@@ -96,7 +96,7 @@ describe("POST /api/admin/caption", () => {
     expect(await res.json()).toEqual({ error: "Failed to parse AI response" });
   });
 
-  test("200 with no suggestions when the parsed JSON has no 'suggestions' key (documents an existing gap)", async () => {
+  test("500 when the parsed JSON has no 'suggestions' key", async () => {
     wireFs(createFsState({ [path.join(dirPath, "shot.jpg")]: Buffer.from("x") }));
     mockGenerateContent(JSON.stringify({ notSuggestions: [] }));
 
@@ -104,8 +104,32 @@ describe("POST /api/admin/caption", () => {
       jsonRequest("http://localhost/api/admin/caption", "POST", { filename: "shot.jpg" })
     );
 
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({});
+    expect(res.status).toBe(500);
+    expect(await res.json()).toEqual({ error: "AI response did not include valid suggestions" });
+  });
+
+  test("500 when 'suggestions' is present but malformed (missing fields)", async () => {
+    wireFs(createFsState({ [path.join(dirPath, "shot.jpg")]: Buffer.from("x") }));
+    mockGenerateContent(JSON.stringify({ suggestions: [{ title: "Only a title" }] }));
+
+    const res = await POST(
+      jsonRequest("http://localhost/api/admin/caption", "POST", { filename: "shot.jpg" })
+    );
+
+    expect(res.status).toBe(500);
+    expect(await res.json()).toEqual({ error: "AI response did not include valid suggestions" });
+  });
+
+  test("500 when 'suggestions' is an empty array", async () => {
+    wireFs(createFsState({ [path.join(dirPath, "shot.jpg")]: Buffer.from("x") }));
+    mockGenerateContent(JSON.stringify({ suggestions: [] }));
+
+    const res = await POST(
+      jsonRequest("http://localhost/api/admin/caption", "POST", { filename: "shot.jpg" })
+    );
+
+    expect(res.status).toBe(500);
+    expect(await res.json()).toEqual({ error: "AI response did not include valid suggestions" });
   });
 
   test("500 with a specific message when the SDK reports a missing/invalid API key", async () => {

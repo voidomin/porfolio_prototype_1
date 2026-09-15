@@ -28,8 +28,6 @@ What's pending, organized by area. See `CHANGELOG.md` for everything already shi
 
 ## Flagged while adding admin CMS test coverage (2026-09) — minor, non-security gaps found and left as-is
 
-- [ ] `commit/route.ts`'s path allowlist uses `startsWith`, so e.g. `src/data/gallery.json.bak` would also pass the check (only ever matters if something else on the write path could produce such a filename — nothing currently does). Low severity; tighten to an exact/proper-boundary check if this route's allowlist ever grows.
-- [ ] `caption/route.ts` returns `200` with `suggestions: undefined` if the AI response parses as JSON but happens to lack a `suggestions` key — no schema validation on the parsed shape. Not currently reachable with the fixed prompt, but worth a validation check if the prompt ever changes.
 - [ ] Admin page: selecting "Re-edit Visuals" on a published photo and submitting routes through the create/process pipeline rather than a dedicated update-with-new-visuals path (confirmed correct in practice — the gallery entry is upserted by matching `id` — but it's a real inconsistency with the plain metadata-edit path, which PUTs). Also, the "AI Suggest" button stays hidden during re-edit-visuals even though the underlying hook would allow it. Both are now pinned down by tests as current behavior; neither is a functional bug worth a source change on its own.
 
 ## Flagged while getting CI actually running for the first time (2026-09) — needs real Linux/CI access to root-cause

@@ -23,10 +23,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "files and message are required" }, { status: 400 });
     }
 
-    // Only allow committing paths under the two directories this workflow writes to.
-    const allowedPrefixes = ["public/images/photography/", "src/data/gallery.json"];
+    // Only allow committing paths under the two locations this workflow writes to.
+    // Split into an exact-file check and a directory-prefix check rather than applying
+    // `startsWith` to both uniformly: `startsWith("src/data/gallery.json")` would also
+    // match "src/data/gallery.json.bak" or similar, since a bare filename has no
+    // boundary character the way "public/images/photography/" (with its trailing
+    // slash) does.
+    const allowedExactFiles = ["src/data/gallery.json"];
+    const allowedDirectoryPrefixes = ["public/images/photography/"];
     const invalid = files.filter(
-      (f) => !allowedPrefixes.some((prefix) => f === prefix || f.startsWith(prefix))
+      (f) =>
+        !allowedExactFiles.includes(f) &&
+        !allowedDirectoryPrefixes.some((prefix) => f.startsWith(prefix))
     );
     if (invalid.length > 0) {
       return NextResponse.json(

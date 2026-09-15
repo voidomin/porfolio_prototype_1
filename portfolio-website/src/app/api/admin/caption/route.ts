@@ -68,12 +68,37 @@ Reply ONLY with valid JSON in this exact format, no other text:
       return NextResponse.json({ error: "Failed to parse AI response" }, { status: 500 });
     }
 
+    // The parsed JSON can be well-formed but still lack (or malform) the
+    // `suggestions` shape the prompt asks for — without this check, that
+    // silently returned a 200 with `suggestions: undefined` instead of a
+    // real error.
+    const isSuggestion = (value: unknown): value is Record<string, string> =>
+      typeof value === "object" &&
+      value !== null &&
+      typeof (value as Record<string, unknown>).title === "string" &&
+      typeof (value as Record<string, unknown>).altText === "string" &&
+      typeof (value as Record<string, unknown>).description === "string";
+
+    if (
+      !Array.isArray(suggestions) ||
+      suggestions.length === 0 ||
+      !suggestions.every(isSuggestion)
+    ) {
+      return NextResponse.json(
+        { error: "AI response did not include valid suggestions" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({ suggestions });
   } catch (error: any) {
     console.error("Caption API error:", error);
     if (error?.message?.includes("API_KEY")) {
       return NextResponse.json({ error: "Invalid or missing GEMINI_API_KEY" }, { status: 500 });
     }
-    return NextResponse.json({ error: error.message || "Caption generation failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Caption generation failed" },
+      { status: 500 }
+    );
   }
 }

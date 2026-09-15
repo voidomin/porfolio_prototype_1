@@ -46,6 +46,19 @@ describe("POST /api/admin/commit", () => {
     expect((await res.json()).error).toMatch(/Refusing to commit unexpected paths/);
   });
 
+  test("400 for a path that merely starts with the allowlisted filename (boundary check)", async () => {
+    // gallery.json is allowlisted as an exact file, not a directory prefix —
+    // a plain startsWith would incorrectly let this through too.
+    const res = await POST(
+      jsonRequest("http://localhost/api/admin/commit", "POST", {
+        files: ["src/data/gallery.json.bak"],
+        message: "commit",
+      })
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/Refusing to commit unexpected paths/);
+  });
+
   test("happy path: adds, commits, and returns the short hash", async () => {
     execFileCustom.mockResolvedValueOnce({ stdout: "", stderr: "" }); // git add
     execFileCustom.mockResolvedValueOnce({ stdout: "1 file changed", stderr: "" }); // git commit
