@@ -69,12 +69,16 @@ uniform vec2 uCursor;`;
 // logic (both the FOG_EXP2 and linear branches, unchanged) plus two added
 // steps: a single low-frequency sine wave sampled from screen-space fragment
 // coordinates (no texture, no hash/fbm — the ridges are flat-shaded
-// silhouettes that don't need real turbulence), shaped with a tight
-// smoothstep into ONE distinct traveling band rather than a busy multi-term
-// ripple (which averaged out to something too subtle to actually notice),
-// blended toward a genuinely paler mist tone — not just a perturbed version
-// of the existing warm fogColor — since a same-hue brightness ripple reads
-// as "slightly different lighting," not "mist," against this dawn palette.
+// silhouettes that don't need real turbulence) drives a *continuous* haze
+// amount with no threshold/smoothstep — a raw sine is already smooth
+// everywhere, so there's no hard edge to appear in the first place, unlike
+// an earlier version that thresholded it into a single sharp-edged "band"
+// and looked like a pasted-on patch instead of atmospheric mist. The mist
+// tone is a paler version of the *existing* fogColor (not an unrelated
+// color), and its peak contribution is deliberately small relative to the
+// base depth-fog blend, so the ridge's own color always still shows through
+// — mist should look like haze settling over the mountains, not a wash
+// replacing them.
 const FOG_MIST_PATCH = `#ifdef USE_FOG
 
 	#ifdef FOG_EXP2
@@ -87,11 +91,11 @@ const FOG_MIST_PATCH = `#ifdef USE_FOG
 
 	#endif
 
-	float uMist = sin(gl_FragCoord.x * 0.003 + uMistOffset) * 0.5 + 0.5;
-	float mistBand = smoothstep(0.5, 0.9, uMist) * uMistIntensity;
-	vec3 mistColor = vec3(1.0, 0.97, 0.88);
-	fogFactor = clamp(fogFactor + mistBand * 0.85, 0.0, 1.0);
-	vec3 blendedFogColor = mix(fogColor, mistColor, mistBand);
+	float uMist = sin(gl_FragCoord.x * 0.0018 + uMistOffset) * 0.5 + 0.5;
+	float mistAmount = uMist * uMistIntensity;
+	vec3 mistColor = mix(fogColor, vec3(1.0), 0.55);
+	fogFactor = clamp(fogFactor + mistAmount * 0.3, 0.0, 1.0);
+	vec3 blendedFogColor = mix(fogColor, mistColor, mistAmount);
 
 	gl_FragColor.rgb = mix( gl_FragColor.rgb, blendedFogColor, fogFactor );
 
@@ -260,7 +264,7 @@ const Scene = () => {
 
     uniforms.uTime.value = state.clock.elapsedTime;
     uniforms.uMistOffset.value += delta * (0.08 + smoothedScrollVelocity.current * 0.0006);
-    uniforms.uMistIntensity.value = 0.55 + mistResponse * 0.45;
+    uniforms.uMistIntensity.value = 0.85 + mistResponse * 0.15;
     uniforms.uCursor.value.set(state.pointer.x, state.pointer.y);
   });
 
