@@ -14,6 +14,7 @@ import { FloatingActionButton } from "@/components/ui/FloatingActionButton";
 import { MountainAscentHUD } from "@/components/ui/MountainAscentHUD";
 import { ChapterTitleIntro } from "@/components/ui/ChapterTitleIntro";
 import { NatureScene } from "@/components/animations/NatureScene";
+import { CinematicOverlay } from "@/components/animations/CinematicOverlay";
 import { BirdFlock } from "@/components/animations/BirdFlock";
 import { FloatingLeaves } from "@/components/animations/FloatingLeaves";
 import { InteractiveTrail } from "@/components/animations/InteractiveTrail";
@@ -28,6 +29,12 @@ export default function Home() {
       {/* Fixed nature background — sky, mountains, sun, stars */}
       <SectionErrorBoundary name="nature-scene">
         <NatureScene />
+      </SectionErrorBoundary>
+
+      {/* Cinematic vignette + film-grain overlay, above content/particles,
+          below top-level UI chrome (Command Palette, custom cursor) */}
+      <SectionErrorBoundary name="cinematic-overlay">
+        <CinematicOverlay />
       </SectionErrorBoundary>
 
       {/* Ambient nature overlays */}

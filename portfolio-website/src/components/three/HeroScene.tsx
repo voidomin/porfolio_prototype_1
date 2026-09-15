@@ -173,9 +173,106 @@ const Ridge = ({ config, uniforms }: { config: RidgeConfig; uniforms: MistUnifor
   );
 };
 
-const BASE_LIGHT_POSITION = { x: 4, y: 6 };
+// Aimed to visually agree with NatureScene's own 2D dawn sun, which sits at
+// screen lower-left at rest (~15vw, ~70vh) — the ridges' highlight side
+// should read as lit by that same visible sun, not an unrelated direction.
+// z stays close to the camera (front-lighting) rather than going backlit/
+// silhouette, which would be a much bigger visual change than intended here.
+const BASE_LIGHT_POSITION = { x: -3.5, y: 2 };
 const BASE_LIGHT_INTENSITY = 1.3;
 const MAX_SCROLL_VELOCITY = 2500; // px/s, clamped before it can dominate the mist
+
+// Sparse ambient light motes drifting up through the ridges — ties the hero
+// into the site's existing "firefly" visual language (same warm gold used by
+// .firefly-dot / the Campfire Blessing embers) instead of a new, unrelated
+// motif. World-space bounds picked to roughly span from the ridges' base up
+// past their tallest peak into open sky, tuned by eye rather than derived
+// exactly from each ridge's own geometry math.
+const MOTE_COUNT = 20;
+const MOTE_BOUNDS = { xRange: 8, yMin: -6, yMax: 0.8, zMin: -7, zMax: -0.5 };
+
+interface MoteDatum {
+  baseX: number;
+  y: number;
+  z: number;
+  speed: number;
+  swayPhase: number;
+}
+
+const LightMotes = () => {
+  const pointsRef = useRef<THREE.Points>(null);
+  const groupRef = useRef<THREE.Group>(null);
+  const parallaxOffset = useRef({ x: 0, y: 0 });
+
+  const motes = useMemo<MoteDatum[]>(
+    () =>
+      Array.from({ length: MOTE_COUNT }, () => ({
+        baseX: (Math.random() * 2 - 1) * MOTE_BOUNDS.xRange,
+        y: MOTE_BOUNDS.yMin + Math.random() * (MOTE_BOUNDS.yMax - MOTE_BOUNDS.yMin),
+        z: MOTE_BOUNDS.zMin + Math.random() * (MOTE_BOUNDS.zMax - MOTE_BOUNDS.zMin),
+        speed: 0.08 + Math.random() * 0.1,
+        swayPhase: Math.random() * Math.PI * 2,
+      })),
+    []
+  );
+
+  const positions = useMemo(() => {
+    const array = new Float32Array(MOTE_COUNT * 3);
+    motes.forEach((mote, i) => {
+      array[i * 3] = mote.baseX;
+      array[i * 3 + 1] = mote.y;
+      array[i * 3 + 2] = mote.z;
+    });
+    return array;
+  }, [motes]);
+
+  useFrame((state, delta) => {
+    // Whole-group parallax toward the cursor — same exponential-smoothing
+    // idiom as the camera/light above, applied once to the group rather than
+    // per-particle, so the motes feel part of the same reactive space
+    // without adding per-particle cursor math.
+    if (groupRef.current) {
+      const followSpeed = 1.5;
+      const catchUp = 1 - Math.exp(-followSpeed * delta);
+      parallaxOffset.current.x += (state.pointer.x * 0.4 - parallaxOffset.current.x) * catchUp;
+      parallaxOffset.current.y += (state.pointer.y * 0.25 - parallaxOffset.current.y) * catchUp;
+      groupRef.current.position.x = parallaxOffset.current.x;
+      groupRef.current.position.y = parallaxOffset.current.y;
+    }
+
+    const posAttr = pointsRef.current?.geometry.attributes.position as
+      | THREE.BufferAttribute
+      | undefined;
+    if (!posAttr) return;
+
+    motes.forEach((mote, i) => {
+      mote.y += mote.speed * delta;
+      if (mote.y > MOTE_BOUNDS.yMax) mote.y = MOTE_BOUNDS.yMin;
+      const sway = Math.sin(state.clock.elapsedTime * 0.4 + mote.swayPhase) * 0.4;
+      posAttr.setXYZ(i, mote.baseX + sway, mote.y, mote.z);
+    });
+    posAttr.needsUpdate = true;
+  });
+
+  return (
+    <group ref={groupRef}>
+      <points ref={pointsRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.06}
+          color="#f0b429"
+          transparent
+          opacity={0.7}
+          sizeAttenuation
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </points>
+    </group>
+  );
+};
 
 const Scene = () => {
   const cameraTarget = useRef({ x: 0, y: 0 });
@@ -272,7 +369,12 @@ const Scene = () => {
     <>
       <fog attach="fog" args={["#fbdf85", 5, 15]} />
       <ambientLight intensity={0.6} color="#fef7e0" />
-      <directionalLight ref={lightRef} position={[4, 6, 4]} intensity={1.3} color="#f0b429" />
+      <directionalLight
+        ref={lightRef}
+        position={[BASE_LIGHT_POSITION.x, BASE_LIGHT_POSITION.y, 4]}
+        intensity={1.3}
+        color="#f0b429"
+      />
       {/* Pushed well below center so peaks stay clear of the hero text/CTAs —
           confirmed by screenshot that the default position rose into the
           headline and buttons, hurting legibility exactly where it matters. */}
@@ -281,6 +383,7 @@ const Scene = () => {
           <Ridge key={i} config={ridge} uniforms={uniforms} />
         ))}
       </group>
+      <LightMotes />
     </>
   );
 };

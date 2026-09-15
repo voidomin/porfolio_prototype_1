@@ -126,6 +126,17 @@ html {
   left: -5%;
   right: -5%;
   pointer-events: none;
+  /* Fades out (never unmounts) once the hero's 3D ridges take over this
+     chapter — opacity-only so it can never register as a layout shift,
+     given the fragile, only-partially-explained CLS interaction this
+     exact element already had with the WebGL canvas mounting nearby. */
+  transition: opacity 0.5s ease;
+}
+
+/* Ground mist — same opacity-only fade rule as .mountain-layer above,
+   for the same reason (this element sits right next to it in the DOM). */
+.ground-mist {
+  transition: opacity 0.5s ease;
 }
 
 /* Cloud drift animation */
@@ -134,6 +145,204 @@ html {
   border-radius: 50%;
   filter: blur(8px);
   opacity: 0.6;
+}
+
+/* Sun rays — soft, slow-breathing light shafts anchored at the dawn sun's
+   position. Pure CSS keyframe drift, no per-frame JS, scoped to the hero
+   chapter only (rendered conditionally in NatureScene). */
+.sun-rays {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255, 245, 214, 0.22) 6deg,
+    transparent 14deg,
+    transparent 40deg,
+    rgba(255, 245, 214, 0.16) 48deg,
+    transparent 58deg,
+    transparent 96deg,
+    rgba(255, 245, 214, 0.2) 104deg,
+    transparent 114deg,
+    transparent 150deg,
+    rgba(255, 245, 214, 0.14) 158deg,
+    transparent 168deg,
+    transparent 200deg,
+    rgba(255, 245, 214, 0.18) 208deg,
+    transparent 218deg,
+    transparent 260deg,
+    rgba(255, 245, 214, 0.15) 268deg,
+    transparent 278deg,
+    transparent 320deg,
+    rgba(255, 245, 214, 0.2) 328deg,
+    transparent 338deg,
+    transparent 360deg
+  );
+  -webkit-mask-image: radial-gradient(circle, black 0%, transparent 65%);
+  mask-image: radial-gradient(circle, black 0%, transparent 65%);
+  animation: sunRaysDrift 40s linear infinite;
+}
+
+/* Rotation only — deliberately no `opacity` here. An animated CSS property
+   fully replaces the same property's static/inline value rather than
+   composing with it (the same rule that broke .moon-rays' `transform`
+   earlier): an opacity keyframe here would permanently override the
+   motion.div's `style={{opacity: sunOpacity}}` binding, forcing the rays
+   to sit at ~0.85-1 opacity always instead of fading with scroll. Caught
+   live: the user reported the rays "showing up all the time, even when
+   the sun/moon isn't," which is exactly that failure mode. */
+@keyframes sunRaysDrift {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Moon rays — same conic-gradient + radial-mask technique as .sun-rays,
+   cooler-toned and dimmer (moonlight, not dawn) with a slower drift.
+   Positioned via right/top (matching the moon disc itself), so it's
+   centered with translate(50%,-50%) — the mirror-image of .sun-rays'
+   left/top + translate(-50%,-50%), since the anchor here is the element's
+   own top-right corner rather than top-left. */
+.moon-rays {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  pointer-events: none;
+  transform: translate(50%, -50%);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(199, 207, 255, 0.16) 8deg,
+    transparent 18deg,
+    transparent 60deg,
+    rgba(199, 207, 255, 0.12) 70deg,
+    transparent 82deg,
+    transparent 140deg,
+    rgba(199, 207, 255, 0.14) 150deg,
+    transparent 162deg,
+    transparent 220deg,
+    rgba(199, 207, 255, 0.11) 230deg,
+    transparent 242deg,
+    transparent 300deg,
+    rgba(199, 207, 255, 0.15) 310deg,
+    transparent 322deg,
+    transparent 360deg
+  );
+  -webkit-mask-image: radial-gradient(circle, black 0%, transparent 65%);
+  mask-image: radial-gradient(circle, black 0%, transparent 65%);
+  animation: moonRaysDrift 65s linear infinite;
+}
+
+/* Own keyframes rather than reusing sunRaysDrift — an animated `transform`
+   fully replaces the element's static `transform` declaration rather than
+   composing with it, so reusing sunRaysDrift's baked-in translate(-50%,-50%)
+   silently discarded .moon-rays' own translate(50%,-50%) and threw the
+   anchor off by the element's full width. Caught via direct bounding-box
+   inspection (getComputedStyle().transform showed a rotation+translate
+   matrix using -50%, not the +50% this element needs). */
+/* Rotation only — see the matching comment on sunRaysDrift above; an
+   opacity keyframe here would override .moon-rays' `moonOpacity` binding
+   the exact same way. */
+@keyframes moonRaysDrift {
+  0% {
+    transform: translate(50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(50%, -50%) rotate(-360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sun-rays,
+  .moon-rays {
+    animation: none;
+  }
+}
+
+/* Moon glow pulse — slow box-shadow breathing, the same "ambient life"
+   treatment the campfire's flame glow already has, so the moon doesn't sit
+   static now that the rest of the hero has more going on. */
+.moon-glow-pulse {
+  animation: moonGlowPulse 7.5s ease-in-out infinite;
+}
+
+@keyframes moonGlowPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 40px 10px rgba(199, 207, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 56px 16px rgba(199, 207, 255, 0.32);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .moon-glow-pulse {
+    animation: none;
+    box-shadow: 0 0 40px 10px rgba(199, 207, 255, 0.2);
+  }
+}
+
+/* Shooting star — sparse ambient flourish, nested inside NatureScene's
+   existing opacity-gated stars wrapper so it only ever shows alongside
+   them. Mostly idle for the bulk of the loop with a brief diagonal
+   streak-and-fade. The "wish" click for this is handled at the window
+   level in NatureScene.tsx (not via pointer-events on this element) — a
+   real click can never reach an element positioned inside the fixed,
+   z-0 NatureScene background via normal hit-testing, since every content
+   section stacked in front of it fills the page and absorbs the hit first. */
+.shooting-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  animation: shootingStarLoop 22s linear infinite;
+}
+
+.shooting-star::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8));
+  transform: translateY(-50%);
+}
+
+@keyframes shootingStarLoop {
+  0%,
+  85% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  87% {
+    opacity: 1;
+  }
+  97% {
+    opacity: 0;
+    transform: translate(220px, 130px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shooting-star {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 /* ─── Section Transitions ─── */

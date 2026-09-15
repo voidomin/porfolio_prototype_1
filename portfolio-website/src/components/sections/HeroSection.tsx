@@ -63,6 +63,19 @@ export const HeroSection = () => {
     return () => window.clearTimeout(id);
   }, []);
 
+  const heroSceneWillMount =
+    isDesktop && !prefersReducedMotion && heroNearViewport && readyForHeavyMount;
+
+  // NatureScene owns the flat 2D mountains/mist by default and only fades
+  // them out once it hears this scene has actually mounted — decoupled via
+  // CustomEvent (same convention as the nature-campfire-* events) instead
+  // of NatureScene duplicating this gating logic itself.
+  useEffect(() => {
+    globalThis.dispatchEvent(
+      new CustomEvent("hero-scene-active", { detail: { active: heroSceneWillMount } })
+    );
+  }, [heroSceneWillMount]);
+
   const letterVariants = {
     hidden: { y: 80, opacity: 0, filter: "blur(8px)" },
     visible: (i: number) => ({
@@ -94,15 +107,26 @@ export const HeroSection = () => {
       ref={heroRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-0"
     >
-      {/* Dawn glow overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-dawn-200/20 via-transparent to-transparent pointer-events-none z-[1]" />
+      {/* Dawn glow overlay — a soft radial bloom anchored at the same
+          screen position NatureScene's own sun sits at rest (~15vw, 70vh
+          at scrollYProgress≈0). Sits between NatureScene (z-0) and the 3D
+          canvas (z-2) so it reads as that sun's own light spilling across
+          into the 3D relief, instead of the two layers meeting at a hard
+          seam. */}
+      <div
+        className="absolute inset-0 pointer-events-none z-[1]"
+        style={{
+          background:
+            "radial-gradient(circle at 15% 72%, rgba(255,241,201,0.35) 0%, rgba(251,223,133,0.16) 28%, transparent 60%)",
+        }}
+      />
 
       {/* Real 3D mountain scene — replaces the flat NatureScene backdrop for
           just this section. Desktop + non-reduced-motion only; the chunk is
           never fetched otherwise. Sits behind the text (z-10) but above the
           dawn glow, and scrolls away normally with the rest of the hero —
           no pinning/fixed-position tricks. */}
-      {isDesktop && !prefersReducedMotion && heroNearViewport && readyForHeavyMount && (
+      {heroSceneWillMount && (
         <div className="absolute inset-0 z-[2]">
           {/* Isolated from the rest of the hero — a WebGL context-creation
               failure (old GPU, WebGL disabled, some in-app browsers) should

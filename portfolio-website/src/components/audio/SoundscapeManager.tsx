@@ -374,6 +374,38 @@ export const SoundscapeManager = () => {
     sparkleOsc.stop(sparkleStart + 0.45);
   }, []);
 
+  // Shooting-star "wish" chime — a small two-note twinkle (E6-B6), same
+  // masterGainRef-gated pattern as triggerBlessingChime above but
+  // deliberately shorter/softer so it reads as a small delight rather than
+  // competing with the campfire's bigger four-note reward. Repeatable (no
+  // localStorage gate) — this is meant to be a small toy each time you
+  // catch a star, not a one-time unlock.
+  const triggerWishChime = useCallback(() => {
+    if (!isPlayingRef.current || !audioCtxRef.current || !masterGainRef.current) return;
+    const ctx = audioCtxRef.current;
+    const destination = masterGainRef.current;
+    const now = ctx.currentTime;
+    const notes = [1318.51, 1975.53]; // E6, B6
+
+    notes.forEach((freq, i) => {
+      const startTime = now + i * 0.1;
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0, startTime);
+      env.gain.linearRampToValueAtTime(0.09, startTime + 0.015);
+      env.gain.exponentialRampToValueAtTime(0.001, startTime + 0.4);
+
+      osc.connect(env);
+      env.connect(destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.45);
+    });
+  }, []);
+
   // Listen for navbar mute/unmute custom triggers
   useEffect(() => {
     const handleToggle = (e: Event) => {
@@ -409,11 +441,13 @@ export const SoundscapeManager = () => {
     window.addEventListener("nature-sound-toggle", handleToggle);
     globalThis.addEventListener("nature-campfire-crackle", triggerManualCrackle);
     globalThis.addEventListener("nature-campfire-blessing", triggerBlessingChime);
+    globalThis.addEventListener("nature-shooting-star-wish", triggerWishChime);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       window.removeEventListener("nature-sound-toggle", handleToggle);
       globalThis.removeEventListener("nature-campfire-crackle", triggerManualCrackle);
       globalThis.removeEventListener("nature-campfire-blessing", triggerBlessingChime);
+      globalThis.removeEventListener("nature-shooting-star-wish", triggerWishChime);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       cleanupSoundscape();
     };
@@ -423,6 +457,7 @@ export const SoundscapeManager = () => {
     cleanupSoundscape,
     triggerManualCrackle,
     triggerBlessingChime,
+    triggerWishChime,
   ]);
 
   return null; // Silent component that acts strictly as the audio canvas controller
