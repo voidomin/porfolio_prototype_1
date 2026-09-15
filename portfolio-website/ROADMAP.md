@@ -5,8 +5,8 @@ What's pending, organized by area. See `CHANGELOG.md` for everything already shi
 ## v1 Checklist — Must complete before launch
 
 - [🚩] Add photography images — **flagged/deferred by request.** Waiting on a planned rework of the upload/edit pipeline (admin CMS) before adding real photos, not just dropping files in `public/images/photography/`.
-- [ ] Test contact form end-to-end — needs a real send against the live site (requires `RESEND_API_KEY`, which only exists in Vercel's env, and lands in your real inbox) — can't be faithfully done from this sandbox. Code-level checks done: validation paths (missing fields, bad email format) and the graceful-failure path all verified locally.
-- [ ] Cross-browser test — check on Firefox and Safari / mobile (needs real browsers/devices, not available in this environment)
+- [ ] Test contact form end-to-end with a real send — needs a real send against the live site (requires `RESEND_API_KEY`, which only exists in Vercel's env, and lands in your real inbox) — can't be faithfully done from this sandbox. Everything short of that is now covered by `e2e/contact-form.spec.ts`: native browser validation (empty/malformed fields), and both the success and failure UI paths via network-mocked `/api/contact` responses — this is still a mock, not a live send, so the item stays open.
+- [ ] Cross-browser test — check on Firefox and Safari / mobile (needs real browsers/devices, not available in this environment). The new E2E suite (`e2e/`) runs Chromium only, by design — a deliberate first-pass scope, not full cross-browser coverage; adding Firefox/WebKit projects to `playwright.config.ts` is a natural next step whenever real cross-browser verification is wanted.
 
 ---
 
@@ -25,7 +25,6 @@ What's pending, organized by area. See `CHANGELOG.md` for everything already shi
 ## Flagged during the Phase 0 repo audit (2026-09) — need your call, not auto-fixed
 
 - [ ] `src/data/projects.json` — `react-projects-studio`'s `demoUrl` and all 5 `subProjects` demo URLs have a stray trailing dot before the slash (e.g. `https://voidomin.github.io/react-projects./`). Turns out the trailing dot isn't the real issue — tested directly: the corrected URL (no dot, trailing slash) 404s too, so the GitHub Pages deployment isn't currently live at that path at all. **Blocked on you:** confirmed it's hosted somewhere else now — waiting on the real, current URL(s) to swap in.
-- [ ] Real E2E test coverage — the one existing test (`src/app/photography/page.test.tsx`, Jest + RTL) is genuine and passes, but thin. `playwright` was installed with zero config/usage and has now been removed; if E2E testing is wanted, it should be added deliberately with a real `playwright.config.ts`, not left as an unused install.
 
 ## Flagged while adding admin CMS test coverage (2026-09) — minor, non-security gaps found and left as-is
 
@@ -50,6 +49,7 @@ What's pending, organized by area. See `CHANGELOG.md` for everything already shi
 - [x] Prettier — auto-format on commit (100 char width, double quotes, LF line endings)
 - [x] Husky + lint-staged — pre-commit hook formats and lints staged files automatically
 - [x] GitHub CodeQL — `.github/workflows/codeql.yml` runs on push/PR to main plus a weekly schedule
+- [x] Playwright E2E suite — `e2e/*.spec.ts`, runs in CI (`.github/workflows/ci.yml`) on every push/PR to main. Chromium only, scoped to safe-to-automate flows (navigation, Command Palette, contact form with network mocking, the admin security gate, responsive/reduced-motion/keyboard-accessibility smoke checks) — full admin CMS write flows and a live contact-form send are explicitly out of scope, see the v1 checklist above.
 
 ### To explore
 - [ ] **Snyk** — scans npm dependencies for known CVEs; free tier, 2-min GitHub connect

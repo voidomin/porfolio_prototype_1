@@ -9,3 +9,7 @@ node_modules/
 # Photo upload raw images folder
 /images-to-process/
 
+# Playwright E2E output
+/playwright-report/
+/test-results/
+

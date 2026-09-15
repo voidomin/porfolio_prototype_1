@@ -1,0 +1,52 @@
+import { defineConfig, devices } from "@playwright/test";
+
+const PORT = 3100;
+const BASE_URL = `http://localhost:${PORT}`;
+
+/* ──────────────────────────────────────────────────────────
+   Chromium only for now — matches this session's own ad-hoc
+   verification tooling; a wider browser matrix is a deliberate
+   later addition, not an oversight (see ROADMAP.md).
+
+   Dedicated port (3100), not 3000/3001: this session hit a real
+   collision more than once from an unrelated leftover dev server
+   on 3000 — a dedicated E2E port never depends on what else
+   happens to be running locally.
+
+   webServer: CI always builds+runs the real production server
+   (DEVELOPMENT.md already flags dev-vs-prod build differences
+   biting this session twice); local runs use `next dev` for fast
+   iteration and can reuse an already-running one.
+   ────────────────────────────────────────────────────────── */
+export default defineConfig({
+  testDir: "./e2e",
+  fullyParallel: true,
+  // Capped, not left at the default (CPU core count): several specs mount
+  // the real WebGL hero scene, and running many of those contexts at once
+  // under software rendering (no real GPU in CI, and this session's own
+  // dev environment) caused near-total timeout failures — confirmed
+  // directly by re-running the exact same suite serially and seeing all
+  // but 3 genuine issues disappear.
+  workers: 2,
+  forbidOnly: Boolean(process.env.CI),
+  retries: process.env.CI ? 1 : 0,
+  reporter: "html",
+  use: {
+    baseURL: BASE_URL,
+    trace: "on-first-retry",
+  },
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+    },
+  ],
+  webServer: {
+    command: process.env.CI
+      ? `npm run build && npm run start -- -p ${PORT}`
+      : `npm run dev -- -p ${PORT}`,
+    url: BASE_URL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+  },
+});
