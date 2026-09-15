@@ -44,8 +44,12 @@ test.describe("prefers-reduced-motion", () => {
     // ROADMAP.md), not console errors generally — a genuine JS error
     // (an uncaught exception, a React warning) has a completely different
     // shape and would still fail this test.
+    // Matches Chrome's actual wording verbatim ("...responded with a status
+    // of 404 (Not Found)") — the earlier version of this regex assumed a
+    // "(404)" substring that doesn't actually occur, so it silently matched
+    // nothing at all. Caught by re-running against the real CI failure log.
     const unexpectedErrors = consoleErrors.filter(
-      (error) => !/Failed to load resource.*\(404\)/.test(error)
+      (error) => !/Failed to load resource:.*status of 404/.test(error)
     );
 
     expect(unexpectedErrors).toEqual([]);

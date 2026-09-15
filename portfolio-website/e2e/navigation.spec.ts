@@ -40,6 +40,7 @@ test.describe("homepage navigation", () => {
 test.describe("Command Palette", () => {
   test("opens on Cmd/Ctrl+K, filters results, and navigates on selection", async ({ page }) => {
     await page.goto("/");
+    await page.waitForTimeout(500); // let hydration settle before the keydown listener is relied on
 
     await page.keyboard.press("Control+k");
     const dialog = page.getByRole("dialog", { name: "Quick navigation" });
@@ -59,6 +60,7 @@ test.describe("Command Palette", () => {
 
   test("closes on Escape", async ({ page }) => {
     await page.goto("/");
+    await page.waitForTimeout(500); // let hydration settle before the keydown listener is relied on
     await page.keyboard.press("Control+k");
     await expect(page.getByRole("dialog", { name: "Quick navigation" })).toBeVisible();
     await page.keyboard.press("Escape");
