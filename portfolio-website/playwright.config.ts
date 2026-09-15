@@ -34,6 +34,17 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     trace: "on-first-retry",
+    // The site registers a real service worker (ServiceWorkerRegister.tsx),
+    // production-builds only — which is exactly why this never surfaced
+    // locally against `next dev`, only against CI's real `next build &&
+    // next start`. Once a page is service-worker-controlled, WebKit's
+    // page.route() silently stops intercepting its fetch() calls — a
+    // documented Playwright/WebKit limitation, confirmed directly here by
+    // reproducing with CI=1 locally and watching the mocked contact-form
+    // route never fire. None of these tests exercise offline/PWA behavior,
+    // so blocking registration entirely is the correct fix, not a
+    // workaround for a real product bug.
+    serviceWorkers: "block",
   },
   projects: [
     {
