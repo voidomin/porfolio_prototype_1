@@ -9,6 +9,13 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    # This workflow lives at the true repo root (required — GitHub Actions
+    # only ever discovers .github/workflows/ there, confirmed directly via
+    # `gh workflow list` only showing CodeQL before this fix), but the
+    # actual app lives in portfolio-website/. Every step below needs this.
+    defaults:
+      run:
+        working-directory: portfolio-website
 
     steps:
       - name: Checkout Repository
@@ -19,6 +26,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+          cache-dependency-path: portfolio-website/package-lock.json
 
       - name: Install Dependencies
         run: npm ci
