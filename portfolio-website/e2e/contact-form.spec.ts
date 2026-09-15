@@ -32,7 +32,7 @@ test.describe("contact form validation", () => {
 
     await page.goto("/#contact");
     await page.locator("#contact").scrollIntoViewIfNeeded();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1500);
 
     await page.getByRole("button", { name: "Send Message" }).click();
 
@@ -49,7 +49,7 @@ test.describe("contact form validation", () => {
 
     await page.goto("/#contact");
     await page.locator("#contact").scrollIntoViewIfNeeded();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1500);
 
     await page.locator("#contact-name").fill("Test User");
     await page.locator("#contact-email").fill("not-an-email");
@@ -69,10 +69,14 @@ test.describe("contact form submit outcomes (network-mocked)", () => {
 
     await page.goto("/#contact");
     await page.locator("#contact").scrollIntoViewIfNeeded();
-    // Lets the section's own entrance/reveal animation (framer-motion
-    // whileInView) settle before interacting — without this, the very
-    // first click right after scrolling in flaked intermittently.
-    await page.waitForTimeout(500);
+    // Lets the section's own entrance/reveal animation settle before
+    // interacting. 1500ms, not 500 — confirmed directly that WebKit
+    // specifically drops the *first* .fill() after a scroll-into-view at
+    // 500ms (the field stays empty even though later fields in the same
+    // sequence fill correctly), while 1500ms was reliable across repeated
+    // runs. Chromium/Firefox never needed this much, but there's no
+    // downside to a shared, generous wait here.
+    await page.waitForTimeout(1500);
 
     await page.locator("#contact-name").fill("Test User");
     await page.locator("#contact-email").fill("test@example.com");
@@ -93,10 +97,14 @@ test.describe("contact form submit outcomes (network-mocked)", () => {
 
     await page.goto("/#contact");
     await page.locator("#contact").scrollIntoViewIfNeeded();
-    // Lets the section's own entrance/reveal animation (framer-motion
-    // whileInView) settle before interacting — without this, the very
-    // first click right after scrolling in flaked intermittently.
-    await page.waitForTimeout(500);
+    // Lets the section's own entrance/reveal animation settle before
+    // interacting. 1500ms, not 500 — confirmed directly that WebKit
+    // specifically drops the *first* .fill() after a scroll-into-view at
+    // 500ms (the field stays empty even though later fields in the same
+    // sequence fill correctly), while 1500ms was reliable across repeated
+    // runs. Chromium/Firefox never needed this much, but there's no
+    // downside to a shared, generous wait here.
+    await page.waitForTimeout(1500);
 
     await page.locator("#contact-name").fill("Test User");
     await page.locator("#contact-email").fill("test@example.com");

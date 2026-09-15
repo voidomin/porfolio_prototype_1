@@ -6,7 +6,7 @@ What's pending, organized by area. See `CHANGELOG.md` for everything already shi
 
 - [🚩] Add photography images — **flagged/deferred by request.** Waiting on a planned rework of the upload/edit pipeline (admin CMS) before adding real photos, not just dropping files in `public/images/photography/`.
 - [ ] Test contact form end-to-end with a real send — needs a real send against the live site (requires `RESEND_API_KEY`, which only exists in Vercel's env, and lands in your real inbox) — can't be faithfully done from this sandbox. Everything short of that is now covered by `e2e/contact-form.spec.ts`: native browser validation (empty/malformed fields), and both the success and failure UI paths via network-mocked `/api/contact` responses — this is still a mock, not a live send, so the item stays open.
-- [ ] Cross-browser test — check on Firefox and Safari / mobile (needs real browsers/devices, not available in this environment). The new E2E suite (`e2e/`) runs Chromium only, by design — a deliberate first-pass scope, not full cross-browser coverage; adding Firefox/WebKit projects to `playwright.config.ts` is a natural next step whenever real cross-browser verification is wanted.
+- [ ] Cross-browser test on real devices — the E2E suite now runs its full 18-check flow set on Chromium, Firefox, and WebKit (`playwright.config.ts`'s three projects), which caught two real, verified bugs immediately (see `CHANGELOG.md`). What's still open: Playwright's WebKit is not literally Safari and its Firefox isn't necessarily identical to a real Firefox install — actual Safari/Firefox on real desktop and mobile hardware still needs a human pass, not available in this environment.
 
 ---
 
@@ -53,7 +53,7 @@ What's pending, organized by area. See `CHANGELOG.md` for everything already shi
 - [x] Prettier — auto-format on commit (100 char width, double quotes, LF line endings)
 - [x] Husky + lint-staged — pre-commit hook formats and lints staged files automatically
 - [x] GitHub CodeQL — `.github/workflows/codeql.yml` runs on push/PR to main plus a weekly schedule
-- [x] Playwright E2E suite — `e2e/*.spec.ts`, runs in CI (`.github/workflows/ci.yml`) on every push/PR to main. Chromium only, scoped to safe-to-automate flows (navigation, Command Palette, contact form with network mocking, the admin security gate, responsive/reduced-motion/keyboard-accessibility smoke checks) — full admin CMS write flows and a live contact-form send are explicitly out of scope, see the v1 checklist above.
+- [x] Playwright E2E suite — `e2e/*.spec.ts`, runs in CI (`.github/workflows/ci.yml`) on every push/PR to main, now across Chromium, Firefox, and WebKit. Scoped to safe-to-automate flows (navigation, Command Palette, contact form with network mocking, the admin security gate, responsive/reduced-motion/keyboard-accessibility smoke checks) — full admin CMS write flows and a live contact-form send are explicitly out of scope, see the v1 checklist above.
 
 ### To explore
 - [ ] **Snyk** — scans npm dependencies for known CVEs; free tier, 2-min GitHub connect

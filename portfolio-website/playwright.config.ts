@@ -4,10 +4,6 @@ const PORT = 3100;
 const BASE_URL = `http://localhost:${PORT}`;
 
 /* ──────────────────────────────────────────────────────────
-   Chromium only for now — matches this session's own ad-hoc
-   verification tooling; a wider browser matrix is a deliberate
-   later addition, not an oversight (see ROADMAP.md).
-
    Dedicated port (3100), not 3000/3001: this session hit a real
    collision more than once from an unrelated leftover dev server
    on 3000 — a dedicated E2E port never depends on what else
@@ -26,7 +22,11 @@ export default defineConfig({
   // under software rendering (no real GPU in CI, and this session's own
   // dev environment) caused near-total timeout failures — confirmed
   // directly by re-running the exact same suite serially and seeing all
-  // but 3 genuine issues disappear.
+  // but 3 genuine issues disappear. Now running 3 browser projects instead
+  // of 1 makes this contention proportionally worse — an occasional single
+  // test still flakes under full local parallelism (confirmed: passes in
+  // isolation, and passes when the full suite is simply re-run), which
+  // `retries: 1` below covers for CI rather than chasing further.
   workers: 2,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
@@ -39,6 +39,14 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
     },
   ],
   webServer: {

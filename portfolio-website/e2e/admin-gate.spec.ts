@@ -12,7 +12,14 @@ import { test, expect } from "@playwright/test";
 
 test.describe("admin surface is gated when ENABLE_ADMIN is unset", () => {
   test("/admin/upload returns 404", async ({ page }) => {
-    const response = await page.goto("/admin/upload");
+    // waitUntil: "commit" — the middleware's 404 has an empty, chunked-
+    // encoding body (no Content-Length), and Firefox specifically never
+    // fires the default "load" event for it, hanging until the test
+    // times out. Confirmed directly (curled the raw response, then
+    // reproduced/fixed the hang in isolation). "commit" is also the more
+    // correct choice for what this test actually checks — the response
+    // status, not any rendered content — regardless of the Firefox quirk.
+    const response = await page.goto("/admin/upload", { waitUntil: "commit" });
     expect(response?.status()).toBe(404);
   });
 
