@@ -105,7 +105,13 @@ export const HeroSection = () => {
     <section
       id="home"
       ref={heroRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-0"
+      // min-h-dvh (not min-h-screen/100vh) — 100vh is measured against the
+      // largest possible mobile viewport (toolbar hidden), so on load, with
+      // the address bar visible, the section renders taller than what's
+      // actually visible and pushes the bottom-anchored scroll cue below
+      // the fold — the one element whose whole job is to be seen without
+      // scrolling first. dvh tracks the real, current viewport instead.
+      className="relative min-h-dvh flex items-center justify-center overflow-hidden pt-20 md:pt-0"
     >
       {/* Dawn glow overlay — a soft radial bloom anchored at the same
           screen position NatureScene's own sun sits at rest (~15vw, 70vh
